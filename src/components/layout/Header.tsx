@@ -3,15 +3,18 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-
-const NAV_LINKS = [
-  { href: '/practice', label: 'Practicar' },
-  { href: '/tenses', label: 'Tiempos' },
-  { href: '/pricing', label: 'Precios' },
-];
+import { useTranslations } from 'next-intl';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 export default function Header() {
   const pathname = usePathname();
+  const t = useTranslations('header');
+
+  const NAV_LINKS = [
+    { href: '/practice', label: t('nav.practice') },
+    { href: '/tenses',   label: t('nav.tenses')   },
+    { href: '/pricing',  label: t('nav.pricing')  },
+  ];
 
   return (
     <header className="sticky top-0 z-50 bg-cream/85 backdrop-blur-md border-b border-ink-900/[0.08]">
@@ -26,7 +29,8 @@ export default function Header() {
         </Link>
 
         {/* Nav */}
-        <nav className="hidden md:flex gap-6 ml-auto" aria-label="Hauptnavigation">
+        <nav className="hidden md:flex items-center gap-6 ml-auto" aria-label="Hauptnavigation">
+          <LanguageSwitcher />
           {NAV_LINKS.map(({ href, label }) => (
             <Link
               key={href}
@@ -47,7 +51,7 @@ export default function Header() {
               px-3.5 py-2 rounded-sm transition-colors duration-micro ease-smooth
               hover:bg-ink-50 hover:text-ink-900"
           >
-            Iniciar sesión
+            {t('login')}
           </Link>
           <Link
             href="/practice"
@@ -58,7 +62,7 @@ export default function Header() {
               hover:-translate-y-px hover:shadow-stamp-primary-hover
               active:translate-y-0.5 active:shadow-none active:bg-terracotta-600"
           >
-            Empezar gratis
+            {t('cta')}
           </Link>
         </div>
 
