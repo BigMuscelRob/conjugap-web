@@ -1,0 +1,119 @@
+{
+  "header": {
+    "nav": {
+      "practice": "Üben",
+      "tenses": "Zeiten",
+      "pricing": "Preise"
+    },
+    "login": "Anmelden",
+    "cta": "Kostenlos starten"
+  },
+  "hero": {
+    "eyebrow": "Konjugationstrainer · Beta",
+    "title": "Spanish verbs,\nfinally on your side.",
+    "subtitle": "Fünf Minuten täglich. Verbito bringt das richtige Verb zur richtigen Zeit — mit Feedback, das wirklich etwas beibringt.",
+    "cta_primary": "Kostenlos starten",
+    "cta_secondary": "Demo ansehen",
+    "social_proof": "12.430 Spanischlernende · 4,9 ★"
+  },
+  "features": {
+    "overline": "How it works",
+    "title": "Drei Dinge. Das ist das Geheimnis.",
+    "items": [
+      {
+        "title": "Pick your battle.",
+        "body": "Wähle einen Tempus und eine Verbklasse. Wir zeigen die Verben, mit denen du wirklich kämpfst — keine zufälligen Übungen."
+      },
+      {
+        "title": "Tipp die Form.",
+        "body": "Kein Multiple Choice. Echtes Tippen baut echtes Muskelgedächtnis auf. Drücke ⏎ zum Prüfen."
+      },
+      {
+        "title": "Bau den Streak auf.",
+        "body": "Fünf Minuten heute. Dann morgen. Verbito erinnert sich, was du vergessen hast, und bringt es zurück."
+      }
+    ]
+  },
+  "stats": {
+    "items": [
+      {
+        "label": "Lernen gerade",
+        "description": "Spanischlernende in 38 Ländern."
+      },
+      {
+        "label": "Verben in der App",
+        "description": "In 14 Tempi konjugiert. Ja, alle."
+      },
+      {
+        "label": "Streak im Durchschnitt",
+        "description": "Mehr Konstanz als die meisten Apps."
+      }
+    ]
+  },
+  "footer": {
+    "tagline": "Spanische Verben, endlich auf deiner Seite.",
+    "groups": {
+      "product": "Produkt",
+      "resources": "Ressourcen",
+      "legal": "Rechtliches"
+    },
+    "copyright": "Alle Rechte vorbehalten.",
+    "made_with": "Hecho con"
+  },
+  "pricing": {
+    "overline": "Preise",
+    "title": "Einfach. Transparent.",
+    "subtitle": "Fang gratis an. Upgrade, wenn du mehr willst. Kein Abo-Trick, kein kleines Gedrucktes.",
+    "popular": "Beliebteste Wahl",
+    "plans": [
+      {
+        "name": "Gratis",
+        "period": "für immer",
+        "description": "Perfekt zum Ausprobieren.",
+        "features": [
+          "10 Verben täglich",
+          "Presente & Pretérito Indefinido",
+          "Streak-Tracking",
+          "Basis-Feedback"
+        ],
+        "cta": "Kostenlos starten"
+      },
+      {
+        "name": "Pro",
+        "period": "pro Monat",
+        "description": "Für ernsthafte Lernende.",
+        "features": [
+          "Unbegrenzte Verben",
+          "Alle 14 Tempi",
+          "Fortgeschrittenes Feedback",
+          "Lernstatistiken",
+          "Offline-Modus"
+        ],
+        "cta": "Pro ausprobieren"
+      }
+    ]
+  },
+  "practice": {
+    "overline": "Üben",
+    "title": "Bereit zum Üben?",
+    "subtitle": "Der Übungsmodus wird gerade aufgebaut. Bald kannst du hier Verben in allen Tempi trainieren — mit gezieltem Feedback und Streak-Tracking.",
+    "coming_soon": "Practice-Screen kommt bald"
+  },
+  "tenses": {
+    "overline": "Tiempos verbales",
+    "title": "Die Tempi im Überblick",
+    "subtitle": "Wähle einen Tempus, um gezielt zu üben. Verbito führt dich durch alle Formen — Schritt für Schritt.",
+    "practice_btn": "Üben",
+    "items": [
+      { "desc": "Gegenwart — was gerade passiert oder immer gilt." },
+      { "desc": "Vergangenheit — abgeschlossene Handlungen." },
+      { "desc": "Beschreibende Vergangenheit — Zustände und Gewohnheiten." },
+      { "desc": "Zukunft — Pläne und Vorhersagen." },
+      { "desc": "Konjunktiv II — was wäre wenn." },
+      { "desc": "Subjuntivo Präsens — Wünsche und Zweifel." }
+    ]
+  },
+  "language_switcher": {
+    "label": "Sprache"
+  }
+}

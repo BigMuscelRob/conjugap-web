@@ -41,18 +41,18 @@ export default function Header() {
               {label}
             </Link>
           ))}
+          <Link
+            href="/login"
+            className="font-bold text-small text-ink-700 no-underline
+              transition-colors duration-micro ease-smooth
+              hover:text-ink-900"
+          >
+            {t('login')}
+          </Link>
         </nav>
 
         {/* Actions */}
         <div className="flex items-center gap-2 shrink-0">
-          <Link
-            href="/login"
-            className="hidden md:inline-flex font-bold text-small text-ink-700 no-underline
-              px-3.5 py-2 rounded-sm transition-colors duration-micro ease-smooth
-              hover:bg-ink-50 hover:text-ink-900"
-          >
-            {t('login')}
-          </Link>
           <Link
             href="/practice"
             className="inline-flex items-center font-body font-bold text-small text-white-warm no-underline
