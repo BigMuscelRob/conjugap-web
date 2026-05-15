@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { LanguageProvider } from '@/i18n/LanguageProvider';
 
 export const metadata: Metadata = {
-  title: 'Verbito — Spanisch konjugieren, endlich kein Stress mehr',
+  title: 'ConjuGab — Spanisch konjugieren, endlich kein Stress mehr',
   description:
     'Trainiere spanische Verbkonjugation mit gezieltem Feedback und kurzen, motivierenden Übungseinheiten.',
   keywords: ['Spanisch', 'Konjugation', 'Lernen', 'Verben', 'Trainer'],
@@ -28,9 +29,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
       </head>
       <body className="min-h-screen flex flex-col bg-cream text-ink-900 font-body antialiased">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <LanguageProvider>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </LanguageProvider>
       </body>
     </html>
   );

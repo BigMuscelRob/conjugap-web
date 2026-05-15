@@ -1,7 +1,12 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export default function Hero() {
+  const t = useTranslations('hero');
+
   return (
     <section
       className="relative overflow-hidden"
@@ -15,7 +20,7 @@ export default function Hero() {
           {/* Eyebrow */}
           <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-pill bg-paper border border-ink-900/[0.08] text-overline tracking-wide-10 uppercase font-bold text-ink-700 w-fit mb-5">
             <span className="w-1.5 h-1.5 rounded-full bg-sage-300" />
-            Konjugationstrainer · Beta
+            {t('eyebrow')}
           </span>
 
           {/* Title */}
@@ -26,8 +31,7 @@ export default function Hero() {
 
           {/* Subtitle */}
           <p className="text-bodyL text-ink-700 max-w-[480px] mb-8">
-            Fünf Minuten täglich. Verbito bringt das richtige Verb zur richtigen Zeit —
-            mit Feedback, das wirklich etwas beibringt.
+            {t('subtitle')}
           </p>
 
           {/* CTAs */}
@@ -41,7 +45,7 @@ export default function Hero() {
                 active:translate-y-0.5 active:shadow-none active:bg-terracotta-600"
             >
               <i className="ph-bold ph-lightning" aria-hidden="true" />
-              Empezar gratis
+              {t('cta_primary')}
             </Link>
             <button
               type="button"
@@ -52,7 +56,7 @@ export default function Hero() {
                 active:bg-ink-100"
             >
               <i className="ph-bold ph-play-circle" aria-hidden="true" />
-              Demo ansehen
+              {t('cta_secondary')}
             </button>
           </div>
 
@@ -75,7 +79,7 @@ export default function Hero() {
                 </span>
               ))}
             </div>
-            <span>12.430 Spanischlernende · 4.9 ★</span>
+            <span>{t('social_proof')}</span>
           </div>
         </div>
 
@@ -86,7 +90,7 @@ export default function Hero() {
             src="/assets/mascot-verbito.svg"
             width={300}
             height={300}
-            alt="Verbito Maskottchen"
+            alt="ConjuGab Maskottchen"
             priority
             className="relative z-10 animate-breathe"
           />

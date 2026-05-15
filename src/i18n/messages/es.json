@@ -1,0 +1,119 @@
+{
+  "header": {
+    "nav": {
+      "practice": "Practicar",
+      "tenses": "Tiempos",
+      "pricing": "Precios"
+    },
+    "login": "Iniciar sesión",
+    "cta": "Empezar gratis"
+  },
+  "hero": {
+    "eyebrow": "Entrenador de conjugación · Beta",
+    "title": "Spanish verbs,\nfinally on your side.",
+    "subtitle": "Cinco minutos al día. ConjuGab trae el verbo correcto en el momento correcto — con feedback que realmente enseña.",
+    "cta_primary": "Empezar gratis",
+    "cta_secondary": "Ver demo",
+    "social_proof": "12.430 aprendientes · 4,9 ★"
+  },
+  "features": {
+    "overline": "Cómo funciona",
+    "title": "Tres cosas. Ese es el secreto.",
+    "items": [
+      {
+        "title": "Elige tu batalla.",
+        "body": "Elige un tiempo verbal y una clase de verbo. Te mostramos los verbos con los que realmente luchas — sin ejercicios al azar."
+      },
+      {
+        "title": "Escribe la forma.",
+        "body": "Sin opción múltiple. Escribir de verdad construye memoria muscular real. Presiona ⏎ para comprobar."
+      },
+      {
+        "title": "Construye la racha.",
+        "body": "Cinco minutos hoy. Luego mañana. ConjuGab recuerda lo que has olvidado y lo recupera."
+      }
+    ]
+  },
+  "stats": {
+    "items": [
+      {
+        "label": "Aprendiendo ahora",
+        "description": "Estudiantes de español en 38 países."
+      },
+      {
+        "label": "Verbos en la app",
+        "description": "Conjugados en 14 tiempos. Sí, todos."
+      },
+      {
+        "label": "Racha promedio",
+        "description": "Más constancia que la mayoría de las apps."
+      }
+    ]
+  },
+  "footer": {
+    "tagline": "Verbos en español, finalmente de tu lado.",
+    "groups": {
+      "product": "Producto",
+      "resources": "Recursos",
+      "legal": "Legal"
+    },
+    "copyright": "Todos los derechos reservados.",
+    "made_with": "Hecho con"
+  },
+  "pricing": {
+    "overline": "Precios",
+    "title": "Simple. Transparente.",
+    "subtitle": "Empieza gratis. Actualiza cuando quieras más. Sin trucos de suscripción, sin letra pequeña.",
+    "popular": "La más popular",
+    "plans": [
+      {
+        "name": "Gratis",
+        "period": "para siempre",
+        "description": "Perfecto para probarlo.",
+        "features": [
+          "10 verbos al día",
+          "Presente & Pretérito Indefinido",
+          "Seguimiento de racha",
+          "Feedback básico"
+        ],
+        "cta": "Empezar gratis"
+      },
+      {
+        "name": "Pro",
+        "period": "por mes",
+        "description": "Para aprendientes serios.",
+        "features": [
+          "Verbos ilimitados",
+          "Los 14 tiempos verbales",
+          "Feedback avanzado",
+          "Estadísticas de aprendizaje",
+          "Modo sin conexión"
+        ],
+        "cta": "Probar Pro"
+      }
+    ]
+  },
+  "practice": {
+    "overline": "Practicar",
+    "title": "¿Listo para practicar?",
+    "subtitle": "El modo de práctica se está construyendo. Pronto podrás entrenar verbos en todos los tiempos aquí — con feedback específico y seguimiento de racha.",
+    "coming_soon": "Pantalla de práctica próximamente"
+  },
+  "tenses": {
+    "overline": "Tiempos verbales",
+    "title": "Los tiempos de un vistazo",
+    "subtitle": "Elige un tiempo para practicar de forma específica. ConjuGab te guía por todas las formas — paso a paso.",
+    "practice_btn": "Practicar",
+    "items": [
+      { "desc": "Presente — lo que pasa ahora o siempre es verdad." },
+      { "desc": "Pasado — acciones completadas." },
+      { "desc": "Pasado descriptivo — estados y hábitos." },
+      { "desc": "Futuro — planes y predicciones." },
+      { "desc": "Condicional — lo que pasaría si." },
+      { "desc": "Subjuntivo presente — deseos y dudas." }
+    ]
+  },
+  "language_switcher": {
+    "label": "Idioma"
+  }
+}

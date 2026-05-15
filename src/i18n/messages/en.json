@@ -1,0 +1,119 @@
+{
+  "header": {
+    "nav": {
+      "practice": "Practice",
+      "tenses": "Tenses",
+      "pricing": "Pricing"
+    },
+    "login": "Log in",
+    "cta": "Start for free"
+  },
+  "hero": {
+    "eyebrow": "Conjugation trainer · Beta",
+    "title": "Spanish verbs,\nfinally on your side.",
+    "subtitle": "Five minutes a day. ConjuGab brings the right verb at the right time — with feedback that actually teaches.",
+    "cta_primary": "Start for free",
+    "cta_secondary": "Watch demo",
+    "social_proof": "12,430 Spanish learners · 4.9 ★"
+  },
+  "features": {
+    "overline": "How it works",
+    "title": "Three things. That's the secret.",
+    "items": [
+      {
+        "title": "Pick your battle.",
+        "body": "Choose a tense and a verb class. We show the verbs you're actually struggling with — no random exercises."
+      },
+      {
+        "title": "Type the form.",
+        "body": "No multiple choice. Real typing builds real muscle memory. Press ⏎ to check."
+      },
+      {
+        "title": "Build the streak.",
+        "body": "Five minutes today. Then tomorrow. ConjuGab remembers what you've forgotten and brings it back."
+      }
+    ]
+  },
+  "stats": {
+    "items": [
+      {
+        "label": "Learning now",
+        "description": "Spanish learners in 38 countries."
+      },
+      {
+        "label": "Verbs in the app",
+        "description": "Conjugated in 14 tenses. Yes, all of them."
+      },
+      {
+        "label": "Average streak",
+        "description": "More consistency than most apps."
+      }
+    ]
+  },
+  "footer": {
+    "tagline": "Spanish verbs, finally on your side.",
+    "groups": {
+      "product": "Product",
+      "resources": "Resources",
+      "legal": "Legal"
+    },
+    "copyright": "All rights reserved.",
+    "made_with": "Made with"
+  },
+  "pricing": {
+    "overline": "Pricing",
+    "title": "Simple. Transparent.",
+    "subtitle": "Start for free. Upgrade when you want more. No subscription tricks, no fine print.",
+    "popular": "Most popular",
+    "plans": [
+      {
+        "name": "Free",
+        "period": "forever",
+        "description": "Perfect for trying it out.",
+        "features": [
+          "10 verbs per day",
+          "Presente & Pretérito Indefinido",
+          "Streak tracking",
+          "Basic feedback"
+        ],
+        "cta": "Start for free"
+      },
+      {
+        "name": "Pro",
+        "period": "per month",
+        "description": "For serious learners.",
+        "features": [
+          "Unlimited verbs",
+          "All 14 tenses",
+          "Advanced feedback",
+          "Learning stats",
+          "Offline mode"
+        ],
+        "cta": "Try Pro"
+      }
+    ]
+  },
+  "practice": {
+    "overline": "Practice",
+    "title": "Ready to practice?",
+    "subtitle": "Practice mode is being built. Soon you'll be able to train verbs in all tenses here — with targeted feedback and streak tracking.",
+    "coming_soon": "Practice screen coming soon"
+  },
+  "tenses": {
+    "overline": "Verb tenses",
+    "title": "Tenses at a glance",
+    "subtitle": "Choose a tense to practice in a targeted way. ConjuGab guides you through all forms — step by step.",
+    "practice_btn": "Practice",
+    "items": [
+      { "desc": "Present — what's happening now or always true." },
+      { "desc": "Past — completed actions." },
+      { "desc": "Descriptive past — states and habits." },
+      { "desc": "Future — plans and predictions." },
+      { "desc": "Conditional — what would happen if." },
+      { "desc": "Subjunctive present — wishes and doubts." }
+    ]
+  },
+  "language_switcher": {
+    "label": "Language"
+  }
+}

@@ -22,9 +22,9 @@ export default function Header() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 no-underline text-ink-900 shrink-0">
-          <Image src="/assets/mascot-mini.svg" width={32} height={32} alt="Verbito Maskottchen" />
+          <Image src="/assets/mascot-mini.svg" width={32} height={32} alt="ConjuGab Logo" />
           <span className="font-display font-bold text-[22px] tracking-tightest">
-            Verb<span className="text-terracotta-500">ito</span>
+            Conju<span className="text-terracotta-500">Gab</span>
           </span>
         </Link>
 
