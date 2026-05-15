@@ -9,7 +9,7 @@ import es from './messages/es.json';
 export type Locale = 'en' | 'de' | 'es';
 
 const MESSAGES: Record<Locale, typeof en> = { en, de, es };
-const STORAGE_KEY = 'conjugab-locale';
+const STORAGE_KEY = 'conjugap-locale';
 const DEFAULT_LOCALE: Locale = 'de';
 
 interface LanguageContextValue {

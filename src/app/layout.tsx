@@ -5,7 +5,7 @@ import Footer from '@/components/layout/Footer';
 import { LanguageProvider } from '@/i18n/LanguageProvider';
 
 export const metadata: Metadata = {
-  title: 'ConjuGab — Spanisch konjugieren, endlich kein Stress mehr',
+  title: 'ConjuGap — Spanisch konjugieren, endlich kein Stress mehr',
   description:
     'Trainiere spanische Verbkonjugation mit gezieltem Feedback und kurzen, motivierenden Übungseinheiten.',
   keywords: ['Spanisch', 'Konjugation', 'Lernen', 'Verben', 'Trainer'],

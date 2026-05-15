@@ -22,9 +22,9 @@ export default function Header() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 no-underline text-ink-900 shrink-0">
-          <Image src="/assets/mascot-mini.svg" width={32} height={32} alt="ConjuGab Logo" />
+          <Image src="/assets/mascot-mini.svg" width={32} height={32} alt="ConjuGap Logo" />
           <span className="font-display font-bold text-[22px] tracking-tightest">
-            Conju<span className="text-terracotta-500">Gab</span>
+            Conju<span className="text-terracotta-500">Gap</span>
           </span>
         </Link>
 

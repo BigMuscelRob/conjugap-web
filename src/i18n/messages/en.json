@@ -11,7 +11,7 @@
   "hero": {
     "eyebrow": "Conjugation trainer · Beta",
     "title": "Spanish verbs,\nfinally on your side.",
-    "subtitle": "Five minutes a day. ConjuGab brings the right verb at the right time — with feedback that actually teaches.",
+    "subtitle": "Five minutes a day. ConjuGap brings the right verb at the right time — with feedback that actually teaches.",
     "cta_primary": "Start for free",
     "cta_secondary": "Watch demo",
     "social_proof": "12,430 Spanish learners · 4.9 ★"
@@ -30,7 +30,7 @@
       },
       {
         "title": "Build the streak.",
-        "body": "Five minutes today. Then tomorrow. ConjuGab remembers what you've forgotten and brings it back."
+        "body": "Five minutes today. Then tomorrow. ConjuGap remembers what you've forgotten and brings it back."
       }
     ]
   },
@@ -101,8 +101,8 @@
   },
   "tenses": {
     "overline": "Verb tenses",
-    "title": "Tenses at a glance",
-    "subtitle": "Choose a tense to practice in a targeted way. ConjuGab guides you through all forms — step by step.",
+    "title": "The Tenses at a Glance",
+    "subtitle": "Choose a tense to practice in a targeted way. ConjuGap guides you through all forms — step by step.",
     "practice_btn": "Practice",
     "items": [
       { "desc": "Present — what's happening now or always true." },

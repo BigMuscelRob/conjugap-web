@@ -44,7 +44,7 @@ export default function Footer() {
           <Link href="/" className="inline-flex items-center gap-2 no-underline text-ink-900 w-fit">
             <Image src="/assets/mascot-mini.svg" width={28} height={28} alt="" />
             <span className="font-display font-bold text-[20px] tracking-tightest">
-              Conju<span className="text-terracotta-500">Gab</span>
+              Conju<span className="text-terracotta-500">Gap</span>
             </span>
           </Link>
           <p className="text-small text-ink-500 max-w-[220px] leading-5">
@@ -85,7 +85,7 @@ export default function Footer() {
       <div className="border-t border-ink-900/[0.08]">
         <div className="max-w-content mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
           <span className="text-micro font-semibold text-ink-500">
-            © {new Date().getFullYear()} ConjuGab. {t('copyright')}
+            © {new Date().getFullYear()} ConjuGap. {t('copyright')}
           </span>
           <span className="text-micro font-semibold text-ink-500 flex items-center gap-1">
             {t('made_with')}{' '}

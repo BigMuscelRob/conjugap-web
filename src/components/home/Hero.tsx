@@ -90,7 +90,7 @@ export default function Hero() {
             src="/assets/mascot-verbito.svg"
             width={300}
             height={300}
-            alt="ConjuGab Maskottchen"
+            alt="ConjuGap Maskottchen"
             priority
             className="relative z-10 animate-breathe"
           />

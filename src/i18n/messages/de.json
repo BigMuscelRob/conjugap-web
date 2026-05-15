@@ -11,7 +11,7 @@
   "hero": {
     "eyebrow": "Konjugationstrainer · Beta",
     "title": "Spanish verbs,\nfinally on your side.",
-    "subtitle": "Fünf Minuten täglich. ConjuGab bringt das richtige Verb zur richtigen Zeit — mit Feedback, das wirklich etwas beibringt.",
+    "subtitle": "Fünf Minuten täglich. ConjuGap bringt das richtige Verb zur richtigen Zeit — mit Feedback, das wirklich etwas beibringt.",
     "cta_primary": "Kostenlos starten",
     "cta_secondary": "Demo ansehen",
     "social_proof": "12.430 Spanischlernende · 4,9 ★"
@@ -30,7 +30,7 @@
       },
       {
         "title": "Bau den Streak auf.",
-        "body": "Fünf Minuten heute. Dann morgen. ConjuGab erinnert sich, was du vergessen hast, und bringt es zurück."
+        "body": "Fünf Minuten heute. Dann morgen. ConjuGap erinnert sich, was du vergessen hast, und bringt es zurück."
       }
     ]
   },
@@ -101,8 +101,8 @@
   },
   "tenses": {
     "overline": "Tiempos verbales",
-    "title": "Die Tempi im Überblick",
-    "subtitle": "Wähle einen Tempus, um gezielt zu üben. ConjuGab führt dich durch alle Formen — Schritt für Schritt.",
+    "title": "Die Zeiten im Überblick",
+    "subtitle": "Wähle einen Tempus, um gezielt zu üben. ConjuGap führt dich durch alle Formen — Schritt für Schritt.",
     "practice_btn": "Üben",
     "items": [
       { "desc": "Gegenwart — was gerade passiert oder immer gilt." },
