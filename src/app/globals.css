@@ -1,26 +1,63 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* =========================================
+   GLOBAL BASE — Verbito defaults
+   (Tailwind preflight handles box-sizing/reset)
+   ========================================= */
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #FBF4E6;
+  color: #2A1F1A;
+  font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* =========================================
+   FOCUS RING — accessible, saffron-300
+   ========================================= */
+:focus-visible {
+  outline: 3px solid #F7CB5B;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* =========================================
+   TYPOGRAPHY UTILITY CLASSES
+   Used for semantic content (verb forms, ES)
+   ========================================= */
+.t-verb {
+  font-family: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 700;
+}
+
+.t-overline {
+  font-size: 12px;
+  line-height: 14px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #7A6A60;
+}
+
+em.es,
+.es {
+  font-style: italic;
+}
+
+/* =========================================
+   REDUCED MOTION
+   ========================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

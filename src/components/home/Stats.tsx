@@ -1,0 +1,51 @@
+const STATS = [
+  {
+    label: 'Aprendiendo ahora',
+    value: '12.430',
+    description: 'Spanischlernende in 38 Ländern.',
+    className: 'bg-terracotta-500 text-white-warm',
+    labelClass: 'text-terracotta-100',
+    descClass: 'text-terracotta-200',
+  },
+  {
+    label: 'Verbos en la app',
+    value: '2.840',
+    description: 'In 14 Tempi konjugiert. Ja, alle.',
+    className: 'bg-paper text-ink-900',
+    labelClass: 'text-ink-500',
+    descClass: 'text-ink-700',
+  },
+  {
+    label: 'Streak im Durchschnitt',
+    value: '9.2 Tage',
+    description: 'Mehr Konstanz als die meisten Apps.',
+    className: 'bg-sage-300 text-ink-900',
+    labelClass: 'text-sage-700',
+    descClass: 'text-ink-700',
+  },
+];
+
+export default function Stats() {
+  return (
+    <section className="bg-cream-deep py-20 px-6">
+      <div className="max-w-content mx-auto grid grid-cols-1 md:grid-cols-3 gap-5">
+        {STATS.map((s) => (
+          <div
+            key={s.label}
+            className={`${s.className} border-2 border-ink-900 rounded-lg p-8 shadow-stamp-big flex flex-col gap-3`}
+          >
+            <span className={`text-[13px] font-bold uppercase tracking-wide-08 ${s.labelClass}`}>
+              {s.label}
+            </span>
+            <span className="font-display font-bold text-64 leading-none tracking-tightest">
+              {s.value}
+            </span>
+            <span className={`text-sm leading-5 mt-3 ${s.descClass}`}>
+              {s.description}
+            </span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}

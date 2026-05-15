@@ -1,0 +1,135 @@
+import type { Verb } from '../types';
+
+export const VERBS: Verb[] = [
+  {
+    infinitive: 'hablar',
+    translation: 'sprechen',
+    verbClass: '-ar',
+    conjugations: {
+      Presente: {
+        yo: 'hablo',
+        tú: 'hablas',
+        'él/ella': 'habla',
+        nosotros: 'hablamos',
+        vosotros: 'habláis',
+        'ellos/ellas': 'hablan',
+      },
+      'Pretérito Indefinido': {
+        yo: 'hablé',
+        tú: 'hablaste',
+        'él/ella': 'habló',
+        nosotros: 'hablamos',
+        vosotros: 'hablasteis',
+        'ellos/ellas': 'hablaron',
+      },
+      'Pretérito Imperfecto': {
+        yo: 'hablaba',
+        tú: 'hablabas',
+        'él/ella': 'hablaba',
+        nosotros: 'hablábamos',
+        vosotros: 'hablabais',
+        'ellos/ellas': 'hablaban',
+      },
+    },
+  },
+  {
+    infinitive: 'comer',
+    translation: 'essen',
+    verbClass: '-er',
+    conjugations: {
+      Presente: {
+        yo: 'como',
+        tú: 'comes',
+        'él/ella': 'come',
+        nosotros: 'comemos',
+        vosotros: 'coméis',
+        'ellos/ellas': 'comen',
+      },
+      'Pretérito Indefinido': {
+        yo: 'comí',
+        tú: 'comiste',
+        'él/ella': 'comió',
+        nosotros: 'comimos',
+        vosotros: 'comisteis',
+        'ellos/ellas': 'comieron',
+      },
+    },
+  },
+  {
+    infinitive: 'vivir',
+    translation: 'leben/wohnen',
+    verbClass: '-ir',
+    conjugations: {
+      Presente: {
+        yo: 'vivo',
+        tú: 'vives',
+        'él/ella': 'vive',
+        nosotros: 'vivimos',
+        vosotros: 'vivís',
+        'ellos/ellas': 'viven',
+      },
+      'Pretérito Indefinido': {
+        yo: 'viví',
+        tú: 'viviste',
+        'él/ella': 'vivió',
+        nosotros: 'vivimos',
+        vosotros: 'vivisteis',
+        'ellos/ellas': 'vivieron',
+      },
+    },
+  },
+  {
+    infinitive: 'ser',
+    translation: 'sein (Eigenschaft)',
+    verbClass: '-er',
+    conjugations: {
+      Presente: {
+        yo: 'soy',
+        tú: 'eres',
+        'él/ella': 'es',
+        nosotros: 'somos',
+        vosotros: 'sois',
+        'ellos/ellas': 'son',
+      },
+      'Pretérito Indefinido': {
+        yo: 'fui',
+        tú: 'fuiste',
+        'él/ella': 'fue',
+        nosotros: 'fuimos',
+        vosotros: 'fuisteis',
+        'ellos/ellas': 'fueron',
+      },
+      'Pretérito Imperfecto': {
+        yo: 'era',
+        tú: 'eras',
+        'él/ella': 'era',
+        nosotros: 'éramos',
+        vosotros: 'erais',
+        'ellos/ellas': 'eran',
+      },
+    },
+  },
+  {
+    infinitive: 'tener',
+    translation: 'haben',
+    verbClass: '-er',
+    conjugations: {
+      Presente: {
+        yo: 'tengo',
+        tú: 'tienes',
+        'él/ella': 'tiene',
+        nosotros: 'tenemos',
+        vosotros: 'tenéis',
+        'ellos/ellas': 'tienen',
+      },
+      'Pretérito Indefinido': {
+        yo: 'tuve',
+        tú: 'tuviste',
+        'él/ella': 'tuvo',
+        nosotros: 'tuvimos',
+        vosotros: 'tuvisteis',
+        'ellos/ellas': 'tuvieron',
+      },
+    },
+  },
+];

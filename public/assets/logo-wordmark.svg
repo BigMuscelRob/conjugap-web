@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" fill="none">
+  
+  <g transform="translate(8 10)">
+    <circle cx="30" cy="30" r="28" fill="#E8623D" stroke="#2A1F1A" stroke-width="3"></circle>
+    
+    <g stroke="#F5B948" stroke-width="3" stroke-linecap="round">
+      <line x1="30" y1="-4" x2="30" y2="2"></line>
+      <line x1="30" y1="58" x2="30" y2="64"></line>
+      <line x1="-4" y1="30" x2="2" y2="30"></line>
+      <line x1="58" y1="30" x2="64" y2="30"></line>
+      <line x1="6" y1="6" x2="11" y2="11"></line>
+      <line x1="49" y1="49" x2="54" y2="54"></line>
+      <line x1="54" y1="6" x2="49" y2="11"></line>
+      <line x1="6" y1="54" x2="11" y2="49"></line>
+    </g>
+    
+    <circle cx="22" cy="27" r="2.5" fill="#2A1F1A"></circle>
+    <circle cx="38" cy="27" r="2.5" fill="#2A1F1A"></circle>
+    <path d="M20 35 Q30 44 40 35" stroke="#2A1F1A" stroke-width="3" stroke-linecap="round" fill="none"></path>
+    
+    <circle cx="17" cy="33" r="2.4" fill="#C2456E" opacity="0.45"></circle>
+    <circle cx="43" cy="33" r="2.4" fill="#C2456E" opacity="0.45"></circle>
+  </g>
+  
+  <g transform="translate(78 53)" font-family="Bricolage Grotesque, system-ui, sans-serif" font-weight="700" font-size="36" letter-spacing="-1.2">
+    <text fill="#2A1F1A">Verb</text>
+    <text x="79" fill="#E8623D">ito</text>
+    <circle cx="153" cy="-21" r="3.5" fill="#F5B948"></circle>
+  </g>
+</svg>
