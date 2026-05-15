@@ -11,7 +11,7 @@
   "hero": {
     "eyebrow": "Entrenador de conjugación · Beta",
     "title": "Spanish verbs,\nfinally on your side.",
-    "subtitle": "Cinco minutos al día. ConjuGab trae el verbo correcto en el momento correcto — con feedback que realmente enseña.",
+    "subtitle": "Cinco minutos al día. ConjuGap trae el verbo correcto en el momento correcto — con feedback que realmente enseña.",
     "cta_primary": "Empezar gratis",
     "cta_secondary": "Ver demo",
     "social_proof": "12.430 aprendientes · 4,9 ★"
@@ -30,7 +30,7 @@
       },
       {
         "title": "Construye la racha.",
-        "body": "Cinco minutos hoy. Luego mañana. ConjuGab recuerda lo que has olvidado y lo recupera."
+        "body": "Cinco minutos hoy. Luego mañana. ConjuGap recuerda lo que has olvidado y lo recupera."
       }
     ]
   },
@@ -102,7 +102,7 @@
   "tenses": {
     "overline": "Tiempos verbales",
     "title": "Los tiempos de un vistazo",
-    "subtitle": "Elige un tiempo para practicar de forma específica. ConjuGab te guía por todas las formas — paso a paso.",
+    "subtitle": "Elige un tiempo para practicar de forma específica. ConjuGap te guía por todas las formas — paso a paso.",
     "practice_btn": "Practicar",
     "items": [
       { "desc": "Presente — lo que pasa ahora o siempre es verdad." },

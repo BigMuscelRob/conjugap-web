@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import PracticeContent from './PracticeContent';
 
 export const metadata: Metadata = {
-  title: 'Practicar — ConjuGab',
+  title: 'Practicar — ConjuGap',
   description: 'Übe Spanische Verbkonjugation mit gezieltem Feedback.',
 };
 
