@@ -70,7 +70,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
   const t = useTranslations('practice.setup');
 
   const [selectedClasses, setSelectedClasses] = useState<string[]>(['-ar', '-er']);
-  const [selectedVerbs,   setSelectedVerbs]   = useState<string[]>(['hablar', 'comer', 'vivir', 'tener']);
+  const [selectedVerbs,   setSelectedVerbs]   = useState<string[]>([]);
   const [selectedTenses,  setSelectedTenses]  = useState<string[]>(['pres']);
   const [mode,            setMode]            = useState<Mode>('structured');
   const [length,          setLength]          = useState(10);
@@ -88,8 +88,10 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
     const isSelected   = selectedVerbs.includes(v.word);
     const matchesGroup = selectedClasses.length === 0 || selectedClasses.includes(v.cls);
     const matchesQuery = query === '' || v.word.includes(query);
-    return isSelected || (matchesGroup && matchesQuery);
+    const visible      = isSelected || (matchesGroup && matchesQuery);
+    return visible;
   });
+  console.log('[VerbFilter] groups:', selectedClasses, '| visible:', filteredVerbs.map(v => v.word));
   const totalQuestions = Math.min(effectiveVerbs.length * selectedTenses.length, length);
   const estMinutes     = Math.max(2, Math.round(totalQuestions * 0.4));
   const canStart       = effectiveVerbs.length > 0 && selectedTenses.length > 0;
