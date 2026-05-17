@@ -58,15 +58,26 @@ module.exports = {
         'white-warm': '#FFFCF7',
         // Semantic warn-soft (berry doesn't map cleanly to 8% opacity)
         'warn-soft': '#FBE6EC',
+
+        // ---- brand-* aliases (practice-page design tokens) ----
+        brand: {
+          dark:   '#2A1F1A', // = ink-900
+          bg:     '#FBF4E6', // = cream
+          card:   '#FFFBF1', // = paper
+          orange: '#E8623D', // = terracotta-500
+          yellow: '#F7CB5B', // = saffron-300
+          muted:  '#7A6A60', // = ink-500
+        },
       },
 
       // =========================================
       // TYPOGRAPHY
       // =========================================
       fontFamily: {
-        display: ['"Bricolage Grotesque"', 'system-ui', '-apple-system', 'sans-serif'],
-        body: ['Nunito', 'system-ui', '-apple-system', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', '"Courier New"', 'monospace'],
+        display:    ['"Bricolage Grotesque"', 'system-ui', '-apple-system', 'sans-serif'],
+        bricolage:  ['"Bricolage Grotesque"', 'system-ui', '-apple-system', 'sans-serif'],
+        body:       ['Nunito', 'system-ui', '-apple-system', 'sans-serif'],
+        mono:       ['"JetBrains Mono"', 'ui-monospace', '"Courier New"', 'monospace'],
       },
       fontSize: {
         micro:    ['12px', { lineHeight: '16px' }],
@@ -152,6 +163,18 @@ module.exports = {
         'verbito-breathe': {
           '0%, 100%': { transform: 'scale(1)' },
           '50%':       { transform: 'scale(1.015)' },
+        },
+        'verbito-celebrate': {
+          '0%':   { transform: 'scale(1) rotate(0deg)' },
+          '30%':  { transform: 'scale(1.18) rotate(-6deg)' },
+          '60%':  { transform: 'scale(1.08) rotate(4deg)' },
+          '100%': { transform: 'scale(1) rotate(0deg)' },
+        },
+        'verbito-shake': {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '20%':       { transform: 'translateX(-7px) rotate(-3deg)' },
+          '60%':       { transform: 'translateX(7px) rotate(3deg)' },
+          '80%':       { transform: 'translateX(-4px)' },
         },
         'verbito-think': {
           '0%, 100%': { transform: 'rotate(-2deg)' },

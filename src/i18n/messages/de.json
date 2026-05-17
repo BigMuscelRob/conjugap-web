@@ -94,10 +94,49 @@
     ]
   },
   "practice": {
-    "overline": "Üben",
-    "title": "Bereit zum Üben?",
-    "subtitle": "Der Übungsmodus wird gerade aufgebaut. Bald kannst du hier Verben in allen Tempi trainieren — mit gezieltem Feedback und Streak-Tracking.",
-    "coming_soon": "Practice-Screen kommt bald"
+    "setup": {
+      "title": "Sitzung konfigurieren",
+      "subtitle": "Drei Schritte. Dann konjugieren. Los!",
+      "streak_label": "{days} Tage",
+      "section_verbs": "Verben",
+      "verbs_count": "{count} ausgewählt",
+      "by_group": "Nach Gruppe",
+      "specific_verbs": "Oder einzelne Verben wählen",
+      "most_common": "16 häufigste",
+      "section_tenses": "Zeiten",
+      "tenses_count": "{count} ausgewählt",
+      "section_mode": "Modus & Länge",
+      "mode_structured_label": "Strukturiert",
+      "mode_structured_body": "Von leicht bis schwer. Verb für Verb, Person für Person — ohne Sprünge.",
+      "mode_random_label": "Zufällig",
+      "mode_random_body": "Alles gemischt. Realistischer — wie ein echtes Gespräch.",
+      "session_length": "Sitzungslänge",
+      "verbs_unit": "Verben",
+      "summary_title": "Deine Sitzung",
+      "summary_live": "Live-Einstellungen",
+      "stat_questions": "Fragen",
+      "stat_duration": "Dauer",
+      "row_verbs": "Verben",
+      "row_tenses": "Zeiten",
+      "row_mode": "Modus",
+      "mode_value_structured": "strukturiert",
+      "mode_value_random": "zufällig",
+      "start": "Sitzung starten!",
+      "start_disabled": "Mindestens 1 Zeit wählen",
+      "pro_tip": "Pro-Tipp: <em>Zufällig</em> trainiert mehr fürs echte Sprechen."
+    },
+    "card": {
+      "placeholder": "hier konjugieren…",
+      "hint_correct": "Richtig! +{xp} XP",
+      "hint_wrong": "Du schriebst <mono>{typed}</mono> · richtig ist <mono>{correct}</mono>",
+      "mascot_idle": "Du kannst das.",
+      "mascot_typing": "Konzentriert…",
+      "mascot_correct": "Smooth.",
+      "mascot_wrong": "Fast. Noch mal.",
+      "btn_hint": "Tipp",
+      "btn_check": "Prüfen",
+      "btn_next": "Weiter"
+    }
   },
   "tenses": {
     "overline": "Tiempos verbales",
