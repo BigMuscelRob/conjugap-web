@@ -73,7 +73,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
   const [selectedVerbs,   setSelectedVerbs]   = useState<string[]>([]);
   const [selectedTenses,  setSelectedTenses]  = useState<string[]>(['pres']);
   const [mode,            setMode]            = useState<Mode>('structured');
-  const [length,          setLength]          = useState(10);
+  const [length,          setLength]          = useState<number | null>(10);
   const [verbSearch,      setVerbSearch]      = useState('');
 
   function toggle<T>(setter: React.Dispatch<React.SetStateAction<T[]>>, current: T[], key: T) {
@@ -92,9 +92,10 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
     return visible;
   });
   console.log('[VerbFilter] groups:', selectedClasses, '| visible:', filteredVerbs.map(v => v.word));
-  const totalQuestions = Math.min(effectiveVerbs.length * selectedTenses.length, length);
-  const estMinutes     = Math.max(2, Math.round(totalQuestions * 0.4));
-  const canStart       = effectiveVerbs.length > 0 && selectedTenses.length > 0;
+  const allQuestionsCount = effectiveVerbs.length * selectedTenses.length;
+  const totalQuestions    = length === null ? allQuestionsCount : length;
+  const estMinutes        = Math.max(2, Math.round(totalQuestions * 0.4));
+  const canStart          = effectiveVerbs.length > 0 && selectedTenses.length > 0;
 
   return (
     <div className="relative min-h-[90vh] px-6 pt-10 pb-[120px] bg-brand-bg overflow-hidden">
@@ -316,6 +317,25 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
             <div>
               <RowLabel className="mb-2.5">{t('session_length')}</RowLabel>
               <div className="flex gap-2">
+                {/* "All selected verbs" option */}
+                <button
+                  type="button"
+                  onClick={() => setLength(null)}
+                  className={`flex-1 px-2 py-3 rounded-[12px] border-2 text-center
+                    font-bricolage font-bold text-lg leading-none
+                    transition-colors duration-micro ease-smooth
+                    ${length === null
+                      ? 'border-brand-dark bg-brand-dark text-brand-yellow'
+                      : 'border-ink-900/[0.12] bg-white-warm text-ink-900 hover:border-ink-900/30'
+                    }`}
+                >
+                  {t('length_all')}
+                  <span className={`block text-[10px] font-bold uppercase tracking-wide-08 mt-1
+                    ${length === null ? 'text-brand-yellow/60' : 'text-brand-muted'}`}>
+                    {t('verbs_unit')}
+                  </span>
+                </button>
+                {/* Fixed length options */}
                 {([5, 10, 20, 50] as const).map(n => {
                   const active = length === n;
                   return (
@@ -413,7 +433,21 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
           <button
             type="button"
             disabled={!canStart}
-            onClick={() => canStart && onStart?.({ verbs: effectiveVerbs, tenses: selectedTenses, mode, length })}
+            onClick={() => {
+              if (!canStart) return;
+              let finalVerbs = effectiveVerbs;
+              if (length !== null) {
+                const needed = Math.ceil(length / Math.max(1, selectedTenses.length));
+                if (finalVerbs.length < needed) {
+                  const extra = SETUP_VERBS
+                    .map(v => v.word)
+                    .filter(w => !finalVerbs.includes(w))
+                    .sort(() => Math.random() - 0.5);
+                  finalVerbs = [...finalVerbs, ...extra].slice(0, needed);
+                }
+              }
+              onStart?.({ verbs: finalVerbs, tenses: selectedTenses, mode, length: length ?? allQuestionsCount });
+            }}
             className="w-full inline-flex items-center justify-center gap-2
               font-body font-bold text-[17px] text-white-warm
               px-7 py-4 bg-terracotta-500 border-2 border-ink-900 rounded-md
