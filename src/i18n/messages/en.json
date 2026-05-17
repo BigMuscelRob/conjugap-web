@@ -94,10 +94,49 @@
     ]
   },
   "practice": {
-    "overline": "Practice",
-    "title": "Ready to practice?",
-    "subtitle": "Practice mode is being built. Soon you'll be able to train verbs in all tenses here — with targeted feedback and streak tracking.",
-    "coming_soon": "Practice screen coming soon"
+    "setup": {
+      "title": "Configure your session",
+      "subtitle": "Three steps. Then conjugate. Let's go!",
+      "streak_label": "{days} days",
+      "section_verbs": "Verbs",
+      "verbs_count": "{count} selected",
+      "by_group": "By group",
+      "specific_verbs": "Or choose specific verbs",
+      "most_common": "16 most common",
+      "section_tenses": "Tenses",
+      "tenses_count": "{count} selected",
+      "section_mode": "Mode & length",
+      "mode_structured_label": "Structured",
+      "mode_structured_body": "Easy to hard. Verb by verb, person by person — no jumps.",
+      "mode_random_label": "Random",
+      "mode_random_body": "All mixed up. More realistic — like a real conversation.",
+      "session_length": "Session length",
+      "verbs_unit": "verbs",
+      "summary_title": "Your session",
+      "summary_live": "Live settings",
+      "stat_questions": "Questions",
+      "stat_duration": "Duration",
+      "row_verbs": "Verbs",
+      "row_tenses": "Tenses",
+      "row_mode": "Mode",
+      "mode_value_structured": "structured",
+      "mode_value_random": "random",
+      "start": "Start session!",
+      "start_disabled": "Choose at least 1 tense",
+      "pro_tip": "Pro tip: <em>random</em> trains you more for real conversation."
+    },
+    "card": {
+      "placeholder": "conjugate here…",
+      "hint_correct": "That's it! +{xp} XP",
+      "hint_wrong": "You wrote <mono>{typed}</mono> · correct is <mono>{correct}</mono>",
+      "mascot_idle": "You can do it.",
+      "mascot_typing": "Focus…",
+      "mascot_correct": "Smooth.",
+      "mascot_wrong": "Close. Again.",
+      "btn_hint": "Hint",
+      "btn_check": "Check",
+      "btn_next": "Next"
+    }
   },
   "tenses": {
     "overline": "Verb tenses",

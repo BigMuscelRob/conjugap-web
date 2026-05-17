@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button';
 import { VERBS } from '@/lib/data/verbs';
 import type { Pronoun } from '@/lib/types';
@@ -17,11 +18,13 @@ const PRONOUNS: { key: Pronoun; label: string }[] = [
 ];
 
 export default function PracticeCard() {
-  const [idx, setIdx]       = useState(0);
+  const t = useTranslations('practice.card');
+
+  const [idx, setIdx]         = useState(0);
   const [pronIdx, setPronIdx] = useState(1); // tú by default
-  const [value, setValue]   = useState('');
-  const [status, setStatus] = useState<Status>('typing');
-  const inputRef            = useRef<HTMLInputElement>(null);
+  const [value, setValue]     = useState('');
+  const [status, setStatus]   = useState<Status>('typing');
+  const inputRef              = useRef<HTMLInputElement>(null);
 
   const verb     = VERBS[idx];
   const pron     = PRONOUNS[pronIdx];
@@ -99,7 +102,7 @@ export default function PracticeCard() {
           onChange={e => setValue(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') check(); }}
           readOnly={status !== 'typing'}
-          placeholder="conjuga aquí…"
+          placeholder={t('placeholder')}
           className={[
             'w-full font-mono text-[32px] font-bold text-center',
             'px-5 py-[18px] rounded-[18px] border-2 outline-none',
@@ -118,17 +121,18 @@ export default function PracticeCard() {
       {status === 'correct' && (
         <div className="flex items-center gap-2.5 px-4 py-3 rounded-md text-[14px] font-bold bg-sage-50 text-sage-700 border border-sage-300/40">
           <i className="ph-fill ph-check-circle text-[20px]" aria-hidden="true" />
-          ¡Eso es! +12 XP
+          {t('hint_correct', { xp: 12 })}
         </div>
       )}
       {status === 'wrong' && (
         <div className="flex items-center gap-2.5 px-4 py-3 rounded-md text-[14px] font-bold bg-warn-soft text-berry-700 border border-berry-500/25">
           <i className="ph-fill ph-arrow-right text-[18px]" aria-hidden="true" />
           <span>
-            You wrote{' '}
-            <span className="font-mono">&ldquo;{value || '—'}&rdquo;</span>
-            {' '}· correct is{' '}
-            <span className="font-mono">{expected}</span>
+            {t.rich('hint_wrong', {
+              typed: value || '—',
+              correct: expected,
+              mono: (chunks) => <span className="font-mono">{chunks}</span>,
+            })}
           </span>
         </div>
       )}
@@ -146,17 +150,17 @@ export default function PracticeCard() {
             draggable={false}
           />
           <span className="text-[13px] text-ink-500 font-semibold italic max-w-[200px]">
-            {status === 'typing' && (value ? 'Concentra…' : 'Tú puedes.')}
-            {status === 'correct' && 'Smooth.'}
-            {status === 'wrong' && 'Casi. Otra vez.'}
+            {status === 'typing' && (value ? t('mascot_typing') : t('mascot_idle'))}
+            {status === 'correct' && t('mascot_correct')}
+            {status === 'wrong' && t('mascot_wrong')}
           </span>
         </div>
 
         <div className="flex gap-2">
-          <Button variant="ghost" size="md" icon="lightbulb">Pista</Button>
+          <Button variant="ghost" size="md" icon="lightbulb">{t('btn_hint')}</Button>
           {status === 'typing'
-            ? <Button variant="success" size="md" onClick={check} iconAfter="arrow-right">Comprobar</Button>
-            : <Button variant="primary" size="md" onClick={next}  iconAfter="arrow-right">Siguiente</Button>
+            ? <Button variant="success" size="md" onClick={check} iconAfter="arrow-right">{t('btn_check')}</Button>
+            : <Button variant="primary" size="md" onClick={next}  iconAfter="arrow-right">{t('btn_next')}</Button>
           }
         </div>
       </div>
