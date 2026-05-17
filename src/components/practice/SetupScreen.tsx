@@ -70,10 +70,11 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
   const t = useTranslations('practice.setup');
 
   const [selectedClasses, setSelectedClasses] = useState<string[]>(['-ar', '-er']);
-  const [selectedVerbs,   setSelectedVerbs]   = useState<string[]>(['hablar', 'comer', 'vivir', 'tener']);
+  const [selectedVerbs,   setSelectedVerbs]   = useState<string[]>([]);
   const [selectedTenses,  setSelectedTenses]  = useState<string[]>(['pres']);
   const [mode,            setMode]            = useState<Mode>('structured');
-  const [length,          setLength]          = useState(10);
+  const [length,          setLength]          = useState<number | null>(10);
+  const [verbSearch,      setVerbSearch]      = useState('');
 
   function toggle<T>(setter: React.Dispatch<React.SetStateAction<T[]>>, current: T[], key: T) {
     setter(current.includes(key) ? current.filter(x => x !== key) : [...current, key]);
@@ -81,9 +82,20 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
 
   const classVerbs     = SETUP_VERBS.filter(v => selectedClasses.includes(v.cls)).map(v => v.word);
   const effectiveVerbs = Array.from(new Set([...classVerbs, ...selectedVerbs]));
-  const totalQuestions = Math.min(effectiveVerbs.length * selectedTenses.length, length);
-  const estMinutes     = Math.max(2, Math.round(totalQuestions * 0.4));
-  const canStart       = effectiveVerbs.length > 0 && selectedTenses.length > 0;
+
+  const query         = verbSearch.trim().toLowerCase();
+  const filteredVerbs = SETUP_VERBS.filter(v => {
+    const isSelected   = selectedVerbs.includes(v.word);
+    const matchesGroup = selectedClasses.length === 0 || selectedClasses.includes(v.cls);
+    const matchesQuery = query === '' || v.word.includes(query);
+    const visible      = isSelected || (matchesGroup && matchesQuery);
+    return visible;
+  });
+  console.log('[VerbFilter] groups:', selectedClasses, '| visible:', filteredVerbs.map(v => v.word));
+  const allQuestionsCount = effectiveVerbs.length * selectedTenses.length;
+  const totalQuestions    = length === null ? allQuestionsCount : length;
+  const estMinutes        = Math.max(2, Math.round(totalQuestions * 0.4));
+  const canStart          = effectiveVerbs.length > 0 && selectedTenses.length > 0;
 
   return (
     <div className="relative min-h-[90vh] px-6 pt-10 pb-[120px] bg-brand-bg overflow-hidden">
@@ -169,6 +181,22 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
               </div>
             </div>
 
+            {/* Verb search */}
+            <div className="relative">
+              <i className="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-ink-300 text-[15px] pointer-events-none" aria-hidden="true" />
+              <input
+                type="text"
+                value={verbSearch}
+                onChange={e => setVerbSearch(e.target.value)}
+                placeholder={t('search_placeholder')}
+                className="w-full font-mono text-sm font-bold text-ink-900 placeholder:text-ink-300 placeholder:font-normal
+                  pl-9 pr-3 py-2.5 rounded-[12px] border-2 border-ink-900/[0.10]
+                  bg-white-warm outline-none
+                  transition-[border-color] duration-micro ease-smooth
+                  focus:border-terracotta-400"
+              />
+            </div>
+
             {/* Individual verb tiles */}
             <div>
               <div className="flex justify-between items-center mb-2.5">
@@ -176,7 +204,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                 <span className="text-[11px] font-semibold text-ink-300">{t('most_common')}</span>
               </div>
               <div className="grid grid-cols-4 gap-2">
-                {SETUP_VERBS.map(v => {
+                {filteredVerbs.map(v => {
                   const active  = selectedVerbs.includes(v.word);
                   const dotCls  = SETUP_CLASSES.find(c => c.key === v.cls)?.dotClass;
                   return (
@@ -289,6 +317,25 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
             <div>
               <RowLabel className="mb-2.5">{t('session_length')}</RowLabel>
               <div className="flex gap-2">
+                {/* "All selected verbs" option */}
+                <button
+                  type="button"
+                  onClick={() => setLength(null)}
+                  className={`flex-1 px-2 py-3 rounded-[12px] border-2 text-center
+                    font-bricolage font-bold text-lg leading-none
+                    transition-colors duration-micro ease-smooth
+                    ${length === null
+                      ? 'border-brand-dark bg-brand-dark text-brand-yellow'
+                      : 'border-ink-900/[0.12] bg-white-warm text-ink-900 hover:border-ink-900/30'
+                    }`}
+                >
+                  {t('length_all')}
+                  <span className={`block text-[10px] font-bold uppercase tracking-wide-08 mt-1
+                    ${length === null ? 'text-brand-yellow/60' : 'text-brand-muted'}`}>
+                    {t('verbs_unit')}
+                  </span>
+                </button>
+                {/* Fixed length options */}
                 {([5, 10, 20, 50] as const).map(n => {
                   const active = length === n;
                   return (
@@ -386,7 +433,21 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
           <button
             type="button"
             disabled={!canStart}
-            onClick={() => canStart && onStart?.({ verbs: effectiveVerbs, tenses: selectedTenses, mode, length })}
+            onClick={() => {
+              if (!canStart) return;
+              let finalVerbs = effectiveVerbs;
+              if (length !== null) {
+                const needed = Math.ceil(length / Math.max(1, selectedTenses.length));
+                if (finalVerbs.length < needed) {
+                  const extra = SETUP_VERBS
+                    .map(v => v.word)
+                    .filter(w => !finalVerbs.includes(w))
+                    .sort(() => Math.random() - 0.5);
+                  finalVerbs = [...finalVerbs, ...extra].slice(0, needed);
+                }
+              }
+              onStart?.({ verbs: finalVerbs, tenses: selectedTenses, mode, length: length ?? allQuestionsCount });
+            }}
             className="w-full inline-flex items-center justify-center gap-2
               font-body font-bold text-[17px] text-white-warm
               px-7 py-4 bg-terracotta-500 border-2 border-ink-900 rounded-md
