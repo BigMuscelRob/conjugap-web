@@ -101,6 +101,7 @@
       "section_verbs": "Verbs",
       "verbs_count": "{count} selected",
       "by_group": "By group",
+      "search_placeholder": "Search verb…",
       "specific_verbs": "Or choose specific verbs",
       "most_common": "16 most common",
       "section_tenses": "Tenses",

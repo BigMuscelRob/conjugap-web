@@ -74,6 +74,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
   const [selectedTenses,  setSelectedTenses]  = useState<string[]>(['pres']);
   const [mode,            setMode]            = useState<Mode>('structured');
   const [length,          setLength]          = useState(10);
+  const [verbSearch,      setVerbSearch]      = useState('');
 
   function toggle<T>(setter: React.Dispatch<React.SetStateAction<T[]>>, current: T[], key: T) {
     setter(current.includes(key) ? current.filter(x => x !== key) : [...current, key]);
@@ -81,6 +82,11 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
 
   const classVerbs     = SETUP_VERBS.filter(v => selectedClasses.includes(v.cls)).map(v => v.word);
   const effectiveVerbs = Array.from(new Set([...classVerbs, ...selectedVerbs]));
+
+  const query        = verbSearch.trim().toLowerCase();
+  const filteredVerbs = query === ''
+    ? SETUP_VERBS
+    : SETUP_VERBS.filter(v => v.word.includes(query) || selectedVerbs.includes(v.word));
   const totalQuestions = Math.min(effectiveVerbs.length * selectedTenses.length, length);
   const estMinutes     = Math.max(2, Math.round(totalQuestions * 0.4));
   const canStart       = effectiveVerbs.length > 0 && selectedTenses.length > 0;
@@ -169,6 +175,22 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
               </div>
             </div>
 
+            {/* Verb search */}
+            <div className="relative">
+              <i className="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-ink-300 text-[15px] pointer-events-none" aria-hidden="true" />
+              <input
+                type="text"
+                value={verbSearch}
+                onChange={e => setVerbSearch(e.target.value)}
+                placeholder={t('search_placeholder')}
+                className="w-full font-mono text-sm font-bold text-ink-900 placeholder:text-ink-300 placeholder:font-normal
+                  pl-9 pr-3 py-2.5 rounded-[12px] border-2 border-ink-900/[0.10]
+                  bg-white-warm outline-none
+                  transition-[border-color] duration-micro ease-smooth
+                  focus:border-terracotta-400"
+              />
+            </div>
+
             {/* Individual verb tiles */}
             <div>
               <div className="flex justify-between items-center mb-2.5">
@@ -176,7 +198,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                 <span className="text-[11px] font-semibold text-ink-300">{t('most_common')}</span>
               </div>
               <div className="grid grid-cols-4 gap-2">
-                {SETUP_VERBS.map(v => {
+                {filteredVerbs.map(v => {
                   const active  = selectedVerbs.includes(v.word);
                   const dotCls  = SETUP_CLASSES.find(c => c.key === v.cls)?.dotClass;
                   return (
