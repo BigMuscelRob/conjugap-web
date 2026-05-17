@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import SetupScreen from '@/components/practice/SetupScreen';
 
 export const metadata: Metadata = {
   title: 'Üben — ConjuGap',
@@ -6,7 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function UebenPage() {
-  return (
-    <main className="min-h-screen bg-brand-bg" />
-  );
+  return <SetupScreen />;
 }
