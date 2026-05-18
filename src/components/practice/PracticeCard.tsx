@@ -97,6 +97,7 @@ export default function PracticeCard({ config }: Props) {
   // In structured mode, `queue` holds ONLY the current tense block.
   // Remaining blocks wait in `pendingBlocks`.
   const [pendingBlocks,          setPendingBlocks]          = useState<QueueItem[][]>([]);
+  const [blockTransition,        setBlockTransition]        = useState<QueueItem[] | null>(null);
   const [totalBlocks,            setTotalBlocks]            = useState(0);
   const [blocksCompleted,        setBlocksCompleted]        = useState(0);
   const [currentBlockSize,       setCurrentBlockSize]       = useState(0);
@@ -149,22 +150,15 @@ export default function PracticeCard({ config }: Props) {
             }
           }
 
-          // Apply length: keep full blocks until we hit the limit
-          let count = 0;
-          const limited: QueueItem[][] = [];
-          for (const block of blocks) {
-            if (count >= config.length) break;
-            limited.push(block);
-            count += block.length;
-          }
-
-          setTotalItems(limited.reduce((s, b) => s + b.length, 0));
-          setTotalBlocks(limited.length);
+          // Structured mode always covers all selected verb/tense combos.
+          setTotalItems(blocks.reduce((s, b) => s + b.length, 0));
+          setTotalBlocks(blocks.length);
           setBlocksCompleted(0);
-          setCurrentBlockSize(limited[0]?.length ?? 0);
+          setCurrentBlockSize(blocks[0]?.length ?? 0);
           setMasteredInCurrentBlock(0);
-          setPendingBlocks(limited.slice(1));
-          setQueue(limited[0] ?? []);
+          setBlockTransition(null);
+          setPendingBlocks(blocks.slice(1));
+          setQueue(blocks[0] ?? []);
 
         // ── Random mode: flat shuffled queue ─────────────────────────────
         } else {
@@ -190,7 +184,7 @@ export default function PracticeCard({ config }: Props) {
             }
           }
           const shuffled = [...items].sort(() => Math.random() - 0.5);
-          const final    = shuffled.slice(0, config.length);
+          const final    = config.length !== null ? shuffled.slice(0, config.length) : shuffled;
           setTotalItems(final.length);
           setQueue(final);
         }
@@ -247,14 +241,14 @@ export default function PracticeCard({ config }: Props) {
         const newQueue = queue.slice(1);
 
         if (newQueue.length === 0) {
-          // Tense block fully mastered → load next block
+          // Tense block fully mastered → show transition or finish
           setBlocksCompleted(prev => prev + 1);
           setMasteredInCurrentBlock(0);
           if (pendingBlocks.length > 0) {
             const [nextBlock, ...rest] = pendingBlocks;
-            setQueue(nextBlock);
-            setCurrentBlockSize(nextBlock.length);
             setPendingBlocks(rest);
+            setBlockTransition(nextBlock);
+            setQueue([]);
           } else {
             setQueue([]);
           }
@@ -280,6 +274,14 @@ export default function PracticeCard({ config }: Props) {
 
     setStatus('typing');
     setValue('');
+  }
+
+  function loadNextBlock() {
+    if (!blockTransition) return;
+    setQueue(blockTransition);
+    setCurrentBlockSize(blockTransition.length);
+    setBlockTransition(null);
+    inputRef.current?.focus();
   }
 
   const mascotState =
@@ -312,6 +314,36 @@ export default function PracticeCard({ config }: Props) {
         <p className="text-base font-semibold text-berry-700 text-center py-10">
           {error ?? 'Keine Fragen für diese Auswahl.'}
         </p>
+      </CardShell>
+    );
+  }
+
+  // ── Block transition ─────────────────────────────────────────────────────
+  if (blockTransition) {
+    const nextTense = TENSE_LABELS[blockTransition[0].tense] ?? blockTransition[0].tense;
+    const nextVerb  = blockTransition[0].infinitive;
+    return (
+      <CardShell>
+        <div className="flex flex-col items-center gap-6 py-8 text-center">
+          <div className="w-14 h-14 rounded-full bg-saffron-50 border-2 border-saffron-200 flex items-center justify-center">
+            <i className="ph-fill ph-arrow-right text-[26px] text-saffron-500" aria-hidden="true" />
+          </div>
+          <div>
+            <p className="text-[12px] font-bold text-brand-muted uppercase tracking-[0.08em] mb-2">
+              Nächste Zeitform
+            </p>
+            <p className="font-bricolage font-bold text-[30px] text-brand-dark leading-tight">
+              {nextTense}
+            </p>
+            <p className="text-[14px] font-semibold text-ink-500 mt-1 italic">{nextVerb}</p>
+          </div>
+          <p className="text-[12px] font-bold text-ink-400 uppercase tracking-[0.05em]">
+            Block {blocksCompleted + 1} / {totalBlocks}
+          </p>
+          <Button variant="primary" size="md" onClick={loadNextBlock} iconAfter="arrow-right">
+            Weiter
+          </Button>
+        </div>
       </CardShell>
     );
   }
