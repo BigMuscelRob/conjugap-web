@@ -127,10 +127,12 @@ export default function PracticeCard({ config, onReset }: Props) {
       setLoading(true);
       setError(null);
       startTimeRef.current = Date.now();
+      console.log('[Queue] verbs:', config.verbs, '| tenses:', config.tenses, '| mode:', config.mode, '| length:', config.length);
       try {
         const verbsRes = await fetch('/api/verbs');
         const allVerbs: ApiVerb[] = await verbsRes.json();
         const selected = allVerbs.filter(v => config.verbs.includes(v.infinitive));
+        console.log('[Queue] matched verbs:', selected.map(v => v.infinitive));
 
         // Fetch all conjugations
         const verbsFull: ApiVerbFull[] = await Promise.all(

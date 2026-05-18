@@ -81,7 +81,9 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
   }
 
   const classVerbs     = SETUP_VERBS.filter(v => selectedClasses.includes(v.cls)).map(v => v.word);
-  const effectiveVerbs = Array.from(new Set([...classVerbs, ...selectedVerbs]));
+  // Individual tile picks take priority: if user selected specific verbs, use only those.
+  // Class chips act as a display filter and as the fallback group when nothing is hand-picked.
+  const effectiveVerbs = selectedVerbs.length > 0 ? selectedVerbs : classVerbs;
 
   const query         = verbSearch.trim().toLowerCase();
   const filteredVerbs = SETUP_VERBS.filter(v => {
