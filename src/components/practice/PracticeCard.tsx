@@ -73,10 +73,11 @@ function formatTime(ms: number) {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 interface Props {
-  config: SessionConfig;
+  config:  SessionConfig;
+  onReset: () => void;
 }
 
-export default function PracticeCard({ config }: Props) {
+export default function PracticeCard({ config, onReset }: Props) {
   const t          = useTranslations('practice.card');
   const structured = config.mode === 'structured';
 
@@ -103,8 +104,22 @@ export default function PracticeCard({ config }: Props) {
   const [currentBlockSize,       setCurrentBlockSize]       = useState(0);
   const [masteredInCurrentBlock, setMasteredInCurrentBlock] = useState(0);
 
+  const [confirmExit, setConfirmExit] = useState(false);
+
   const startTimeRef = useRef(Date.now());
   const inputRef     = useRef<HTMLInputElement>(null);
+
+  // ── Back-button guard ────────────────────────────────────────────────────
+  useEffect(() => {
+    window.history.pushState({ practiceSession: true }, '');
+    function onPopState() {
+      // Re-push so a second back press also gets caught
+      window.history.pushState({ practiceSession: true }, '');
+      setConfirmExit(true);
+    }
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   // ── Load + build queue ───────────────────────────────────────────────────
   useEffect(() => {
@@ -296,25 +311,56 @@ export default function PracticeCard({ config }: Props) {
     wrong:     'animate-shake',
   };
 
+  // ── Exit confirmation overlay (rendered on top of any screen state) ──────
+  const exitOverlay = confirmExit ? (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/60 backdrop-blur-sm px-4">
+      <div className="bg-paper border-2 border-ink-900 rounded-[24px] p-8 shadow-[0_6px_0_#2A1F1A] max-w-[400px] w-full flex flex-col gap-5 text-center">
+        <i className="ph-fill ph-warning text-[44px] text-saffron-500 mx-auto" aria-hidden="true" />
+        <div>
+          <p className="font-bricolage font-bold text-[22px] text-brand-dark leading-tight mb-2">
+            Session beenden?
+          </p>
+          <p className="text-[14px] font-semibold text-brand-muted leading-relaxed">
+            Möchtest du die Session wirklich beenden?<br />Dein Fortschritt geht verloren.
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <Button variant="secondary" size="md" onClick={() => setConfirmExit(false)} className="flex-1">
+            Weitermachen
+          </Button>
+          <Button variant="primary" size="md" onClick={onReset} className="flex-1">
+            Beenden
+          </Button>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
   // ── Loading ───────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <CardShell>
-        <div className="flex flex-col items-center gap-4 py-10">
-          <div className="w-10 h-10 border-4 border-terracotta-200 border-t-terracotta-500 rounded-full animate-spin" />
-          <p className="text-sm font-semibold text-brand-muted">Lade Verben…</p>
-        </div>
-      </CardShell>
+      <>
+        {exitOverlay}
+        <CardShell>
+          <div className="flex flex-col items-center gap-4 py-10">
+            <div className="w-10 h-10 border-4 border-terracotta-200 border-t-terracotta-500 rounded-full animate-spin" />
+            <p className="text-sm font-semibold text-brand-muted">Lade Verben…</p>
+          </div>
+        </CardShell>
+      </>
     );
   }
 
   if (error || totalItems === 0) {
     return (
-      <CardShell>
-        <p className="text-base font-semibold text-berry-700 text-center py-10">
-          {error ?? 'Keine Fragen für diese Auswahl.'}
-        </p>
-      </CardShell>
+      <>
+        {exitOverlay}
+        <CardShell>
+          <p className="text-base font-semibold text-berry-700 text-center py-10">
+            {error ?? 'Keine Fragen für diese Auswahl.'}
+          </p>
+        </CardShell>
+      </>
     );
   }
 
@@ -323,28 +369,31 @@ export default function PracticeCard({ config }: Props) {
     const nextTense = TENSE_LABELS[blockTransition[0].tense] ?? blockTransition[0].tense;
     const nextVerb  = blockTransition[0].infinitive;
     return (
-      <CardShell>
-        <div className="flex flex-col items-center gap-6 py-8 text-center">
-          <div className="w-14 h-14 rounded-full bg-saffron-50 border-2 border-saffron-200 flex items-center justify-center">
-            <i className="ph-fill ph-arrow-right text-[26px] text-saffron-500" aria-hidden="true" />
-          </div>
-          <div>
-            <p className="text-[12px] font-bold text-brand-muted uppercase tracking-[0.08em] mb-2">
-              Nächste Zeitform
+      <>
+        {exitOverlay}
+        <CardShell>
+          <div className="flex flex-col items-center gap-6 py-8 text-center">
+            <div className="w-14 h-14 rounded-full bg-saffron-50 border-2 border-saffron-200 flex items-center justify-center">
+              <i className="ph-fill ph-arrow-right text-[26px] text-saffron-500" aria-hidden="true" />
+            </div>
+            <div>
+              <p className="text-[12px] font-bold text-brand-muted uppercase tracking-[0.08em] mb-2">
+                Nächste Zeitform
+              </p>
+              <p className="font-bricolage font-bold text-[30px] text-brand-dark leading-tight">
+                {nextTense}
+              </p>
+              <p className="text-[14px] font-semibold text-ink-500 mt-1 italic">{nextVerb}</p>
+            </div>
+            <p className="text-[12px] font-bold text-ink-400 uppercase tracking-[0.05em]">
+              Block {blocksCompleted + 1} / {totalBlocks}
             </p>
-            <p className="font-bricolage font-bold text-[30px] text-brand-dark leading-tight">
-              {nextTense}
-            </p>
-            <p className="text-[14px] font-semibold text-ink-500 mt-1 italic">{nextVerb}</p>
+            <Button variant="primary" size="md" onClick={loadNextBlock} iconAfter="arrow-right">
+              Weiter
+            </Button>
           </div>
-          <p className="text-[12px] font-bold text-ink-400 uppercase tracking-[0.05em]">
-            Block {blocksCompleted + 1} / {totalBlocks}
-          </p>
-          <Button variant="primary" size="md" onClick={loadNextBlock} iconAfter="arrow-right">
-            Weiter
-          </Button>
-        </div>
-      </CardShell>
+        </CardShell>
+      </>
     );
   }
 
@@ -353,29 +402,34 @@ export default function PracticeCard({ config }: Props) {
     const elapsed     = Date.now() - startTimeRef.current;
     const neededRetry = masteredN - firstTryCorrect.size;
     return (
-      <CardShell>
-        <div className="flex flex-col items-center gap-6 py-6">
-          <i className="ph-fill ph-check-circle text-[56px] text-sage-500" aria-hidden="true" />
-          <div className="text-center">
-            <p className="font-bricolage font-bold text-[28px] text-brand-dark leading-tight">
-              Session abgeschlossen!
-            </p>
-            <p className="text-sm font-semibold text-brand-muted mt-1">
-              {totalItems} Fragen beantwortet
-            </p>
+      <>
+        {exitOverlay}
+        <CardShell>
+          <div className="flex flex-col items-center gap-6 py-6">
+            <i className="ph-fill ph-check-circle text-[56px] text-sage-500" aria-hidden="true" />
+            <div className="text-center">
+              <p className="font-bricolage font-bold text-[28px] text-brand-dark leading-tight">
+                Session abgeschlossen!
+              </p>
+              <p className="text-sm font-semibold text-brand-muted mt-1">
+                {totalItems} Fragen beantwortet
+              </p>
+            </div>
+            <div className="w-full grid grid-cols-3 gap-3">
+              <StatBox icon="check-circle"    iconColor="text-sage-500"       label="Beim 1. Versuch"  value={String(firstTryCorrect.size)} />
+              <StatBox icon="arrow-clockwise" iconColor="text-saffron-500"    label="Mit Wdh. gelernt" value={String(neededRetry)} />
+              <StatBox icon="timer"           iconColor="text-terracotta-500" label="Gesamtzeit"        value={formatTime(elapsed)} />
+            </div>
           </div>
-          <div className="w-full grid grid-cols-3 gap-3">
-            <StatBox icon="check-circle"    iconColor="text-sage-500"       label="Beim 1. Versuch"  value={String(firstTryCorrect.size)} />
-            <StatBox icon="arrow-clockwise" iconColor="text-saffron-500"    label="Mit Wdh. gelernt" value={String(neededRetry)} />
-            <StatBox icon="timer"           iconColor="text-terracotta-500" label="Gesamtzeit"        value={formatTime(elapsed)} />
-          </div>
-        </div>
-      </CardShell>
+        </CardShell>
+      </>
     );
   }
 
   // ── Main card ─────────────────────────────────────────────────────────────
   return (
+    <>
+    {exitOverlay}
     <CardShell>
 
       {/* Top: chips + progress */}
@@ -490,6 +544,7 @@ export default function PracticeCard({ config }: Props) {
         </div>
       </div>
     </CardShell>
+    </>
   );
 }
 

@@ -13,7 +13,7 @@ export default function UebenClient() {
 
   return (
     <main className="min-h-screen bg-cream py-16 px-4">
-      <PracticeCard config={config} />
+      <PracticeCard config={config} onReset={() => setConfig(null)} />
     </main>
   );
 }
