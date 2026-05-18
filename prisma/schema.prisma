@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Verb {
+  id           Int           @id @default(autoincrement())
+  infinitive   String        @unique
+  cls          String        // -ar, -er, -ir, irregulares
+  irregular    Boolean       @default(false)
+  meaningDe    String
+  meaningEn    String
+  conjugations Conjugation[]
+}
+
+model Conjugation {
+  id      Int    @id @default(autoincrement())
+  verbId  Int
+  tense   String
+  pronoun String
+  form    String
+  verb    Verb   @relation(fields: [verbId], references: [id])
+}
