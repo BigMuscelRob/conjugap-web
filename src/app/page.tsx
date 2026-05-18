@@ -18,13 +18,9 @@ export default function ComingSoonPage() {
 
       {/* Top bar — logo + language switcher */}
       <header className="relative z-10 flex items-center justify-between px-6 py-5 sm:px-10">
-        <Image
-          src="/assets/logo-wordmark.svg"
-          width={140}
-          height={32}
-          alt="ConjuGap"
-          priority
-        />
+        <span className="font-bricolage font-bold text-[22px] tracking-tight text-brand-dark">
+          Conju<span className="text-terracotta-500">Gap</span>
+        </span>
         <LanguageSwitcher />
       </header>
 
