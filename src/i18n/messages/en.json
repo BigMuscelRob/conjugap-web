@@ -156,5 +156,11 @@
   },
   "language_switcher": {
     "label": "Language"
+  },
+  "coming_soon": {
+    "badge": "Coming Soon",
+    "title": "Spanish verbs –\nfinally stress-free.",
+    "subtitle": "ConjuGap is a smart conjugation trainer that meets you where you are. Five minutes a day is all it takes.",
+    "eta": "Summer 2026"
   }
 }

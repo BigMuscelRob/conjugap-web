@@ -156,5 +156,11 @@
   },
   "language_switcher": {
     "label": "Sprache"
+  },
+  "coming_soon": {
+    "badge": "Coming Soon",
+    "title": "Spanische Verben –\nendlich kein Stress mehr.",
+    "subtitle": "ConjuGap ist ein smarter Konjugationstrainer, der dich genau dort abholt, wo du stehst. Fünf Minuten täglich reichen.",
+    "eta": "Sommer 2026"
   }
 }
