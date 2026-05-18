@@ -156,5 +156,11 @@
   },
   "language_switcher": {
     "label": "Idioma"
+  },
+  "coming_soon": {
+    "badge": "Próximamente",
+    "title": "Verbos en español –\nsin estrés, de verdad.",
+    "subtitle": "ConjuGap es un entrenador de conjugación inteligente que te ayuda exactamente donde lo necesitas. Cinco minutos al día.",
+    "eta": "Verano 2026"
   }
 }

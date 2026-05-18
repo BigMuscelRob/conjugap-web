@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import { LanguageProvider } from '@/i18n/LanguageProvider';
 
 export const metadata: Metadata = {
@@ -34,9 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen flex flex-col bg-cream text-ink-900 font-body antialiased">
         <LanguageProvider>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          {children}
         </LanguageProvider>
       </body>
     </html>
