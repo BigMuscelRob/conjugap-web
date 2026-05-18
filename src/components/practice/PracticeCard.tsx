@@ -229,7 +229,8 @@ export default function PracticeCard({ config }: Props) {
   function check() {
     if (!current || status !== 'typing') { advance(); return; }
 
-    const ok             = value.trim().toLowerCase() === current.form.toLowerCase();
+    const normalize      = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    const ok             = normalize(value.trim()) === normalize(current.form);
     const isFirstAttempt = !attempted.has(current.key);
 
     setAttempted(prev => new Set([...prev, current.key]));
