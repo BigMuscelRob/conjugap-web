@@ -29,7 +29,7 @@ type ApiVerbFull = ApiVerb & { conjugations: ApiConjugation[] };
 // ── Queue ─────────────────────────────────────────────────────────────────────
 
 type QueueItem = {
-  key:        string;   // `${infinitive}|${tense}|${pronoun}` — unique per question
+  key:        string;   // `${infinitive}|${tense}|${pronoun}`
   infinitive: string;
   cls:        string;
   meaningDe:  string;
@@ -77,22 +77,30 @@ interface Props {
 }
 
 export default function PracticeCard({ config }: Props) {
-  const t = useTranslations('practice.card');
+  const t          = useTranslations('practice.card');
+  const structured = config.mode === 'structured';
 
-  // ── Data loading ────────────────────────────────────────────────────────
+  // ── Shared state ────────────────────────────────────────────────────────
   const [queue,      setQueue]      = useState<QueueItem[]>([]);
   const [totalItems, setTotalItems] = useState(0);
   const [loading,    setLoading]    = useState(true);
   const [error,      setError]      = useState<string | null>(null);
+  const [value,      setValue]      = useState('');
+  const [status,     setStatus]     = useState<Status>('typing');
 
-  // ── Answer state ────────────────────────────────────────────────────────
-  const [value,  setValue]  = useState('');
-  const [status, setStatus] = useState<Status>('typing');
-
-  // ── Progress tracking ───────────────────────────────────────────────────
+  // ── Progress tracking (shared) ───────────────────────────────────────────
   const [mastered,        setMastered]        = useState<Set<string>>(new Set());
   const [attempted,       setAttempted]       = useState<Set<string>>(new Set());
   const [firstTryCorrect, setFirstTryCorrect] = useState<Set<string>>(new Set());
+
+  // ── Structured-mode block state ──────────────────────────────────────────
+  // In structured mode, `queue` holds ONLY the current tense block.
+  // Remaining blocks wait in `pendingBlocks`.
+  const [pendingBlocks,          setPendingBlocks]          = useState<QueueItem[][]>([]);
+  const [totalBlocks,            setTotalBlocks]            = useState(0);
+  const [blocksCompleted,        setBlocksCompleted]        = useState(0);
+  const [currentBlockSize,       setCurrentBlockSize]       = useState(0);
+  const [masteredInCurrentBlock, setMasteredInCurrentBlock] = useState(0);
 
   const startTimeRef = useRef(Date.now());
   const inputRef     = useRef<HTMLInputElement>(null);
@@ -108,39 +116,85 @@ export default function PracticeCard({ config }: Props) {
         const allVerbs: ApiVerb[] = await verbsRes.json();
         const selected = allVerbs.filter(v => config.verbs.includes(v.infinitive));
 
-        const items: QueueItem[] = [];
+        // Fetch all conjugations
+        const verbsFull: ApiVerbFull[] = await Promise.all(
+          selected.map(v =>
+            fetch(`/api/verbs/${v.id}/conjugations`).then(r => r.json())
+          )
+        );
 
-        for (const verb of selected) {
-          const conjRes = await fetch(`/api/verbs/${verb.id}/conjugations`);
-          const full: ApiVerbFull = await conjRes.json();
+        // ── Structured mode: build blocks (verb × tense) ─────────────────
+        if (structured) {
+          const blocks: QueueItem[][] = [];
+          for (const verb of verbsFull) {
+            for (const tenseKey of config.tenses) {
+              const block: QueueItem[] = [];
+              for (const pronoun of PRONOUN_ORDER) {
+                const conj = verb.conjugations.find(
+                  c => c.tense === tenseKey && c.pronoun === pronoun
+                );
+                if (conj && conj.form !== '—') {
+                  block.push({
+                    key:        `${verb.infinitive}|${tenseKey}|${pronoun}`,
+                    infinitive: verb.infinitive,
+                    cls:        verb.cls,
+                    meaningDe:  verb.meaningDe,
+                    tense:      tenseKey,
+                    pronoun,
+                    form:       conj.form,
+                  });
+                }
+              }
+              if (block.length > 0) blocks.push(block);
+            }
+          }
 
-          for (const tenseKey of config.tenses) {
-            const forms = full.conjugations.filter(c => c.tense === tenseKey);
-            for (const pronoun of PRONOUN_ORDER) {
-              const conj = forms.find(c => c.pronoun === pronoun);
-              if (conj && conj.form !== '—') {
-                items.push({
-                  key:        `${verb.infinitive}|${tenseKey}|${pronoun}`,
-                  infinitive: verb.infinitive,
-                  cls:        verb.cls,
-                  meaningDe:  verb.meaningDe,
-                  tense:      tenseKey,
-                  pronoun,
-                  form:       conj.form,
-                });
+          // Apply length: keep full blocks until we hit the limit
+          let count = 0;
+          const limited: QueueItem[][] = [];
+          for (const block of blocks) {
+            if (count >= config.length) break;
+            limited.push(block);
+            count += block.length;
+          }
+
+          setTotalItems(limited.reduce((s, b) => s + b.length, 0));
+          setTotalBlocks(limited.length);
+          setBlocksCompleted(0);
+          setCurrentBlockSize(limited[0]?.length ?? 0);
+          setMasteredInCurrentBlock(0);
+          setPendingBlocks(limited.slice(1));
+          setQueue(limited[0] ?? []);
+
+        // ── Random mode: flat shuffled queue ─────────────────────────────
+        } else {
+          const items: QueueItem[] = [];
+          for (const verb of verbsFull) {
+            for (const tenseKey of config.tenses) {
+              for (const pronoun of PRONOUN_ORDER) {
+                const conj = verb.conjugations.find(
+                  c => c.tense === tenseKey && c.pronoun === pronoun
+                );
+                if (conj && conj.form !== '—') {
+                  items.push({
+                    key:        `${verb.infinitive}|${tenseKey}|${pronoun}`,
+                    infinitive: verb.infinitive,
+                    cls:        verb.cls,
+                    meaningDe:  verb.meaningDe,
+                    tense:      tenseKey,
+                    pronoun,
+                    form:       conj.form,
+                  });
+                }
               }
             }
           }
+          const shuffled = [...items].sort(() => Math.random() - 0.5);
+          const final    = shuffled.slice(0, config.length);
+          setTotalItems(final.length);
+          setQueue(final);
         }
 
-        let final = config.mode === 'random'
-          ? [...items].sort(() => Math.random() - 0.5)
-          : items;
-
-        if (config.length < final.length) final = final.slice(0, config.length);
-
-        setTotalItems(final.length);
-        setQueue(final);
         setMastered(new Set());
         setAttempted(new Set());
         setFirstTryCorrect(new Set());
@@ -151,20 +205,27 @@ export default function PracticeCard({ config }: Props) {
       }
     }
     buildQueue();
-  }, [config]);
+  }, [config]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!loading) inputRef.current?.focus();
   }, [queue, loading]);
 
   // ── Derived ──────────────────────────────────────────────────────────────
-  const current    = queue[0] ?? null;
-  const masteredN  = mastered.size;
-  const retryCount = queue.length - (totalItems - masteredN);   // extra entries = retries
-  const progress   = totalItems > 0 ? (masteredN / totalItems) * 100 : 0;
-  const done       = !loading && masteredN === totalItems && totalItems > 0;
+  const current   = queue[0] ?? null;
+  const masteredN = mastered.size;
+  const done      = !loading && totalItems > 0 && masteredN === totalItems;
 
-  // ── Handlers ─────────────────────────────────────────────────────────────
+  // Progress bar + counter differ per mode
+  const progressPct = structured
+    ? currentBlockSize > 0 ? (masteredInCurrentBlock / currentBlockSize) * 100 : 0
+    : totalItems > 0       ? (masteredN / totalItems) * 100                    : 0;
+
+  const retryCount = structured
+    ? queue.length - (currentBlockSize - masteredInCurrentBlock)
+    : queue.length - (totalItems - masteredN);
+
+  // ── check / advance ───────────────────────────────────────────────────────
   function check() {
     if (!current || status !== 'typing') { advance(); return; }
 
@@ -173,22 +234,49 @@ export default function PracticeCard({ config }: Props) {
 
     setAttempted(prev => new Set([...prev, current.key]));
     if (ok && isFirstAttempt) setFirstTryCorrect(prev => new Set([...prev, current.key]));
-
     setStatus(ok ? 'correct' : 'wrong');
   }
 
   function advance() {
     if (status === 'correct') {
       setMastered(prev => new Set([...prev, queue[0].key]));
-      setQueue(prev => prev.slice(1));
+
+      if (structured) {
+        const newMasteredInBlock = masteredInCurrentBlock + 1;
+        const newQueue = queue.slice(1);
+
+        if (newQueue.length === 0) {
+          // Tense block fully mastered → load next block
+          setBlocksCompleted(prev => prev + 1);
+          setMasteredInCurrentBlock(0);
+          if (pendingBlocks.length > 0) {
+            const [nextBlock, ...rest] = pendingBlocks;
+            setQueue(nextBlock);
+            setCurrentBlockSize(nextBlock.length);
+            setPendingBlocks(rest);
+          } else {
+            setQueue([]);
+          }
+        } else {
+          setMasteredInCurrentBlock(newMasteredInBlock);
+          setQueue(newQueue);
+        }
+      } else {
+        setQueue(prev => prev.slice(1));
+      }
+
     } else if (status === 'wrong') {
-      const delay = 3 + Math.floor(Math.random() * 3); // 3–5
+      // Re-insert 3–5 positions later.
+      // In structured mode this naturally stays within the current block
+      // because `queue` only contains the current block's items.
+      const delay = 3 + Math.floor(Math.random() * 3);
       setQueue(prev => {
         const [first, ...rest] = prev;
         const at = Math.min(delay, rest.length);
         return [...rest.slice(0, at), first, ...rest.slice(at)];
       });
     }
+
     setStatus('typing');
     setValue('');
   }
@@ -217,7 +305,7 @@ export default function PracticeCard({ config }: Props) {
     );
   }
 
-  if (error || (!done && queue.length === 0)) {
+  if (error || totalItems === 0) {
     return (
       <CardShell>
         <p className="text-base font-semibold text-berry-700 text-center py-10">
@@ -229,8 +317,8 @@ export default function PracticeCard({ config }: Props) {
 
   // ── Summary ───────────────────────────────────────────────────────────────
   if (done) {
-    const elapsed      = Date.now() - startTimeRef.current;
-    const neededRetry  = masteredN - firstTryCorrect.size;
+    const elapsed     = Date.now() - startTimeRef.current;
+    const neededRetry = masteredN - firstTryCorrect.size;
     return (
       <CardShell>
         <div className="flex flex-col items-center gap-6 py-6">
@@ -243,26 +331,10 @@ export default function PracticeCard({ config }: Props) {
               {totalItems} Fragen beantwortet
             </p>
           </div>
-
           <div className="w-full grid grid-cols-3 gap-3">
-            <StatBox
-              icon="check-circle"
-              iconColor="text-sage-500"
-              label="Beim 1. Versuch"
-              value={String(firstTryCorrect.size)}
-            />
-            <StatBox
-              icon="arrow-clockwise"
-              iconColor="text-saffron-500"
-              label="Mit Wdh. gelernt"
-              value={String(neededRetry)}
-            />
-            <StatBox
-              icon="timer"
-              iconColor="text-terracotta-500"
-              label="Gesamtzeit"
-              value={formatTime(elapsed)}
-            />
+            <StatBox icon="check-circle"    iconColor="text-sage-500"       label="Beim 1. Versuch"  value={String(firstTryCorrect.size)} />
+            <StatBox icon="arrow-clockwise" iconColor="text-saffron-500"    label="Mit Wdh. gelernt" value={String(neededRetry)} />
+            <StatBox icon="timer"           iconColor="text-terracotta-500" label="Gesamtzeit"        value={formatTime(elapsed)} />
           </div>
         </div>
       </CardShell>
@@ -277,22 +349,31 @@ export default function PracticeCard({ config }: Props) {
       <div className="flex items-center justify-between">
         <div className="flex gap-2">
           <span className="px-3 py-1.5 rounded-pill text-[12px] font-bold bg-saffron-50 text-saffron-700 border-2 border-saffron-200">
-            {current.cls}
+            {current!.cls}
           </span>
           <span className="px-3 py-1.5 rounded-pill text-[12px] font-bold bg-ink-900 text-saffron-300 border-2 border-ink-900">
-            {TENSE_LABELS[current.tense] ?? current.tense}
+            {TENSE_LABELS[current!.tense] ?? current!.tense}
           </span>
         </div>
 
         <div className="flex items-center gap-2 text-ink-500 text-[12px] font-bold uppercase tracking-[0.05em]">
-          <span>{masteredN} / {totalItems}</span>
+          {structured ? (
+            <>
+              <span>{masteredInCurrentBlock} / {currentBlockSize}</span>
+              <span className="text-ink-300 text-[10px] normal-case">
+                ({blocksCompleted + 1}/{totalBlocks})
+              </span>
+            </>
+          ) : (
+            <span>{masteredN} / {totalItems}</span>
+          )}
           {retryCount > 0 && (
             <span className="text-saffron-600 font-bold text-[11px]">↻{retryCount}</span>
           )}
           <div className="w-16 h-2 bg-ink-100 rounded-pill overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-terracotta-500 to-saffron-300 rounded-pill transition-all duration-base"
-              style={{ width: `${progress}%` }}
+              style={{ width: `${progressPct}%` }}
             />
           </div>
         </div>
@@ -301,20 +382,20 @@ export default function PracticeCard({ config }: Props) {
       {/* Prompt */}
       <div className="text-center flex flex-col gap-1">
         <div className="text-[14px] font-bold text-ink-500 tracking-wide-08 uppercase">
-          {PRONOUN_LABELS[current.pronoun] ?? current.pronoun}
+          {PRONOUN_LABELS[current!.pronoun] ?? current!.pronoun}
         </div>
         <div className="font-display text-[56px] font-bold tracking-tightest text-ink-900 leading-none">
-          {current.infinitive}
+          {current!.infinitive}
         </div>
         <div className="text-ink-500 italic text-[14px] mt-1">
-          {current.meaningDe}
+          {current!.meaningDe}
         </div>
       </div>
 
       {/* Input */}
       <input
         ref={inputRef}
-        value={status === 'wrong' ? current.form : value}
+        value={status === 'wrong' ? current!.form : value}
         onChange={e => setValue(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter') check(); }}
         readOnly={status !== 'typing'}
@@ -342,7 +423,7 @@ export default function PracticeCard({ config }: Props) {
           <span>
             {t.rich('hint_wrong', {
               typed:   value || '—',
-              correct: current.form,
+              correct: current!.form,
               mono:    (chunks) => <span className="font-mono">{chunks}</span>,
             })}
           </span>
@@ -370,7 +451,7 @@ export default function PracticeCard({ config }: Props) {
         <div className="flex gap-2">
           <Button variant="ghost" size="md" icon="lightbulb">{t('btn_hint')}</Button>
           {status === 'typing'
-            ? <Button variant="success" size="md" onClick={check} iconAfter="arrow-right">{t('btn_check')}</Button>
+            ? <Button variant="success" size="md" onClick={check}   iconAfter="arrow-right">{t('btn_check')}</Button>
             : <Button variant="primary" size="md" onClick={advance} iconAfter="arrow-right">{t('btn_next')}</Button>
           }
         </div>
@@ -390,10 +471,10 @@ function CardShell({ children }: { children: React.ReactNode }) {
 }
 
 function StatBox({ icon, iconColor, label, value }: {
-  icon:       string;
-  iconColor:  string;
-  label:      string;
-  value:      string;
+  icon:      string;
+  iconColor: string;
+  label:     string;
+  value:     string;
 }) {
   return (
     <div className="flex flex-col items-center gap-1.5 p-4 rounded-[16px] bg-cream-deep border border-ink-900/[0.08]">
