@@ -198,8 +198,7 @@ export default function PracticeCard({ config, onReset }: Props) {
               }
             }
           }
-          const shuffled = [...items].sort(() => Math.random() - 0.5);
-          const final    = config.length !== null ? shuffled.slice(0, config.length) : shuffled;
+          const final = [...items].sort(() => Math.random() - 0.5);
           setTotalItems(final.length);
           setQueue(final);
         }
@@ -225,10 +224,7 @@ export default function PracticeCard({ config, onReset }: Props) {
   const masteredN = mastered.size;
   const done      = !loading && totalItems > 0 && masteredN === totalItems;
 
-  // Progress bar + counter differ per mode
-  const progressPct = structured
-    ? currentBlockSize > 0 ? (masteredInCurrentBlock / currentBlockSize) * 100 : 0
-    : totalItems > 0       ? (masteredN / totalItems) * 100                    : 0;
+  const progressPct = totalItems > 0 ? (masteredN / totalItems) * 100 : 0;
 
   const retryCount = structured
     ? queue.length - (currentBlockSize - masteredInCurrentBlock)
@@ -444,15 +440,11 @@ export default function PracticeCard({ config, onReset }: Props) {
         </div>
 
         <div className="flex items-center gap-2 text-ink-500 text-[12px] font-bold uppercase tracking-[0.05em]">
-          {structured ? (
-            <>
-              <span>{masteredInCurrentBlock} / {currentBlockSize}</span>
-              <span className="text-ink-300 text-[10px] normal-case">
-                ({blocksCompleted + 1}/{totalBlocks})
-              </span>
-            </>
-          ) : (
-            <span>{masteredN} / {totalItems}</span>
+          <span>{masteredN} / {totalItems}</span>
+          {structured && (
+            <span className="text-ink-300 text-[10px] normal-case font-semibold">
+              Block {blocksCompleted + 1}/{totalBlocks}
+            </span>
           )}
           {retryCount > 0 && (
             <span className="text-saffron-600 font-bold text-[11px]">↻{retryCount}</span>

@@ -56,7 +56,7 @@ export type SessionConfig = {
   verbs:   string[];
   tenses:  string[];
   mode:    Mode;
-  length:  number;
+  length:  number | null;  // null = Auswahl (only selected verbs/tenses)
 };
 
 interface SetupScreenProps {
@@ -437,16 +437,21 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
               if (!canStart) return;
               let finalVerbs = effectiveVerbs;
               if (length !== null) {
-                const needed = Math.ceil(length / Math.max(1, selectedTenses.length));
-                if (finalVerbs.length < needed) {
+                if (finalVerbs.length < length) {
+                  // Fill up with random verbs from pool not already selected
                   const extra = SETUP_VERBS
                     .map(v => v.word)
                     .filter(w => !finalVerbs.includes(w))
                     .sort(() => Math.random() - 0.5);
-                  finalVerbs = [...finalVerbs, ...extra].slice(0, needed);
+                  finalVerbs = [...finalVerbs, ...extra].slice(0, length);
+                } else if (finalVerbs.length > length) {
+                  // More selected than session length — take random subset
+                  finalVerbs = [...finalVerbs]
+                    .sort(() => Math.random() - 0.5)
+                    .slice(0, length);
                 }
               }
-              onStart?.({ verbs: finalVerbs, tenses: selectedTenses, mode, length: length ?? allQuestionsCount });
+              onStart?.({ verbs: finalVerbs, tenses: selectedTenses, mode, length });
             }}
             className="w-full inline-flex items-center justify-center gap-2
               font-body font-bold text-[17px] text-white-warm
