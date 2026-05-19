@@ -149,6 +149,8 @@ export default function PracticeCard({ config, onReset }: Props) {
 
   // ── Load + build queue ───────────────────────────────────────────────────
   useEffect(() => {
+    let cancelled = false;  // abort stale runs (Strict Mode double-invoke, fast re-config)
+
     async function buildQueue() {
       setLoading(true);
       setError(null);
@@ -160,12 +162,13 @@ export default function PracticeCard({ config, onReset }: Props) {
         const selected = allVerbs.filter(v => config.verbs.includes(v.infinitive));
         console.log('[Queue] matched verbs:', selected.map(v => v.infinitive));
 
-        // Fetch all conjugations
         const verbsFull: ApiVerbFull[] = await Promise.all(
           selected.map(v =>
             fetch(`/api/verbs/${v.id}/conjugations`).then(r => r.json())
           )
         );
+
+        if (cancelled) return;
 
         // ── Structured mode: build blocks (verb × tense) ─────────────────
         if (structured) {
@@ -193,7 +196,6 @@ export default function PracticeCard({ config, onReset }: Props) {
             }
           }
 
-          // Structured mode always covers all selected verb/tense combos.
           setTotalItems(blocks.reduce((s, b) => s + b.length, 0));
           setTotalBlocks(blocks.length);
           setBlocksCompleted(0);
@@ -203,19 +205,19 @@ export default function PracticeCard({ config, onReset }: Props) {
           setPendingBlocks(blocks.slice(1));
           setQueue(blocks[0] ?? []);
 
-        // ── Random mode: flat shuffled queue ─────────────────────────────
+        // ── Random mode: flat Fisher-Yates shuffled queue ─────────────────
         } else {
-          console.log('[Queue/random] building — tenses:', config.tenses, '| verbs:', verbsFull.map(v => v.infinitive));
+          console.log('[Queue/random] building — tenses:', config.tenses);
           const items: QueueItem[] = [];
           for (const verb of verbsFull) {
             for (const tenseKey of config.tenses) {
-              let tenseHits = 0;
+              let hits = 0;
               for (const pronoun of PRONOUN_ORDER) {
                 const conj = verb.conjugations.find(
                   c => c.tense === tenseKey && c.pronoun === pronoun
                 );
                 if (conj && conj.form !== '—') {
-                  tenseHits++;
+                  hits++;
                   items.push({
                     key:        `${verb.infinitive}|${tenseKey}|${pronoun}`,
                     infinitive: verb.infinitive,
@@ -227,11 +229,26 @@ export default function PracticeCard({ config, onReset }: Props) {
                   });
                 }
               }
-              console.log(`[Queue/random]   ${verb.infinitive}/${tenseKey}: ${tenseHits} forms added`);
+              console.log(`[Queue/random]   ${verb.infinitive}/${tenseKey}: ${hits} forms`);
             }
           }
+
+          // Fisher-Yates applied to the complete flat items array
           const final = fisherYates(items);
-          console.log('[Queue/random] total items:', final.length, '| first 5:', final.slice(0, 5).map(i => `${i.infinitive}/${i.tense}/${i.pronoun}`));
+          console.log(
+            '[Queue/random] total:', final.length,
+            '| first 10:',
+            final.slice(0, 10).map(i => `${i.tense}/${i.pronoun}`).join(', ')
+          );
+
+          // Reset any leftover structured-mode state
+          setPendingBlocks([]);
+          setBlockTransition(null);
+          setTotalBlocks(0);
+          setBlocksCompleted(0);
+          setCurrentBlockSize(0);
+          setMasteredInCurrentBlock(0);
+
           setTotalItems(final.length);
           setQueue(final);
         }
@@ -242,10 +259,12 @@ export default function PracticeCard({ config, onReset }: Props) {
       } catch {
         setError('Fehler beim Laden der Verbdaten.');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
+
     buildQueue();
+    return () => { cancelled = true; };
   }, [config]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
