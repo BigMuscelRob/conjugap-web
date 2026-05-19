@@ -231,7 +231,20 @@ export default function PracticeCard({ config, onReset }: Props) {
   }
 
   // ── Main card (running) ───────────────────────────────────────────────────
-  const current = session.current!;
+  if (!session.current) {
+    return (
+      <>
+        {exitOverlay}
+        <CardShell>
+          <div className="flex flex-col items-center gap-4 py-10">
+            <div className="w-10 h-10 border-4 border-terracotta-200 border-t-terracotta-500 rounded-full animate-spin" />
+            <p className="text-sm font-semibold text-brand-muted">Laden…</p>
+          </div>
+        </CardShell>
+      </>
+    );
+  }
+  const current = session.current;
 
   return (
     <>

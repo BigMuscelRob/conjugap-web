@@ -66,6 +66,7 @@ export function usePracticeSession(config: SessionConfig): PracticeSessionResult
     (retry.error || retry.totalItems === 0)        ? 'error'      :
     retry.done                                     ? 'finished'   :
     (structured && retry.blockTransition !== null) ? 'transition' :
+    retry.current === null                         ? 'loading'    : // queue effect not yet flushed
                                                      'running';
 
   // ── Actions ───────────────────────────────────────────────────────────────
