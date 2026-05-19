@@ -70,10 +70,21 @@ function formatTime(ms: number) {
   return `${m}:${String(s % 60).padStart(2, '0')}`;
 }
 
-function fisherYates<T>(arr: T[]): T[] {
+// Mulberry32 seeded PRNG — deterministic per seed, different every session
+function createRng(seed: number): () => number {
+  let s = seed;
+  return () => {
+    s = (s + 0x6D2B79F5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function fisherYates<T>(arr: T[], rng: () => number = Math.random): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rng() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
@@ -233,12 +244,29 @@ export default function PracticeCard({ config, onReset }: Props) {
             }
           }
 
-          // Fisher-Yates applied to the complete flat items array
-          const final = fisherYates(items);
+          // 3× Fisher-Yates with a seeded PRNG (Date.now seed = different every session)
+          const rng   = createRng(Date.now());
+          let   final = fisherYates(fisherYates(fisherYates(items, rng), rng), rng);
+
+          // Anti-collision: no two consecutive items may share the same verb+tense combo
+          for (let i = 0; i < final.length - 1; i++) {
+            if (
+              final[i].infinitive === final[i + 1].infinitive &&
+              final[i].tense      === final[i + 1].tense
+            ) {
+              // Swap the offender with a random position further ahead
+              const swapIdx = i + 2 + Math.floor(rng() * Math.max(1, final.length - i - 2));
+              if (swapIdx < final.length) {
+                [final[i + 1], final[swapIdx]] = [final[swapIdx], final[i + 1]];
+              }
+            }
+          }
+
           console.log(
-            '[Queue/random] total:', final.length,
-            '| first 10:',
-            final.slice(0, 10).map(i => `${i.tense}/${i.pronoun}`).join(', ')
+            '[Queue/random] seed:', Date.now(),
+            '| total:', final.length,
+            '| first 15:',
+            final.slice(0, 15).map(i => `${i.tense}/${i.pronoun}`).join(', ')
           );
 
           // Reset any leftover structured-mode state
