@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button';
 import type { SessionConfig } from './SetupScreen';
-import { usePracticeQueue } from '@/hooks/usePracticeQueue';
+import { usePracticeRetry } from '@/hooks/usePracticeRetry';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -65,7 +65,7 @@ export default function PracticeCard({ config, onReset }: Props) {
     startedAtRef,
     advance,
     loadNextBlock,
-  } = usePracticeQueue(config);
+  } = usePracticeRetry(config);
 
   const [value,       setValue]      = useState('');
   const [status,      setStatus]     = useState<Status>('typing');

@@ -36,25 +36,14 @@ export type QueueItem = {
   form:       string;
 };
 
-export type PracticeQueueResult = {
-  current:          QueueItem | null;
-  loading:          boolean;
-  error:            string | null;
-  done:             boolean;
-  totalItems:       number;
-  masteredN:        number;
-  firstTryCorrectN: number;
-  progressPct:      number;
-  retryCount:       number;
-  // Structured-mode extras
-  blocksCompleted:  number;
-  totalBlocks:      number;
-  blockTransition:  QueueItem[] | null;
-  // Session timing (ref — stable, no re-render on set)
-  startedAtRef:     React.RefObject<number>;
-  // Actions
-  advance:          (outcome: 'correct' | 'wrong') => void;
-  loadNextBlock:    () => void;
+export type QueueBuild = {
+  loading:       boolean;
+  error:         string | null;
+  firstBlock:    QueueItem[];    // first block (structured) or full shuffled list (random)
+  pendingBlocks: QueueItem[][];  // remaining blocks (structured) or [] (random)
+  totalItems:    number;
+  totalBlocks:   number;
+  startedAtRef:  React.RefObject<number>;
 };
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
@@ -82,31 +71,18 @@ function fisherYates<T>(arr: T[], rng: () => number = Math.random): T[] {
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
-export function usePracticeQueue(config: SessionConfig): PracticeQueueResult {
+export function usePracticeQueue(config: SessionConfig): QueueBuild {
   const structured = config.mode === 'structured';
 
-  // ── Queue + loading state ──────────────────────────────────────────────────
-  const [queue,      setQueue]      = useState<QueueItem[]>([]);
-  const [totalItems, setTotalItems] = useState(0);
-  const [loading,    setLoading]    = useState(true);
-  const [error,      setError]      = useState<string | null>(null);
-
-  // ── Session tracking ───────────────────────────────────────────────────────
-  const [mastered,        setMastered]        = useState<Set<string>>(new Set());
-  const [attempted,       setAttempted]       = useState<Set<string>>(new Set());
-  const [firstTryCorrect, setFirstTryCorrect] = useState<Set<string>>(new Set());
-
-  // ── Structured-mode block state ────────────────────────────────────────────
-  const [pendingBlocks,          setPendingBlocks]          = useState<QueueItem[][]>([]);
-  const [blockTransition,        setBlockTransition]        = useState<QueueItem[] | null>(null);
-  const [totalBlocks,            setTotalBlocks]            = useState(0);
-  const [blocksCompleted,        setBlocksCompleted]        = useState(0);
-  const [currentBlockSize,       setCurrentBlockSize]       = useState(0);
-  const [masteredInCurrentBlock, setMasteredInCurrentBlock] = useState(0);
+  const [loading,       setLoading]       = useState(true);
+  const [error,         setError]         = useState<string | null>(null);
+  const [firstBlock,    setFirstBlock]    = useState<QueueItem[]>([]);
+  const [pendingBlocks, setPendingBlocks] = useState<QueueItem[][]>([]);
+  const [totalItems,    setTotalItems]    = useState(0);
+  const [totalBlocks,   setTotalBlocks]   = useState(0);
 
   const startedAtRef = useRef(Date.now());
 
-  // ── Build queue on config change ───────────────────────────────────────────
   useEffect(() => {
     let cancelled = false;
 
@@ -154,12 +130,8 @@ export function usePracticeQueue(config: SessionConfig): PracticeQueueResult {
           }
           setTotalItems(blocks.reduce((s, b) => s + b.length, 0));
           setTotalBlocks(blocks.length);
-          setBlocksCompleted(0);
-          setCurrentBlockSize(blocks[0]?.length ?? 0);
-          setMasteredInCurrentBlock(0);
-          setBlockTransition(null);
+          setFirstBlock(blocks[0] ?? []);
           setPendingBlocks(blocks.slice(1));
-          setQueue(blocks[0] ?? []);
 
         // ── Random: flat 3× Fisher-Yates + anti-collision ─────────────────
         } else {
@@ -192,7 +164,6 @@ export function usePracticeQueue(config: SessionConfig): PracticeQueueResult {
           const rng   = createRng(Date.now());
           let   final = fisherYates(fisherYates(fisherYates(items, rng), rng), rng);
 
-          // No two consecutive items with the same verb+tense
           for (let i = 0; i < final.length - 1; i++) {
             if (
               final[i].infinitive === final[i + 1].infinitive &&
@@ -211,21 +182,13 @@ export function usePracticeQueue(config: SessionConfig): PracticeQueueResult {
             final.slice(0, 15).map(i => `${i.tense}/${i.pronoun}`).join(', ')
           );
 
-          setPendingBlocks([]);
-          setBlockTransition(null);
-          setTotalBlocks(0);
-          setBlocksCompleted(0);
-          setCurrentBlockSize(0);
-          setMasteredInCurrentBlock(0);
           setTotalItems(final.length);
-          setQueue(final);
+          setTotalBlocks(0);
+          setFirstBlock(final);
+          setPendingBlocks([]);
         }
-
-        setMastered(new Set());
-        setAttempted(new Set());
-        setFirstTryCorrect(new Set());
       } catch {
-        setError('Fehler beim Laden der Verbdaten.');
+        if (!cancelled) setError('Fehler beim Laden der Verbdaten.');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -235,82 +198,5 @@ export function usePracticeQueue(config: SessionConfig): PracticeQueueResult {
     return () => { cancelled = true; };
   }, [config]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Derived ───────────────────────────────────────────────────────────────
-  const current     = queue[0] ?? null;
-  const masteredN   = mastered.size;
-  const done        = !loading && totalItems > 0 && masteredN === totalItems;
-  const progressPct = totalItems > 0 ? (masteredN / totalItems) * 100 : 0;
-  const retryCount  = structured
-    ? queue.length - (currentBlockSize - masteredInCurrentBlock)
-    : attempted.size - masteredN;
-
-  // ── Actions ───────────────────────────────────────────────────────────────
-
-  function advance(outcome: 'correct' | 'wrong') {
-    if (outcome === 'correct') {
-      const key            = queue[0].key;
-      const isFirstAttempt = !attempted.has(key);
-
-      setAttempted(prev => new Set([...prev, key]));
-      if (isFirstAttempt) setFirstTryCorrect(prev => new Set([...prev, key]));
-      setMastered(prev => new Set([...prev, key]));
-
-      if (structured) {
-        const newMastered = masteredInCurrentBlock + 1;
-        const newQueue    = queue.slice(1);
-
-        if (newQueue.length === 0) {
-          setBlocksCompleted(prev => prev + 1);
-          setMasteredInCurrentBlock(0);
-          if (pendingBlocks.length > 0) {
-            const [next, ...rest] = pendingBlocks;
-            setPendingBlocks(rest);
-            setBlockTransition(next);
-            setQueue([]);
-          } else {
-            setQueue([]);
-          }
-        } else {
-          setMasteredInCurrentBlock(newMastered);
-          setQueue(newQueue);
-        }
-      } else {
-        setQueue(prev => prev.slice(1));
-      }
-
-    } else {
-      setAttempted(prev => new Set([...prev, queue[0].key]));
-      const delay = 3 + Math.floor(Math.random() * 3);
-      setQueue(prev => {
-        const [first, ...rest] = prev;
-        const at = Math.min(delay, rest.length);
-        return [...rest.slice(0, at), first, ...rest.slice(at)];
-      });
-    }
-  }
-
-  function loadNextBlock() {
-    if (!blockTransition) return;
-    setQueue(blockTransition);
-    setCurrentBlockSize(blockTransition.length);
-    setBlockTransition(null);
-  }
-
-  return {
-    current,
-    loading,
-    error,
-    done,
-    totalItems,
-    masteredN,
-    firstTryCorrectN: firstTryCorrect.size,
-    progressPct,
-    retryCount,
-    blocksCompleted,
-    totalBlocks,
-    blockTransition,
-    startedAtRef,
-    advance,
-    loadNextBlock,
-  };
+  return { loading, error, firstBlock, pendingBlocks, totalItems, totalBlocks, startedAtRef };
 }
