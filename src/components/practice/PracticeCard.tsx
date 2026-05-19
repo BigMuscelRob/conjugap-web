@@ -4,39 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button';
 import type { SessionConfig } from './SetupScreen';
+import { usePracticeQueue } from '@/hooks/usePracticeQueue';
 
-// ── API shapes ────────────────────────────────────────────────────────────────
-
-type ApiVerb = {
-  id:        number;
-  infinitive: string;
-  cls:       string;
-  irregular: boolean;
-  meaningDe: string;
-  meaningEn: string;
-};
-
-type ApiConjugation = {
-  id:      number;
-  verbId:  number;
-  tense:   string;
-  pronoun: string;
-  form:    string;
-};
-
-type ApiVerbFull = ApiVerb & { conjugations: ApiConjugation[] };
-
-// ── Queue ─────────────────────────────────────────────────────────────────────
-
-type QueueItem = {
-  key:        string;   // `${infinitive}|${tense}|${pronoun}`
-  infinitive: string;
-  cls:        string;
-  meaningDe:  string;
-  tense:      string;
-  pronoun:    string;
-  form:       string;
-};
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 type Status = 'typing' | 'correct' | 'wrong';
 
@@ -62,32 +32,10 @@ const PRONOUN_LABELS: Record<string, string> = {
   'ellos/ellas': 'ELLOS / ELLAS',
 };
 
-const PRONOUN_ORDER = ['yo', 'tú', 'él/ella', 'nosotros', 'vosotros', 'ellos/ellas'];
-
 function formatTime(ms: number) {
   const s = Math.floor(ms / 1000);
   const m = Math.floor(s / 60);
   return `${m}:${String(s % 60).padStart(2, '0')}`;
-}
-
-// Mulberry32 seeded PRNG — deterministic per seed, different every session
-function createRng(seed: number): () => number {
-  let s = seed;
-  return () => {
-    s = (s + 0x6D2B79F5) | 0;
-    let t = Math.imul(s ^ (s >>> 15), 1 | s);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function fisherYates<T>(arr: T[], rng: () => number = Math.random): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -101,33 +49,29 @@ export default function PracticeCard({ config, onReset }: Props) {
   const t          = useTranslations('practice.card');
   const structured = config.mode === 'structured';
 
-  // ── Shared state ────────────────────────────────────────────────────────
-  const [queue,      setQueue]      = useState<QueueItem[]>([]);
-  const [totalItems, setTotalItems] = useState(0);
-  const [loading,    setLoading]    = useState(true);
-  const [error,      setError]      = useState<string | null>(null);
-  const [value,      setValue]      = useState('');
-  const [status,     setStatus]     = useState<Status>('typing');
+  const {
+    current,
+    loading,
+    error,
+    done,
+    totalItems,
+    masteredN,
+    firstTryCorrectN,
+    progressPct,
+    retryCount,
+    blocksCompleted,
+    totalBlocks,
+    blockTransition,
+    startedAtRef,
+    advance,
+    loadNextBlock,
+  } = usePracticeQueue(config);
 
-  // ── Progress tracking (shared) ───────────────────────────────────────────
-  const [mastered,        setMastered]        = useState<Set<string>>(new Set());
-  const [attempted,       setAttempted]       = useState<Set<string>>(new Set());
-  const [firstTryCorrect, setFirstTryCorrect] = useState<Set<string>>(new Set());
-
-  // ── Structured-mode block state ──────────────────────────────────────────
-  // In structured mode, `queue` holds ONLY the current tense block.
-  // Remaining blocks wait in `pendingBlocks`.
-  const [pendingBlocks,          setPendingBlocks]          = useState<QueueItem[][]>([]);
-  const [blockTransition,        setBlockTransition]        = useState<QueueItem[] | null>(null);
-  const [totalBlocks,            setTotalBlocks]            = useState(0);
-  const [blocksCompleted,        setBlocksCompleted]        = useState(0);
-  const [currentBlockSize,       setCurrentBlockSize]       = useState(0);
-  const [masteredInCurrentBlock, setMasteredInCurrentBlock] = useState(0);
-
+  const [value,       setValue]      = useState('');
+  const [status,      setStatus]     = useState<Status>('typing');
   const [confirmExit, setConfirmExit] = useState(false);
 
-  const startTimeRef = useRef(Date.now());
-  const inputRef     = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // ── Back-button guard ────────────────────────────────────────────────────
   useEffect(() => {
@@ -158,223 +102,25 @@ export default function PracticeCard({ config, onReset }: Props) {
     };
   }, [confirmExit]);
 
-  // ── Load + build queue ───────────────────────────────────────────────────
-  useEffect(() => {
-    let cancelled = false;  // abort stale runs (Strict Mode double-invoke, fast re-config)
-
-    async function buildQueue() {
-      setLoading(true);
-      setError(null);
-      startTimeRef.current = Date.now();
-      console.log('[Queue] verbs:', config.verbs, '| tenses:', config.tenses, '| mode:', config.mode, '| length:', config.length);
-      try {
-        const verbsRes = await fetch('/api/verbs');
-        const allVerbs: ApiVerb[] = await verbsRes.json();
-        const selected = allVerbs.filter(v => config.verbs.includes(v.infinitive));
-        console.log('[Queue] matched verbs:', selected.map(v => v.infinitive));
-
-        const verbsFull: ApiVerbFull[] = await Promise.all(
-          selected.map(v =>
-            fetch(`/api/verbs/${v.id}/conjugations`).then(r => r.json())
-          )
-        );
-
-        if (cancelled) return;
-
-        // ── Structured mode: build blocks (verb × tense) ─────────────────
-        if (structured) {
-          const blocks: QueueItem[][] = [];
-          for (const verb of verbsFull) {
-            for (const tenseKey of config.tenses) {
-              const block: QueueItem[] = [];
-              for (const pronoun of PRONOUN_ORDER) {
-                const conj = verb.conjugations.find(
-                  c => c.tense === tenseKey && c.pronoun === pronoun
-                );
-                if (conj && conj.form !== '—') {
-                  block.push({
-                    key:        `${verb.infinitive}|${tenseKey}|${pronoun}`,
-                    infinitive: verb.infinitive,
-                    cls:        verb.cls,
-                    meaningDe:  verb.meaningDe,
-                    tense:      tenseKey,
-                    pronoun,
-                    form:       conj.form,
-                  });
-                }
-              }
-              if (block.length > 0) blocks.push(block);
-            }
-          }
-
-          setTotalItems(blocks.reduce((s, b) => s + b.length, 0));
-          setTotalBlocks(blocks.length);
-          setBlocksCompleted(0);
-          setCurrentBlockSize(blocks[0]?.length ?? 0);
-          setMasteredInCurrentBlock(0);
-          setBlockTransition(null);
-          setPendingBlocks(blocks.slice(1));
-          setQueue(blocks[0] ?? []);
-
-        // ── Random mode: flat Fisher-Yates shuffled queue ─────────────────
-        } else {
-          console.log('[Queue/random] building — tenses:', config.tenses);
-          const items: QueueItem[] = [];
-          for (const verb of verbsFull) {
-            for (const tenseKey of config.tenses) {
-              let hits = 0;
-              for (const pronoun of PRONOUN_ORDER) {
-                const conj = verb.conjugations.find(
-                  c => c.tense === tenseKey && c.pronoun === pronoun
-                );
-                if (conj && conj.form !== '—') {
-                  hits++;
-                  items.push({
-                    key:        `${verb.infinitive}|${tenseKey}|${pronoun}`,
-                    infinitive: verb.infinitive,
-                    cls:        verb.cls,
-                    meaningDe:  verb.meaningDe,
-                    tense:      tenseKey,
-                    pronoun,
-                    form:       conj.form,
-                  });
-                }
-              }
-              console.log(`[Queue/random]   ${verb.infinitive}/${tenseKey}: ${hits} forms`);
-            }
-          }
-
-          // 3× Fisher-Yates with a seeded PRNG (Date.now seed = different every session)
-          const rng   = createRng(Date.now());
-          let   final = fisherYates(fisherYates(fisherYates(items, rng), rng), rng);
-
-          // Anti-collision: no two consecutive items may share the same verb+tense combo
-          for (let i = 0; i < final.length - 1; i++) {
-            if (
-              final[i].infinitive === final[i + 1].infinitive &&
-              final[i].tense      === final[i + 1].tense
-            ) {
-              // Swap the offender with a random position further ahead
-              const swapIdx = i + 2 + Math.floor(rng() * Math.max(1, final.length - i - 2));
-              if (swapIdx < final.length) {
-                [final[i + 1], final[swapIdx]] = [final[swapIdx], final[i + 1]];
-              }
-            }
-          }
-
-          console.log(
-            '[Queue/random] seed:', Date.now(),
-            '| total:', final.length,
-            '| first 15:',
-            final.slice(0, 15).map(i => `${i.tense}/${i.pronoun}`).join(', ')
-          );
-
-          // Reset any leftover structured-mode state
-          setPendingBlocks([]);
-          setBlockTransition(null);
-          setTotalBlocks(0);
-          setBlocksCompleted(0);
-          setCurrentBlockSize(0);
-          setMasteredInCurrentBlock(0);
-
-          setTotalItems(final.length);
-          setQueue(final);
-        }
-
-        setMastered(new Set());
-        setAttempted(new Set());
-        setFirstTryCorrect(new Set());
-      } catch {
-        setError('Fehler beim Laden der Verbdaten.');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    buildQueue();
-    return () => { cancelled = true; };
-  }, [config]); // eslint-disable-line react-hooks/exhaustive-deps
-
+  // ── Auto-focus on card change ─────────────────────────────────────────────
   useEffect(() => {
     if (!loading) inputRef.current?.focus();
-  }, [queue, loading]);
-
-  // ── Derived ──────────────────────────────────────────────────────────────
-  const current   = queue[0] ?? null;
-  const masteredN = mastered.size;
-  const done      = !loading && totalItems > 0 && masteredN === totalItems;
-
-  const progressPct = totalItems > 0 ? (masteredN / totalItems) * 100 : 0;
-
-  // Structured: extra items beyond unmastered in current block.
-  // Random: items attempted at least once but not yet mastered.
-  const retryCount = structured
-    ? queue.length - (currentBlockSize - masteredInCurrentBlock)
-    : attempted.size - masteredN;
+  }, [current, loading]);
 
   // ── check / advance ───────────────────────────────────────────────────────
-  function check() {
-    if (!current || status !== 'typing') { advance(); return; }
-
-    const normalize      = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-    const ok             = normalize(value.trim()) === normalize(current.form);
-    const isFirstAttempt = !attempted.has(current.key);
-
-    setAttempted(prev => new Set([...prev, current.key]));
-    if (ok && isFirstAttempt) setFirstTryCorrect(prev => new Set([...prev, current.key]));
-    setStatus(ok ? 'correct' : 'wrong');
-  }
-
-  function advance() {
-    if (status === 'correct') {
-      setMastered(prev => new Set([...prev, queue[0].key]));
-
-      if (structured) {
-        const newMasteredInBlock = masteredInCurrentBlock + 1;
-        const newQueue = queue.slice(1);
-
-        if (newQueue.length === 0) {
-          // Tense block fully mastered → show transition or finish
-          setBlocksCompleted(prev => prev + 1);
-          setMasteredInCurrentBlock(0);
-          if (pendingBlocks.length > 0) {
-            const [nextBlock, ...rest] = pendingBlocks;
-            setPendingBlocks(rest);
-            setBlockTransition(nextBlock);
-            setQueue([]);
-          } else {
-            setQueue([]);
-          }
-        } else {
-          setMasteredInCurrentBlock(newMasteredInBlock);
-          setQueue(newQueue);
-        }
-      } else {
-        setQueue(prev => prev.slice(1));
-      }
-
-    } else if (status === 'wrong') {
-      // Re-insert 3–5 positions later.
-      // In structured mode this naturally stays within the current block
-      // because `queue` only contains the current block's items.
-      const delay = 3 + Math.floor(Math.random() * 3);
-      setQueue(prev => {
-        const [first, ...rest] = prev;
-        const at = Math.min(delay, rest.length);
-        return [...rest.slice(0, at), first, ...rest.slice(at)];
-      });
-    }
-
+  function handleAdvance() {
+    if (status === 'typing') return;
+    advance(status);
     setStatus('typing');
     setValue('');
   }
 
-  function loadNextBlock() {
-    if (!blockTransition) return;
-    setQueue(blockTransition);
-    setCurrentBlockSize(blockTransition.length);
-    setBlockTransition(null);
-    inputRef.current?.focus();
+  function check() {
+    if (!current || status !== 'typing') { handleAdvance(); return; }
+
+    const normalize = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    const ok = normalize(value.trim()) === normalize(current.form);
+    setStatus(ok ? 'correct' : 'wrong');
   }
 
   const mascotState =
@@ -466,7 +212,12 @@ export default function PracticeCard({ config, onReset }: Props) {
             <p className="text-[12px] font-bold text-ink-400 uppercase tracking-[0.05em]">
               Block {blocksCompleted + 1} / {totalBlocks}
             </p>
-            <Button variant="primary" size="md" onClick={loadNextBlock} iconAfter="arrow-right">
+            <Button
+              variant="primary"
+              size="md"
+              iconAfter="arrow-right"
+              onClick={() => { loadNextBlock(); inputRef.current?.focus(); }}
+            >
               Weiter
             </Button>
           </div>
@@ -477,8 +228,8 @@ export default function PracticeCard({ config, onReset }: Props) {
 
   // ── Summary ───────────────────────────────────────────────────────────────
   if (done) {
-    const elapsed     = Date.now() - startTimeRef.current;
-    const neededRetry = masteredN - firstTryCorrect.size;
+    const elapsed     = Date.now() - startedAtRef.current;
+    const neededRetry = masteredN - firstTryCorrectN;
     return (
       <>
         {exitOverlay}
@@ -494,7 +245,7 @@ export default function PracticeCard({ config, onReset }: Props) {
               </p>
             </div>
             <div className="w-full grid grid-cols-3 gap-3">
-              <StatBox icon="check-circle"    iconColor="text-sage-500"       label="Beim 1. Versuch"  value={String(firstTryCorrect.size)} />
+              <StatBox icon="check-circle"    iconColor="text-sage-500"       label="Beim 1. Versuch"  value={String(firstTryCorrectN)} />
               <StatBox icon="arrow-clockwise" iconColor="text-saffron-500"    label="Mit Wdh. gelernt" value={String(neededRetry)} />
               <StatBox icon="timer"           iconColor="text-terracotta-500" label="Gesamtzeit"        value={formatTime(elapsed)} />
             </div>
@@ -612,8 +363,8 @@ export default function PracticeCard({ config, onReset }: Props) {
         <div className="flex gap-2">
           <Button variant="ghost" size="md" icon="lightbulb">{t('btn_hint')}</Button>
           {status === 'typing'
-            ? <Button variant="success" size="md" onClick={check}   iconAfter="arrow-right">{t('btn_check')}</Button>
-            : <Button variant="primary" size="md" onClick={advance} iconAfter="arrow-right">{t('btn_next')}</Button>
+            ? <Button variant="success" size="md" onClick={check}         iconAfter="arrow-right">{t('btn_check')}</Button>
+            : <Button variant="primary" size="md" onClick={handleAdvance} iconAfter="arrow-right">{t('btn_next')}</Button>
           }
         </div>
       </div>
