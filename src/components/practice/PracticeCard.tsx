@@ -70,6 +70,15 @@ function formatTime(ms: number) {
   return `${m}:${String(s % 60).padStart(2, '0')}`;
 }
 
+function fisherYates<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 interface Props {
@@ -196,14 +205,17 @@ export default function PracticeCard({ config, onReset }: Props) {
 
         // ── Random mode: flat shuffled queue ─────────────────────────────
         } else {
+          console.log('[Queue/random] building — tenses:', config.tenses, '| verbs:', verbsFull.map(v => v.infinitive));
           const items: QueueItem[] = [];
           for (const verb of verbsFull) {
             for (const tenseKey of config.tenses) {
+              let tenseHits = 0;
               for (const pronoun of PRONOUN_ORDER) {
                 const conj = verb.conjugations.find(
                   c => c.tense === tenseKey && c.pronoun === pronoun
                 );
                 if (conj && conj.form !== '—') {
+                  tenseHits++;
                   items.push({
                     key:        `${verb.infinitive}|${tenseKey}|${pronoun}`,
                     infinitive: verb.infinitive,
@@ -215,9 +227,11 @@ export default function PracticeCard({ config, onReset }: Props) {
                   });
                 }
               }
+              console.log(`[Queue/random]   ${verb.infinitive}/${tenseKey}: ${tenseHits} forms added`);
             }
           }
-          const final = [...items].sort(() => Math.random() - 0.5);
+          const final = fisherYates(items);
+          console.log('[Queue/random] total items:', final.length, '| first 5:', final.slice(0, 5).map(i => `${i.infinitive}/${i.tense}/${i.pronoun}`));
           setTotalItems(final.length);
           setQueue(final);
         }
