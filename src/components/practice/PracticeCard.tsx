@@ -228,9 +228,11 @@ export default function PracticeCard({ config, onReset }: Props) {
 
   const progressPct = totalItems > 0 ? (masteredN / totalItems) * 100 : 0;
 
+  // Structured: extra items beyond unmastered in current block.
+  // Random: items attempted at least once but not yet mastered.
   const retryCount = structured
     ? queue.length - (currentBlockSize - masteredInCurrentBlock)
-    : queue.length - (totalItems - masteredN);
+    : attempted.size - masteredN;
 
   // ── check / advance ───────────────────────────────────────────────────────
   function check() {
@@ -362,8 +364,8 @@ export default function PracticeCard({ config, onReset }: Props) {
     );
   }
 
-  // ── Block transition ─────────────────────────────────────────────────────
-  if (blockTransition) {
+  // ── Block transition (structured mode only) ──────────────────────────────
+  if (structured && blockTransition) {
     const nextTense = TENSE_LABELS[blockTransition[0].tense] ?? blockTransition[0].tense;
     const nextVerb  = blockTransition[0].infinitive;
     return (
