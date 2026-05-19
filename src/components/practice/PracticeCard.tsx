@@ -4,11 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button';
 import type { SessionConfig } from './SetupScreen';
-import { usePracticeRetry } from '@/hooks/usePracticeRetry';
-
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-type Status = 'typing' | 'correct' | 'wrong';
+import { usePracticeSession } from '@/hooks/usePracticeSession';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -48,27 +44,10 @@ interface Props {
 export default function PracticeCard({ config, onReset }: Props) {
   const t          = useTranslations('practice.card');
   const structured = config.mode === 'structured';
+  const session    = usePracticeSession(config);
 
-  const {
-    current,
-    loading,
-    error,
-    done,
-    totalItems,
-    masteredN,
-    firstTryCorrectN,
-    progressPct,
-    retryCount,
-    blocksCompleted,
-    totalBlocks,
-    blockTransition,
-    startedAtRef,
-    advance,
-    loadNextBlock,
-  } = usePracticeRetry(config);
-
-  const [value,       setValue]      = useState('');
-  const [status,      setStatus]     = useState<Status>('typing');
+  // Pure UI state
+  const [value,       setValue]       = useState('');
   const [confirmExit, setConfirmExit] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -102,31 +81,31 @@ export default function PracticeCard({ config, onReset }: Props) {
     };
   }, [confirmExit]);
 
-  // ── Auto-focus on card change ─────────────────────────────────────────────
+  // ── Auto-focus when a new question appears ────────────────────────────────
   useEffect(() => {
-    if (!loading) inputRef.current?.focus();
-  }, [current, loading]);
+    if (session.sessionStatus === 'running') inputRef.current?.focus();
+  }, [session.current, session.sessionStatus]);
 
-  // ── check / advance ───────────────────────────────────────────────────────
-  function handleAdvance() {
-    if (status === 'typing') return;
-    advance(status);
-    setStatus('typing');
+  // ── Input handlers ────────────────────────────────────────────────────────
+  function handleCheck() {
+    session.checkAnswer(value);
+  }
+
+  function handleNext() {
+    session.nextQuestion();
     setValue('');
   }
 
-  function check() {
-    if (!current || status !== 'typing') { handleAdvance(); return; }
-
-    const normalize = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-    const ok = normalize(value.trim()) === normalize(current.form);
-    setStatus(ok ? 'correct' : 'wrong');
+  function handleEnterKey() {
+    if (session.answerState === 'idle') handleCheck();
+    else handleNext();
   }
 
+  // ── Mascot ────────────────────────────────────────────────────────────────
   const mascotState =
-    status === 'correct' ? 'celebrate' :
-    status === 'wrong'   ? 'wrong'     :
-    value.length > 0     ? 'think'     : 'idle';
+    session.answerState === 'correct' ? 'celebrate' :
+    session.answerState === 'wrong'   ? 'wrong'     :
+    value.length > 0                  ? 'think'     : 'idle';
 
   const mascotAnim: Record<string, string> = {
     idle:      'animate-breathe',
@@ -135,7 +114,7 @@ export default function PracticeCard({ config, onReset }: Props) {
     wrong:     'animate-shake',
   };
 
-  // ── Exit confirmation overlay (rendered on top of any screen state) ──────
+  // ── Exit confirmation overlay (shown on all screens) ─────────────────────
   const exitOverlay = confirmExit ? (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/60 backdrop-blur-sm px-4">
       <div className="bg-paper border-2 border-ink-900 rounded-[24px] p-8 shadow-[0_6px_0_#2A1F1A] max-w-[400px] w-full flex flex-col gap-5 text-center">
@@ -161,7 +140,7 @@ export default function PracticeCard({ config, onReset }: Props) {
   ) : null;
 
   // ── Loading ───────────────────────────────────────────────────────────────
-  if (loading) {
+  if (session.sessionStatus === 'loading') {
     return (
       <>
         {exitOverlay}
@@ -175,23 +154,24 @@ export default function PracticeCard({ config, onReset }: Props) {
     );
   }
 
-  if (error || totalItems === 0) {
+  // ── Error / empty ─────────────────────────────────────────────────────────
+  if (session.sessionStatus === 'error') {
     return (
       <>
         {exitOverlay}
         <CardShell>
           <p className="text-base font-semibold text-berry-700 text-center py-10">
-            {error ?? 'Keine Fragen für diese Auswahl.'}
+            {session.error ?? 'Keine Fragen für diese Auswahl.'}
           </p>
         </CardShell>
       </>
     );
   }
 
-  // ── Block transition (structured mode only) ──────────────────────────────
-  if (structured && blockTransition) {
-    const nextTense = TENSE_LABELS[blockTransition[0].tense] ?? blockTransition[0].tense;
-    const nextVerb  = blockTransition[0].infinitive;
+  // ── Block transition (structured mode) ───────────────────────────────────
+  if (session.sessionStatus === 'transition') {
+    const nextTense = TENSE_LABELS[session.blockTransition![0].tense] ?? session.blockTransition![0].tense;
+    const nextVerb  = session.blockTransition![0].infinitive;
     return (
       <>
         {exitOverlay}
@@ -210,14 +190,9 @@ export default function PracticeCard({ config, onReset }: Props) {
               <p className="text-[14px] font-semibold text-ink-500 mt-1 italic">{nextVerb}</p>
             </div>
             <p className="text-[12px] font-bold text-ink-400 uppercase tracking-[0.05em]">
-              Block {blocksCompleted + 1} / {totalBlocks}
+              Block {session.blocksCompleted + 1} / {session.totalBlocks}
             </p>
-            <Button
-              variant="primary"
-              size="md"
-              iconAfter="arrow-right"
-              onClick={() => { loadNextBlock(); inputRef.current?.focus(); }}
-            >
+            <Button variant="primary" size="md" iconAfter="arrow-right" onClick={session.loadNextBlock}>
               Weiter
             </Button>
           </div>
@@ -227,9 +202,9 @@ export default function PracticeCard({ config, onReset }: Props) {
   }
 
   // ── Summary ───────────────────────────────────────────────────────────────
-  if (done) {
-    const elapsed     = Date.now() - startedAtRef.current;
-    const neededRetry = masteredN - firstTryCorrectN;
+  if (session.sessionStatus === 'finished') {
+    const elapsed     = Date.now() - session.startedAtRef.current;
+    const neededRetry = session.masteredN - session.firstTryCorrectN;
     return (
       <>
         {exitOverlay}
@@ -241,13 +216,13 @@ export default function PracticeCard({ config, onReset }: Props) {
                 Session abgeschlossen!
               </p>
               <p className="text-sm font-semibold text-brand-muted mt-1">
-                {totalItems} Fragen beantwortet
+                {session.totalItems} Fragen beantwortet
               </p>
             </div>
             <div className="w-full grid grid-cols-3 gap-3">
-              <StatBox icon="check-circle"    iconColor="text-sage-500"       label="Beim 1. Versuch"  value={String(firstTryCorrectN)} />
-              <StatBox icon="arrow-clockwise" iconColor="text-saffron-500"    label="Mit Wdh. gelernt" value={String(neededRetry)} />
-              <StatBox icon="timer"           iconColor="text-terracotta-500" label="Gesamtzeit"        value={formatTime(elapsed)} />
+              <StatBox icon="check-circle"    iconColor="text-sage-500"       label="Beim 1. Versuch"   value={String(session.firstTryCorrectN)} />
+              <StatBox icon="arrow-clockwise" iconColor="text-saffron-500"    label="Mit Wdh. gelernt"  value={String(neededRetry)} />
+              <StatBox icon="timer"           iconColor="text-terracotta-500" label="Gesamtzeit"         value={formatTime(elapsed)} />
             </div>
           </div>
         </CardShell>
@@ -255,7 +230,9 @@ export default function PracticeCard({ config, onReset }: Props) {
     );
   }
 
-  // ── Main card ─────────────────────────────────────────────────────────────
+  // ── Main card (running) ───────────────────────────────────────────────────
+  const current = session.current!;
+
   return (
     <>
     {exitOverlay}
@@ -265,27 +242,27 @@ export default function PracticeCard({ config, onReset }: Props) {
       <div className="flex items-center justify-between">
         <div className="flex gap-2">
           <span className="px-3 py-1.5 rounded-pill text-[12px] font-bold bg-saffron-50 text-saffron-700 border-2 border-saffron-200">
-            {current!.cls}
+            {current.cls}
           </span>
           <span className="px-3 py-1.5 rounded-pill text-[12px] font-bold bg-ink-900 text-saffron-300 border-2 border-ink-900">
-            {TENSE_LABELS[current!.tense] ?? current!.tense}
+            {TENSE_LABELS[current.tense] ?? current.tense}
           </span>
         </div>
 
         <div className="flex items-center gap-2 text-ink-500 text-[12px] font-bold uppercase tracking-[0.05em]">
-          <span>{masteredN} / {totalItems}</span>
+          <span>{session.masteredN} / {session.totalItems}</span>
           {structured && (
             <span className="text-ink-300 text-[10px] normal-case font-semibold">
-              Block {blocksCompleted + 1}/{totalBlocks}
+              Block {session.blocksCompleted + 1}/{session.totalBlocks}
             </span>
           )}
-          {retryCount > 0 && (
-            <span className="text-saffron-600 font-bold text-[11px]">↻{retryCount}</span>
+          {session.retryCount > 0 && (
+            <span className="text-saffron-600 font-bold text-[11px]">↻{session.retryCount}</span>
           )}
           <div className="w-16 h-2 bg-ink-100 rounded-pill overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-terracotta-500 to-saffron-300 rounded-pill transition-all duration-base"
-              style={{ width: `${progressPct}%` }}
+              style={{ width: `${session.progressPct}%` }}
             />
           </div>
         </div>
@@ -294,48 +271,48 @@ export default function PracticeCard({ config, onReset }: Props) {
       {/* Prompt */}
       <div className="text-center flex flex-col gap-1">
         <div className="text-[14px] font-bold text-ink-500 tracking-wide-08 uppercase">
-          {PRONOUN_LABELS[current!.pronoun] ?? current!.pronoun}
+          {PRONOUN_LABELS[current.pronoun] ?? current.pronoun}
         </div>
         <div className="font-display text-[56px] font-bold tracking-tightest text-ink-900 leading-none">
-          {current!.infinitive}
+          {current.infinitive}
         </div>
         <div className="text-ink-500 italic text-[14px] mt-1">
-          {current!.meaningDe}
+          {current.meaningDe}
         </div>
       </div>
 
       {/* Input */}
       <input
         ref={inputRef}
-        value={status === 'wrong' ? current!.form : value}
+        value={session.answerState === 'wrong' ? current.form : value}
         onChange={e => setValue(e.target.value)}
-        onKeyDown={e => { if (e.key === 'Enter') check(); }}
-        readOnly={status !== 'typing'}
+        onKeyDown={e => { if (e.key === 'Enter') handleEnterKey(); }}
+        readOnly={session.answerState !== 'idle'}
         placeholder={t('placeholder')}
         className={[
           'w-full font-mono text-[32px] font-bold text-center',
           'px-5 py-[18px] rounded-[18px] border-2 outline-none',
           'transition-[border-color,background-color] duration-micro shadow-inset',
-          status === 'correct' ? 'border-sage-700 bg-sage-50 text-sage-700'
-            : status === 'wrong' ? 'border-berry-500 bg-warn-soft text-berry-700'
+          session.answerState === 'correct' ? 'border-sage-700 bg-sage-50 text-sage-700'
+            : session.answerState === 'wrong' ? 'border-berry-500 bg-warn-soft text-berry-700'
             : 'border-ink-200 bg-white-warm text-ink-900 focus:border-terracotta-400',
         ].join(' ')}
       />
 
       {/* Feedback */}
-      {status === 'correct' && (
+      {session.answerState === 'correct' && (
         <div className="flex items-center gap-2.5 px-4 py-3 rounded-md text-[14px] font-bold bg-sage-50 text-sage-700 border border-sage-300/40">
           <i className="ph-fill ph-check-circle text-[20px]" aria-hidden="true" />
           {t('hint_correct', { xp: 12 })}
         </div>
       )}
-      {status === 'wrong' && (
+      {session.answerState === 'wrong' && (
         <div className="flex items-center gap-2.5 px-4 py-3 rounded-md text-[14px] font-bold bg-warn-soft text-berry-700 border border-berry-500/25">
           <i className="ph-fill ph-arrow-right text-[18px]" aria-hidden="true" />
           <span>
             {t.rich('hint_wrong', {
               typed:   value || '—',
-              correct: current!.form,
+              correct: current.form,
               mono:    (chunks) => <span className="font-mono">{chunks}</span>,
             })}
           </span>
@@ -346,7 +323,7 @@ export default function PracticeCard({ config, onReset }: Props) {
       <div className="flex justify-between items-center gap-3 mt-1">
         <div className="flex items-center gap-2.5">
           <img
-            key={status}
+            key={session.answerState}
             src="/assets/mascot-mini.svg"
             alt=""
             width={56}
@@ -355,16 +332,16 @@ export default function PracticeCard({ config, onReset }: Props) {
             draggable={false}
           />
           <span className="text-[13px] text-ink-500 font-semibold italic max-w-[200px]">
-            {status === 'typing'  && (value ? t('mascot_typing') : t('mascot_idle'))}
-            {status === 'correct' && t('mascot_correct')}
-            {status === 'wrong'   && t('mascot_wrong')}
+            {session.answerState === 'idle'    && (value ? t('mascot_typing') : t('mascot_idle'))}
+            {session.answerState === 'correct' && t('mascot_correct')}
+            {session.answerState === 'wrong'   && t('mascot_wrong')}
           </span>
         </div>
         <div className="flex gap-2">
           <Button variant="ghost" size="md" icon="lightbulb">{t('btn_hint')}</Button>
-          {status === 'typing'
-            ? <Button variant="success" size="md" onClick={check}         iconAfter="arrow-right">{t('btn_check')}</Button>
-            : <Button variant="primary" size="md" onClick={handleAdvance} iconAfter="arrow-right">{t('btn_next')}</Button>
+          {session.answerState === 'idle'
+            ? <Button variant="success" size="md" onClick={handleCheck} iconAfter="arrow-right">{t('btn_check')}</Button>
+            : <Button variant="primary" size="md" onClick={handleNext}  iconAfter="arrow-right">{t('btn_next')}</Button>
           }
         </div>
       </div>
