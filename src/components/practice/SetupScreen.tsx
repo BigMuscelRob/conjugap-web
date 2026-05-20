@@ -1,22 +1,13 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { useVerbFilter, SETUP_CLASSES, SETUP_VERBS } from '@/hooks/useVerbFilter';
+import { useSessionConfig, SETUP_TENSES } from '@/hooks/useSessionConfig';
+import { SETUP_CLASSES } from '@/hooks/useVerbFilter';
 
-// ── Static data ───────────────────────────────────────────────────────────────
+export type { SessionConfig } from '@/hooks/useSessionConfig';
 
-const SETUP_TENSES = [
-  { key: 'pres',  label: 'Presente',             level: 'A1' },
-  { key: 'pi',    label: 'Pretérito Indefinido', level: 'A2' },
-  { key: 'imp',   label: 'Imperfecto',           level: 'A2' },
-  { key: 'pp',    label: 'Pretérito Perfecto',   level: 'B1' },
-  { key: 'fut',   label: 'Futuro Simple',        level: 'B1' },
-  { key: 'cond',  label: 'Condicional',          level: 'B1' },
-  { key: 'sub',   label: 'Subjuntivo Presente',  level: 'B2' },
-  { key: 'imper', label: 'Imperativo',           level: 'B1' },
-];
+// ── Static rendering data ─────────────────────────────────────────────────────
 
 const MODES = [
   { key: 'structured' as const, icon: 'stack'   },
@@ -25,17 +16,8 @@ const MODES = [
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
-type Mode = 'structured' | 'random';
-
-export type SessionConfig = {
-  verbs:   string[];
-  tenses:  string[];
-  mode:    Mode;
-  length:  number | null;  // null = Auswahl (only selected verbs/tenses)
-};
-
 interface SetupScreenProps {
-  onStart?: (config: SessionConfig) => void;
+  onStart?: (config: import('@/hooks/useSessionConfig').SessionConfig) => void;
   onBack?:  () => void;
 }
 
@@ -43,22 +25,7 @@ interface SetupScreenProps {
 
 export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
   const t      = useTranslations('practice.setup');
-  const filter = useVerbFilter();
-
-  const [selectedTenses, setSelectedTenses] = useState<string[]>(['pres']);
-  const [mode,           setMode]           = useState<Mode>('structured');
-  const [length,         setLength]         = useState<number | null>(10);
-
-  function toggleTense(key: string) {
-    setSelectedTenses(prev =>
-      prev.includes(key) ? prev.filter(x => x !== key) : [...prev, key]
-    );
-  }
-
-  const allQuestionsCount = filter.effectiveVerbs.length * selectedTenses.length;
-  const totalQuestions    = length === null ? allQuestionsCount : length;
-  const estMinutes        = Math.max(2, Math.round(totalQuestions * 0.4));
-  const canStart          = filter.effectiveVerbs.length > 0 && selectedTenses.length > 0;
+  const config = useSessionConfig();
 
   return (
     <div className="relative min-h-[90vh] px-6 pt-10 pb-[120px] bg-brand-bg overflow-hidden">
@@ -114,7 +81,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                 {t('section_verbs')}
               </span>
               <span className="ml-auto text-[13px] font-semibold text-brand-muted shrink-0">
-                {t('verbs_count', { count: filter.effectiveVerbs.length })}
+                {t('verbs_count', { count: config.effectiveVerbs.length })}
               </span>
             </div>
 
@@ -123,12 +90,12 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
               <RowLabel>{t('by_group')}</RowLabel>
               <div className="flex flex-wrap gap-2 mt-2.5">
                 {SETUP_CLASSES.map(c => {
-                  const active = filter.selectedClasses.includes(c.key);
+                  const active = config.selectedClasses.includes(c.key);
                   return (
                     <button
                       key={c.key}
                       type="button"
-                      onClick={() => filter.toggleClass(c.key)}
+                      onClick={() => config.toggleClass(c.key)}
                       className={`inline-flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full
                         border-2 font-bold text-[13px] transition-colors duration-micro ease-smooth
                         ${active
@@ -149,8 +116,8 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
               <i className="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-ink-300 text-[15px] pointer-events-none" aria-hidden="true" />
               <input
                 type="text"
-                value={filter.verbSearch}
-                onChange={e => filter.setVerbSearch(e.target.value)}
+                value={config.verbSearch}
+                onChange={e => config.setVerbSearch(e.target.value)}
                 placeholder={t('search_placeholder')}
                 className="w-full font-mono text-sm font-bold text-ink-900 placeholder:text-ink-300 placeholder:font-normal
                   pl-9 pr-3 py-2.5 rounded-[12px] border-2 border-ink-900/[0.10]
@@ -167,14 +134,14 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                 <span className="text-[11px] font-semibold text-ink-300">{t('most_common')}</span>
               </div>
               <div className="grid grid-cols-4 gap-2">
-                {filter.filteredVerbs.map(v => {
-                  const active = filter.selectedVerbs.includes(v.word);
+                {config.filteredVerbs.map(v => {
+                  const active = config.selectedVerbs.includes(v.word);
                   const dotCls = SETUP_CLASSES.find(c => c.key === v.cls)?.dotClass;
                   return (
                     <button
                       key={v.word}
                       type="button"
-                      onClick={() => filter.toggleVerb(v.word)}
+                      onClick={() => config.toggleVerb(v.word)}
                       className={`px-3 py-2.5 rounded-[12px] border-2
                         flex items-center justify-between gap-1
                         transition-colors duration-micro ease-smooth
@@ -204,18 +171,18 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                 {t('section_tenses')}
               </span>
               <span className="ml-auto text-[13px] font-semibold text-brand-muted shrink-0">
-                {t('tenses_count', { count: selectedTenses.length })}
+                {t('tenses_count', { count: config.selectedTenses.length })}
               </span>
             </div>
 
             <div className="flex flex-wrap gap-2">
               {SETUP_TENSES.map(tense => {
-                const active = selectedTenses.includes(tense.key);
+                const active = config.selectedTenses.includes(tense.key);
                 return (
                   <button
                     key={tense.key}
                     type="button"
-                    onClick={() => toggleTense(tense.key)}
+                    onClick={() => config.toggleTense(tense.key)}
                     className={`inline-flex items-center gap-2.5 px-3.5 py-2.5 rounded-full
                       border-2 font-bold text-[13px] transition-colors duration-micro ease-smooth
                       ${active
@@ -250,12 +217,12 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
             {/* Mode cards */}
             <div className="grid grid-cols-2 gap-3">
               {MODES.map(m => {
-                const active = mode === m.key;
+                const active = config.mode === m.key;
                 return (
                   <button
                     key={m.key}
                     type="button"
-                    onClick={() => setMode(m.key)}
+                    onClick={() => config.setMode(m.key)}
                     className={`p-[18px] rounded-[16px] border-2 text-left flex flex-col gap-1.5
                       transition-all duration-micro ease-smooth
                       ${active
@@ -283,29 +250,29 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                 {/* "All selected verbs" option */}
                 <button
                   type="button"
-                  onClick={() => setLength(null)}
+                  onClick={() => config.setLength(null)}
                   className={`flex-1 px-2 py-3 rounded-[12px] border-2 text-center
                     font-bricolage font-bold text-lg leading-none
                     transition-colors duration-micro ease-smooth
-                    ${length === null
+                    ${config.length === null
                       ? 'border-brand-dark bg-brand-dark text-brand-yellow'
                       : 'border-ink-900/[0.12] bg-white-warm text-ink-900 hover:border-ink-900/30'
                     }`}
                 >
                   {t('length_all')}
                   <span className={`block text-[10px] font-bold uppercase tracking-wide-08 mt-1
-                    ${length === null ? 'text-brand-yellow/60' : 'text-brand-muted'}`}>
+                    ${config.length === null ? 'text-brand-yellow/60' : 'text-brand-muted'}`}>
                     {t('verbs_unit')}
                   </span>
                 </button>
                 {/* Fixed length options */}
                 {([5, 10, 20, 50] as const).map(n => {
-                  const active = length === n;
+                  const active = config.length === n;
                   return (
                     <button
                       key={n}
                       type="button"
-                      onClick={() => setLength(n)}
+                      onClick={() => config.setLength(n)}
                       className={`flex-1 px-2 py-3 rounded-[12px] border-2 text-center
                         font-bricolage font-bold text-lg leading-none
                         transition-colors duration-micro ease-smooth
@@ -357,7 +324,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                 {t('stat_questions')}
               </p>
               <p className="font-bricolage font-bold text-[30px] tracking-tight-2 text-ink-900 leading-none mt-1">
-                {totalQuestions}
+                {config.totalQuestions}
               </p>
             </div>
             <div className="p-3 rounded-[12px] bg-cream-deep">
@@ -365,7 +332,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                 {t('stat_duration')}
               </p>
               <p className="font-bricolage font-bold text-[30px] tracking-tight-2 text-ink-900 leading-none mt-1">
-                ~{estMinutes} min
+                ~{config.estimatedMinutes} min
               </p>
             </div>
           </div>
@@ -373,9 +340,9 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
           {/* Summary rows */}
           <div>
             {[
-              { label: t('row_verbs'),  value: filter.effectiveVerbs.length,                                                   last: false },
-              { label: t('row_tenses'), value: selectedTenses.length,                                                          last: false },
-              { label: t('row_mode'),   value: mode === 'structured' ? t('mode_value_structured') : t('mode_value_random'),   last: true  },
+              { label: t('row_verbs'),  value: config.effectiveVerbs.length,                                                              last: false },
+              { label: t('row_tenses'), value: config.selectedTenses.length,                                                              last: false },
+              { label: t('row_mode'),   value: config.mode === 'structured' ? t('mode_value_structured') : t('mode_value_random'),        last: true  },
             ].map(row => (
               <div
                 key={row.label}
@@ -395,25 +362,8 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
           {/* Start CTA */}
           <button
             type="button"
-            disabled={!canStart}
-            onClick={() => {
-              if (!canStart) return;
-              let finalVerbs = filter.effectiveVerbs;
-              if (length !== null) {
-                if (finalVerbs.length < length) {
-                  const extra = SETUP_VERBS
-                    .map(v => v.word)
-                    .filter(w => !finalVerbs.includes(w))
-                    .sort(() => Math.random() - 0.5);
-                  finalVerbs = [...finalVerbs, ...extra].slice(0, length);
-                } else if (finalVerbs.length > length) {
-                  finalVerbs = [...finalVerbs]
-                    .sort(() => Math.random() - 0.5)
-                    .slice(0, length);
-                }
-              }
-              onStart?.({ verbs: finalVerbs, tenses: selectedTenses, mode, length });
-            }}
+            disabled={!config.canStart}
+            onClick={() => { if (config.canStart) onStart?.(config.buildConfig()); }}
             className="w-full inline-flex items-center justify-center gap-2
               font-body font-bold text-[17px] text-white-warm
               px-7 py-4 bg-terracotta-500 border-2 border-ink-900 rounded-md
@@ -423,7 +373,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
               disabled:opacity-50 disabled:cursor-not-allowed
               disabled:translate-y-0 disabled:shadow-stamp-primary"
           >
-            {canStart ? t('start') : t('start_disabled')}
+            {config.canStart ? t('start') : t('start_disabled')}
             <i className="ph-bold ph-arrow-right" aria-hidden="true" />
           </button>
 
