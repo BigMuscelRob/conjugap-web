@@ -283,7 +283,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                   </span>
                 </button>
                 {/* Fixed length options */}
-                {([5, 10, 20, 50] as const).map(n => {
+                {([5, 10, 20] as const).map(n => {
                   const active = config.length === n;
                   return (
                     <button

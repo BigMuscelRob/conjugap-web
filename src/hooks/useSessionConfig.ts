@@ -55,7 +55,7 @@ export function useSessionConfig(): SessionConfigResult {
 
   const [selectedTenses, setSelectedTenses] = useState<string[]>(['pres']);
   const [mode,           setMode]           = useState<Mode>('structured');
-  const [length,         setLength]         = useState<number | null>(10);
+  const [length,         setLength]         = useState<number | null>(null);
 
   function toggleTense(key: string) {
     setSelectedTenses(prev =>
