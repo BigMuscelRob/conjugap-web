@@ -3,34 +3,9 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { useVerbFilter, SETUP_CLASSES, SETUP_VERBS } from '@/hooks/useVerbFilter';
 
-// ── Static data (mirrors SetupScreen.jsx) ────────────────────────────────────
-
-const SETUP_CLASSES = [
-  { key: '-ar',         label: '-ar regulares', dotClass: 'bg-terracotta-500' },
-  { key: '-er',         label: '-er regulares', dotClass: 'bg-saffron-500'    },
-  { key: '-ir',         label: '-ir regulares', dotClass: 'bg-sage-300'       },
-  { key: 'irregulares', label: 'irregulares',   dotClass: 'bg-berry-500'      },
-] as const;
-
-const SETUP_VERBS = [
-  { word: 'hablar',   cls: '-ar'         },
-  { word: 'comer',    cls: '-er'         },
-  { word: 'vivir',    cls: '-ir'         },
-  { word: 'tener',    cls: 'irregulares' },
-  { word: 'ir',       cls: 'irregulares' },
-  { word: 'ser',      cls: 'irregulares' },
-  { word: 'estar',    cls: 'irregulares' },
-  { word: 'querer',   cls: 'irregulares' },
-  { word: 'estudiar', cls: '-ar'         },
-  { word: 'trabajar', cls: '-ar'         },
-  { word: 'beber',    cls: '-er'         },
-  { word: 'leer',     cls: '-er'         },
-  { word: 'escribir', cls: '-ir'         },
-  { word: 'salir',    cls: 'irregulares' },
-  { word: 'venir',    cls: 'irregulares' },
-  { word: 'hacer',    cls: 'irregulares' },
-];
+// ── Static data ───────────────────────────────────────────────────────────────
 
 const SETUP_TENSES = [
   { key: 'pres',  label: 'Presente',             level: 'A1' },
@@ -67,37 +42,23 @@ interface SetupScreenProps {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
-  const t = useTranslations('practice.setup');
+  const t      = useTranslations('practice.setup');
+  const filter = useVerbFilter();
 
-  const [selectedClasses, setSelectedClasses] = useState<string[]>(['-ar', '-er']);
-  const [selectedVerbs,   setSelectedVerbs]   = useState<string[]>([]);
-  const [selectedTenses,  setSelectedTenses]  = useState<string[]>(['pres']);
-  const [mode,            setMode]            = useState<Mode>('structured');
-  const [length,          setLength]          = useState<number | null>(10);
-  const [verbSearch,      setVerbSearch]      = useState('');
+  const [selectedTenses, setSelectedTenses] = useState<string[]>(['pres']);
+  const [mode,           setMode]           = useState<Mode>('structured');
+  const [length,         setLength]         = useState<number | null>(10);
 
-  function toggle<T>(setter: React.Dispatch<React.SetStateAction<T[]>>, current: T[], key: T) {
-    setter(current.includes(key) ? current.filter(x => x !== key) : [...current, key]);
+  function toggleTense(key: string) {
+    setSelectedTenses(prev =>
+      prev.includes(key) ? prev.filter(x => x !== key) : [...prev, key]
+    );
   }
 
-  const classVerbs     = SETUP_VERBS.filter(v => selectedClasses.includes(v.cls)).map(v => v.word);
-  // Individual tile picks take priority: if user selected specific verbs, use only those.
-  // Class chips act as a display filter and as the fallback group when nothing is hand-picked.
-  const effectiveVerbs = selectedVerbs.length > 0 ? selectedVerbs : classVerbs;
-
-  const query         = verbSearch.trim().toLowerCase();
-  const filteredVerbs = SETUP_VERBS.filter(v => {
-    const isSelected   = selectedVerbs.includes(v.word);
-    const matchesGroup = selectedClasses.length === 0 || selectedClasses.includes(v.cls);
-    const matchesQuery = query === '' || v.word.includes(query);
-    const visible      = isSelected || (matchesGroup && matchesQuery);
-    return visible;
-  });
-  console.log('[VerbFilter] groups:', selectedClasses, '| visible:', filteredVerbs.map(v => v.word));
-  const allQuestionsCount = effectiveVerbs.length * selectedTenses.length;
+  const allQuestionsCount = filter.effectiveVerbs.length * selectedTenses.length;
   const totalQuestions    = length === null ? allQuestionsCount : length;
   const estMinutes        = Math.max(2, Math.round(totalQuestions * 0.4));
-  const canStart          = effectiveVerbs.length > 0 && selectedTenses.length > 0;
+  const canStart          = filter.effectiveVerbs.length > 0 && selectedTenses.length > 0;
 
   return (
     <div className="relative min-h-[90vh] px-6 pt-10 pb-[120px] bg-brand-bg overflow-hidden">
@@ -153,7 +114,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                 {t('section_verbs')}
               </span>
               <span className="ml-auto text-[13px] font-semibold text-brand-muted shrink-0">
-                {t('verbs_count', { count: effectiveVerbs.length })}
+                {t('verbs_count', { count: filter.effectiveVerbs.length })}
               </span>
             </div>
 
@@ -162,12 +123,12 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
               <RowLabel>{t('by_group')}</RowLabel>
               <div className="flex flex-wrap gap-2 mt-2.5">
                 {SETUP_CLASSES.map(c => {
-                  const active = selectedClasses.includes(c.key);
+                  const active = filter.selectedClasses.includes(c.key);
                   return (
                     <button
                       key={c.key}
                       type="button"
-                      onClick={() => toggle(setSelectedClasses, selectedClasses, c.key)}
+                      onClick={() => filter.toggleClass(c.key)}
                       className={`inline-flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full
                         border-2 font-bold text-[13px] transition-colors duration-micro ease-smooth
                         ${active
@@ -188,8 +149,8 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
               <i className="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-ink-300 text-[15px] pointer-events-none" aria-hidden="true" />
               <input
                 type="text"
-                value={verbSearch}
-                onChange={e => setVerbSearch(e.target.value)}
+                value={filter.verbSearch}
+                onChange={e => filter.setVerbSearch(e.target.value)}
                 placeholder={t('search_placeholder')}
                 className="w-full font-mono text-sm font-bold text-ink-900 placeholder:text-ink-300 placeholder:font-normal
                   pl-9 pr-3 py-2.5 rounded-[12px] border-2 border-ink-900/[0.10]
@@ -206,14 +167,14 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                 <span className="text-[11px] font-semibold text-ink-300">{t('most_common')}</span>
               </div>
               <div className="grid grid-cols-4 gap-2">
-                {filteredVerbs.map(v => {
-                  const active  = selectedVerbs.includes(v.word);
-                  const dotCls  = SETUP_CLASSES.find(c => c.key === v.cls)?.dotClass;
+                {filter.filteredVerbs.map(v => {
+                  const active = filter.selectedVerbs.includes(v.word);
+                  const dotCls = SETUP_CLASSES.find(c => c.key === v.cls)?.dotClass;
                   return (
                     <button
                       key={v.word}
                       type="button"
-                      onClick={() => toggle(setSelectedVerbs, selectedVerbs, v.word)}
+                      onClick={() => filter.toggleVerb(v.word)}
                       className={`px-3 py-2.5 rounded-[12px] border-2
                         flex items-center justify-between gap-1
                         transition-colors duration-micro ease-smooth
@@ -254,7 +215,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                   <button
                     key={tense.key}
                     type="button"
-                    onClick={() => toggle(setSelectedTenses, selectedTenses, tense.key)}
+                    onClick={() => toggleTense(tense.key)}
                     className={`inline-flex items-center gap-2.5 px-3.5 py-2.5 rounded-full
                       border-2 font-bold text-[13px] transition-colors duration-micro ease-smooth
                       ${active
@@ -412,9 +373,9 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
           {/* Summary rows */}
           <div>
             {[
-              { label: t('row_verbs'),  value: effectiveVerbs.length,                                                        last: false },
-              { label: t('row_tenses'), value: selectedTenses.length,                                                        last: false },
-              { label: t('row_mode'),   value: mode === 'structured' ? t('mode_value_structured') : t('mode_value_random'), last: true  },
+              { label: t('row_verbs'),  value: filter.effectiveVerbs.length,                                                   last: false },
+              { label: t('row_tenses'), value: selectedTenses.length,                                                          last: false },
+              { label: t('row_mode'),   value: mode === 'structured' ? t('mode_value_structured') : t('mode_value_random'),   last: true  },
             ].map(row => (
               <div
                 key={row.label}
@@ -437,17 +398,15 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
             disabled={!canStart}
             onClick={() => {
               if (!canStart) return;
-              let finalVerbs = effectiveVerbs;
+              let finalVerbs = filter.effectiveVerbs;
               if (length !== null) {
                 if (finalVerbs.length < length) {
-                  // Fill up with random verbs from pool not already selected
                   const extra = SETUP_VERBS
                     .map(v => v.word)
                     .filter(w => !finalVerbs.includes(w))
                     .sort(() => Math.random() - 0.5);
                   finalVerbs = [...finalVerbs, ...extra].slice(0, length);
                 } else if (finalVerbs.length > length) {
-                  // More selected than session length — take random subset
                   finalVerbs = [...finalVerbs]
                     .sort(() => Math.random() - 0.5)
                     .slice(0, length);
