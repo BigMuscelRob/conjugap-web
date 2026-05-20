@@ -1,8 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useVerbData } from './useVerbData';
+import type { VerbEntry } from './useVerbData';
 
-// ── Static data ───────────────────────────────────────────────────────────────
+export type { VerbEntry };
+
+// ── Static data (class definitions never change) ──────────────────────────────
 
 export const SETUP_CLASSES = [
   { key: '-ar',         label: '-ar regulares', dotClass: 'bg-terracotta-500' },
@@ -10,27 +14,6 @@ export const SETUP_CLASSES = [
   { key: '-ir',         label: '-ir regulares', dotClass: 'bg-sage-300'       },
   { key: 'irregulares', label: 'irregulares',   dotClass: 'bg-berry-500'      },
 ] as const;
-
-export const SETUP_VERBS = [
-  { word: 'hablar',   cls: '-ar'         },
-  { word: 'comer',    cls: '-er'         },
-  { word: 'vivir',    cls: '-ir'         },
-  { word: 'tener',    cls: 'irregulares' },
-  { word: 'ir',       cls: 'irregulares' },
-  { word: 'ser',      cls: 'irregulares' },
-  { word: 'estar',    cls: 'irregulares' },
-  { word: 'querer',   cls: 'irregulares' },
-  { word: 'estudiar', cls: '-ar'         },
-  { word: 'trabajar', cls: '-ar'         },
-  { word: 'beber',    cls: '-er'         },
-  { word: 'leer',     cls: '-er'         },
-  { word: 'escribir', cls: '-ir'         },
-  { word: 'salir',    cls: 'irregulares' },
-  { word: 'venir',    cls: 'irregulares' },
-  { word: 'hacer',    cls: 'irregulares' },
-];
-
-export type VerbEntry = typeof SETUP_VERBS[number];
 
 // ── Public type ───────────────────────────────────────────────────────────────
 
@@ -40,6 +23,9 @@ export type VerbFilterResult = {
   verbSearch:      string;
   filteredVerbs:   VerbEntry[];  // tiles visible in the grid
   effectiveVerbs:  string[];     // verb list used to build the session
+  allVerbs:        VerbEntry[];  // full list from API (for fill-up logic etc.)
+  isLoading:       boolean;
+  error:           string | null;
   toggleClass:     (cls: string)  => void;
   toggleVerb:      (word: string) => void;
   setVerbSearch:   (q: string)    => void;
@@ -48,6 +34,8 @@ export type VerbFilterResult = {
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
 export function useVerbFilter(): VerbFilterResult {
+  const { verbs, isLoading, error } = useVerbData();
+
   const [selectedClasses, setSelectedClasses] = useState<string[]>(['-ar', '-er']);
   const [selectedVerbs,   setSelectedVerbs]   = useState<string[]>([]);
   const [verbSearch,      setVerbSearch]      = useState('');
@@ -66,11 +54,11 @@ export function useVerbFilter(): VerbFilterResult {
 
   // Class chips are the display filter and fallback group when no verb is hand-picked.
   // Individual tile selections take full priority when any verb is chosen.
-  const classVerbs     = SETUP_VERBS.filter(v => selectedClasses.includes(v.cls)).map(v => v.word);
+  const classVerbs     = verbs.filter(v => selectedClasses.includes(v.cls)).map(v => v.word);
   const effectiveVerbs = selectedVerbs.length > 0 ? selectedVerbs : classVerbs;
 
   const query         = verbSearch.trim().toLowerCase();
-  const filteredVerbs = SETUP_VERBS.filter(v => {
+  const filteredVerbs = verbs.filter(v => {
     const isSelected   = selectedVerbs.includes(v.word);
     const matchesGroup = selectedClasses.length === 0 || selectedClasses.includes(v.cls);
     const matchesQuery = query === '' || v.word.includes(query);
@@ -83,6 +71,9 @@ export function useVerbFilter(): VerbFilterResult {
     verbSearch,
     filteredVerbs,
     effectiveVerbs,
+    allVerbs:  verbs,
+    isLoading,
+    error,
     toggleClass,
     toggleVerb,
     setVerbSearch,

@@ -27,6 +27,23 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
   const t      = useTranslations('practice.setup');
   const config = useSessionConfig();
 
+  if (config.isLoading) {
+    return (
+      <div className="min-h-screen bg-brand-bg flex items-center justify-center gap-3">
+        <div className="w-8 h-8 border-4 border-terracotta-200 border-t-terracotta-500 rounded-full animate-spin" />
+        <p className="text-sm font-semibold text-brand-muted">Lade Verben…</p>
+      </div>
+    );
+  }
+
+  if (config.error) {
+    return (
+      <div className="min-h-screen bg-brand-bg flex items-center justify-center">
+        <p className="text-base font-semibold text-berry-700">{config.error}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="relative min-h-[90vh] px-6 pt-10 pb-[120px] bg-brand-bg overflow-hidden">
 

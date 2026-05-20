@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useVerbFilter, SETUP_VERBS } from './useVerbFilter';
+import { useVerbFilter } from './useVerbFilter';
 import type { VerbFilterResult } from './useVerbFilter';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -73,7 +73,7 @@ export function useSessionConfig(): SessionConfigResult {
     if (length !== null) {
       if (finalVerbs.length < length) {
         // Fill up with random verbs from pool not already included
-        const extra = SETUP_VERBS
+        const extra = filter.allVerbs
           .map(v => v.word)
           .filter(w => !finalVerbs.includes(w))
           .sort(() => Math.random() - 0.5);
