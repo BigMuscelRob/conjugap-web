@@ -1,19 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import SetupScreen from '@/components/practice/SetupScreen';
+import SetupScreen, { type SessionConfig } from '@/components/practice/SetupScreen';
 import PracticeCard from '@/components/practice/PracticeCard';
 
 export default function UebenClient() {
-  const [started, setStarted] = useState(false);
+  const [config, setConfig] = useState<SessionConfig | null>(null);
 
-  if (!started) {
-    return <SetupScreen onStart={() => setStarted(true)} />;
+  if (!config) {
+    return <SetupScreen onStart={setConfig} />;
   }
 
   return (
     <main className="min-h-screen bg-cream py-16 px-4">
-      <PracticeCard />
+      <PracticeCard config={config} onReset={() => setConfig(null)} />
     </main>
   );
 }

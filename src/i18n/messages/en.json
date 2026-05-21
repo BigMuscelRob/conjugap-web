@@ -145,14 +145,16 @@
     "title": "The Tenses at a Glance",
     "subtitle": "Choose a tense to practice in a targeted way. ConjuGap guides you through all forms — step by step.",
     "practice_btn": "Practice",
-    "items": [
-      { "desc": "Present — what's happening now or always true." },
-      { "desc": "Past — completed actions." },
-      { "desc": "Descriptive past — states and habits." },
-      { "desc": "Future — plans and predictions." },
-      { "desc": "Conditional — what would happen if." },
-      { "desc": "Subjunctive present — wishes and doubts." }
-    ]
+    "items": {
+      "pres":  { "desc": "Present — what's happening now or always true." },
+      "pi":    { "desc": "Simple past — completed actions." },
+      "imp":   { "desc": "Descriptive past — states and habits." },
+      "pp":    { "desc": "Present perfect — past with present relevance." },
+      "fut":   { "desc": "Future — plans and predictions." },
+      "cond":  { "desc": "Conditional — what would happen if." },
+      "sub":   { "desc": "Present subjunctive — wishes and doubts." },
+      "imper": { "desc": "Imperative — commands and requests." }
+    }
   },
   "language_switcher": {
     "label": "Language"
