@@ -77,7 +77,7 @@ export default function Header() {
         </nav>
 
         {/* Desktop actions — login + CTA together */}
-        <div className="hidden md:flex items-center gap-3 shrink-0">
+        <div className="hidden md:flex items-center gap-3 shrink-0 ml-6">
           <Link
             href="/login"
             className="font-bold text-small text-ink-700 no-underline
