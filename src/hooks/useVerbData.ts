@@ -15,7 +15,7 @@ type ApiVerb = {
 
 // ── Public types ──────────────────────────────────────────────────────────────
 
-export type VerbEntry = { word: string; cls: string };
+export type VerbEntry = { word: string; cls: string; irregular: boolean };
 
 export type VerbDataResult = {
   verbs:     VerbEntry[];
@@ -37,7 +37,7 @@ function loadVerbs(): Promise<VerbEntry[]> {
   pending = fetch('/api/verbs')
     .then(r => r.json() as Promise<ApiVerb[]>)
     .then(data => {
-      cache   = data.map(v => ({ word: v.infinitive, cls: v.cls }));
+      cache   = data.map(v => ({ word: v.infinitive, cls: v.cls, irregular: v.irregular }));
       pending = null;
       return cache;
     });

@@ -59,17 +59,23 @@ export function useVerbFilter(): VerbFilterResult {
     );
   }
 
+  function matchesClasses(v: { cls: string; irregular: boolean }, classes: string[]): boolean {
+    if (classes.length === 0) return true;
+    if (classes.includes('irregulares') && v.irregular) return true;
+    return classes.some(c => c !== 'irregulares' && c === v.cls);
+  }
+
   // Class chips are the display filter and fallback group when no verb is hand-picked.
   // Individual tile selections take full priority when any verb is chosen.
-  const classVerbs     = verbs.filter(v => selectedClasses.includes(v.cls)).map(v => v.word);
+  const classVerbs     = verbs.filter(v => matchesClasses(v, selectedClasses)).map(v => v.word);
   const effectiveVerbs = selectedVerbs.length > 0 ? selectedVerbs : classVerbs;
 
   const query         = verbSearch.trim().toLowerCase();
   const filteredVerbs = verbs.filter(v => {
     const isSelected   = selectedVerbs.includes(v.word);
-    const matchesGroup = selectedClasses.length === 0 || selectedClasses.includes(v.cls);
+    const matchesGroup = matchesClasses(v, selectedClasses);
     const matchesQuery = query === '' || v.word.includes(query);
-    return isSelected || (matchesGroup && matchesQuery); // selected verbs always visible
+    return isSelected || (matchesGroup && matchesQuery);
   });
 
   return {
