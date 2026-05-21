@@ -105,7 +105,8 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
             {/* Group chips */}
             <div>
               <RowLabel>{t('by_group')}</RowLabel>
-              <div className="flex flex-wrap gap-2 mt-2.5">
+              <div className={`flex flex-wrap gap-2 mt-2.5 transition-opacity duration-micro
+                ${config.classesAreFilterOnly ? 'opacity-50' : ''}`}>
                 {SETUP_CLASSES.map(c => {
                   const active = config.selectedClasses.includes(c.key);
                   return (
@@ -113,6 +114,9 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                       key={c.key}
                       type="button"
                       onClick={() => config.toggleClass(c.key)}
+                      title={config.classesAreFilterOnly
+                        ? 'Wird als Anzeigefilter verwendet – individuelle Verben haben Vorrang'
+                        : undefined}
                       className={`inline-flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full
                         border-2 font-bold text-[13px] transition-colors duration-micro ease-smooth
                         ${active
@@ -126,6 +130,22 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                   );
                 })}
               </div>
+              {config.classesAreFilterOnly && (
+                <div className="flex items-center justify-between gap-2 mt-2 px-1">
+                  <p className="text-[11px] font-semibold text-brand-muted leading-snug">
+                    Einzelne Verben ausgewählt — Gruppen werden nur als Filter verwendet.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => config.selectedVerbs.forEach(v => config.toggleVerb(v))}
+                    className="shrink-0 text-[11px] font-bold text-brand-muted
+                      hover:text-ink-900 transition-colors duration-micro ease-smooth"
+                    title="Einzelauswahl zurücksetzen"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Verb search */}

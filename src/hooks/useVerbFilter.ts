@@ -18,17 +18,18 @@ export const SETUP_CLASSES = [
 // ── Public type ───────────────────────────────────────────────────────────────
 
 export type VerbFilterResult = {
-  selectedClasses: string[];
-  selectedVerbs:   string[];
-  verbSearch:      string;
-  filteredVerbs:   VerbEntry[];  // tiles visible in the grid
-  effectiveVerbs:  string[];     // verb list used to build the session
-  allVerbs:        VerbEntry[];  // full list from API (for fill-up logic etc.)
-  isLoading:       boolean;
-  error:           string | null;
-  toggleClass:     (cls: string)  => void;
-  toggleVerb:      (word: string) => void;
-  setVerbSearch:   (q: string)    => void;
+  selectedClasses:     string[];
+  selectedVerbs:       string[];
+  verbSearch:          string;
+  filteredVerbs:       VerbEntry[];  // tiles visible in the grid
+  effectiveVerbs:      string[];     // verb list used to build the session
+  allVerbs:            VerbEntry[];  // full list from API (for fill-up logic etc.)
+  classesAreFilterOnly: boolean;    // true when individual verbs override class selection
+  isLoading:           boolean;
+  error:               string | null;
+  toggleClass:         (cls: string)  => void;
+  toggleVerb:          (word: string) => void;
+  setVerbSearch:       (q: string)    => void;
 };
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
@@ -71,7 +72,8 @@ export function useVerbFilter(): VerbFilterResult {
     verbSearch,
     filteredVerbs,
     effectiveVerbs,
-    allVerbs:  verbs,
+    allVerbs:            verbs,
+    classesAreFilterOnly: selectedVerbs.length > 0,
     isLoading,
     error,
     toggleClass,
