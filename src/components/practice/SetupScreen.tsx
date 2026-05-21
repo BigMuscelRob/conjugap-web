@@ -252,7 +252,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
             </div>
 
             {/* Mode cards */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 max-[480px]:grid-cols-1">
               {MODES.map(m => {
                 const active = config.mode === m.key;
                 return (
@@ -268,7 +268,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                       }`}
                   >
                     <span className="font-bricolage font-bold text-[17px] tracking-tight-1
-                      text-ink-900 flex items-center gap-2 whitespace-nowrap">
+                      text-ink-900 flex items-center gap-2">
                       <i className={`ph-bold ph-${m.icon} text-[20px] text-brand-orange`} aria-hidden="true" />
                       {m.key === 'structured' ? t('mode_structured_label') : t('mode_random_label')}
                     </span>
