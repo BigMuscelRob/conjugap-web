@@ -61,7 +61,7 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
+        {/* Desktop Nav — page links + language switcher only */}
         <nav className="hidden md:flex items-center gap-6 ml-auto" aria-label="Hauptnavigation">
           <LanguageSwitcher />
           {NAV_LINKS.map(({ href, label }) => (
@@ -74,6 +74,10 @@ export default function Header() {
               {label}
             </Link>
           ))}
+        </nav>
+
+        {/* Desktop actions — login + CTA together */}
+        <div className="hidden md:flex items-center gap-3 shrink-0">
           <Link
             href="/login"
             className="font-bold text-small text-ink-700 no-underline
@@ -81,14 +85,9 @@ export default function Header() {
           >
             {t('login')}
           </Link>
-        </nav>
-
-        {/* Actions */}
-        <div className="flex items-center gap-2 ml-auto md:ml-0 shrink-0">
-          {/* Desktop CTA */}
           <Link
             href="/practice"
-            className="hidden md:inline-flex items-center font-body font-bold text-small text-white-warm no-underline
+            className="inline-flex items-center font-body font-bold text-small text-white-warm no-underline
               px-4 py-2 bg-terracotta-500 border-2 border-ink-900 rounded-md
               shadow-stamp-primary
               transition-all duration-micro ease-smooth
@@ -97,22 +96,22 @@ export default function Header() {
           >
             {t('cta')}
           </Link>
-
-          {/* Hamburger — mobile only */}
-          <button
-            type="button"
-            onClick={() => setDrawerOpen(prev => !prev)}
-            className="md:hidden flex items-center justify-center w-10 h-10 rounded-full
-              text-ink-900 hover:bg-ink-100 transition-colors duration-micro ease-smooth"
-            aria-label={drawerOpen ? 'Menü schließen' : 'Menü öffnen'}
-            aria-expanded={drawerOpen}
-          >
-            <i
-              className={`ph-bold ${drawerOpen ? 'ph-x' : 'ph-list'} text-[28px]`}
-              aria-hidden="true"
-            />
-          </button>
         </div>
+
+        {/* Hamburger — mobile only */}
+        <button
+          type="button"
+          onClick={() => setDrawerOpen(prev => !prev)}
+          className="md:hidden ml-auto flex items-center justify-center w-10 h-10 rounded-full
+            text-ink-900 hover:bg-ink-100 transition-colors duration-micro ease-smooth"
+          aria-label={drawerOpen ? 'Menü schließen' : 'Menü öffnen'}
+          aria-expanded={drawerOpen}
+        >
+          <i
+            className={`ph-bold ${drawerOpen ? 'ph-x' : 'ph-list'} text-[28px]`}
+            aria-hidden="true"
+          />
+        </button>
       </div>
 
       {/* Mobile drawer */}
