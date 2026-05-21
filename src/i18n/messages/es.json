@@ -145,14 +145,16 @@
     "title": "Los Tiempos de un Vistazo",
     "subtitle": "Elige un tiempo para practicar de forma específica. ConjuGap te guía por todas las formas — paso a paso.",
     "practice_btn": "Practicar",
-    "items": [
-      { "desc": "Presente — lo que pasa ahora o siempre es verdad." },
-      { "desc": "Pasado — acciones completadas." },
-      { "desc": "Pasado descriptivo — estados y hábitos." },
-      { "desc": "Futuro — planes y predicciones." },
-      { "desc": "Condicional — lo que pasaría si." },
-      { "desc": "Subjuntivo presente — deseos y dudas." }
-    ]
+    "items": {
+      "pres":  { "desc": "Presente — lo que pasa ahora o siempre es verdad." },
+      "pi":    { "desc": "Pretérito indefinido — acciones completadas." },
+      "imp":   { "desc": "Imperfecto — estados y hábitos en el pasado." },
+      "pp":    { "desc": "Pretérito perfecto — pasado con relevancia presente." },
+      "fut":   { "desc": "Futuro simple — planes y predicciones." },
+      "cond":  { "desc": "Condicional — lo que pasaría si." },
+      "sub":   { "desc": "Subjuntivo presente — deseos y dudas." },
+      "imper": { "desc": "Imperativo — órdenes y peticiones." }
+    }
   },
   "language_switcher": {
     "label": "Idioma"
