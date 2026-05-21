@@ -6,7 +6,13 @@ import type { VerbEntry } from './useVerbData';
 
 export type { VerbEntry };
 
-// ── Static data (class definitions never change) ──────────────────────────────
+// ── Static data ───────────────────────────────────────────────────────────────
+
+export const TOP_VERBS = [
+  'ser', 'estar', 'haber', 'tener', 'hacer',
+  'poder', 'saber', 'ir', 'querer', 'venir',
+  'dar', 'hablar', 'ver', 'decir', 'poner', 'salir',
+];
 
 export const SETUP_CLASSES = [
   { key: '-ar',         label: '-ar regulares', dotClass: 'bg-terracotta-500' },

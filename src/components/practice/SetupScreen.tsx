@@ -1,9 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useSessionConfig, SETUP_TENSES } from '@/hooks/useSessionConfig';
-import { SETUP_CLASSES } from '@/hooks/useVerbFilter';
+import { SETUP_CLASSES, TOP_VERBS } from '@/hooks/useVerbFilter';
 
 export type { SessionConfig } from '@/hooks/useSessionConfig';
 
@@ -26,6 +27,7 @@ interface SetupScreenProps {
 export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
   const t      = useTranslations('practice.setup');
   const config = useSessionConfig();
+  const [showAllVerbs, setShowAllVerbs] = useState(false);
 
   if (config.isLoading) {
     return (
@@ -170,32 +172,58 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                 <RowLabel>{t('specific_verbs')}</RowLabel>
                 <span className="text-[11px] font-semibold text-ink-300">{t('most_common')}</span>
               </div>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {config.filteredVerbs.map(v => {
-                  const active = config.selectedVerbs.includes(v.word);
-                  const dotCls = SETUP_CLASSES.find(c => c.key === v.cls)?.dotClass;
-                  return (
-                    <button
-                      key={v.word}
-                      type="button"
-                      onClick={() => config.toggleVerb(v.word)}
-                      className={`px-3 py-2.5 rounded-[12px] border-2
-                        flex items-center justify-between gap-1
-                        transition-colors duration-micro ease-smooth
-                        ${active
-                          ? 'bg-brand-dark border-brand-dark'
-                          : 'bg-white-warm border-ink-900/[0.08] hover:border-ink-900/20'
-                        }`}
-                    >
-                      <span className={`font-mono text-sm font-bold truncate
-                        ${active ? 'text-white-warm' : 'text-ink-900'}`}>
-                        {v.word}
-                      </span>
-                      {dotCls && <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotCls}`} />}
-                    </button>
-                  );
-                })}
-              </div>
+              {(() => {
+                const isSearching = config.verbSearch.trim() !== '';
+                const verbsToShow = (showAllVerbs || isSearching)
+                  ? config.filteredVerbs
+                  : config.filteredVerbs.filter(v =>
+                      TOP_VERBS.includes(v.word) || config.selectedVerbs.includes(v.word)
+                    );
+                return (
+                  <>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                      {verbsToShow.map(v => {
+                        const active = config.selectedVerbs.includes(v.word);
+                        const dotCls = SETUP_CLASSES.find(c => c.key === v.cls)?.dotClass;
+                        return (
+                          <button
+                            key={v.word}
+                            type="button"
+                            onClick={() => config.toggleVerb(v.word)}
+                            className={`px-3 py-2.5 rounded-[12px] border-2
+                              flex items-center justify-between gap-1
+                              transition-colors duration-micro ease-smooth
+                              ${active
+                                ? 'bg-brand-dark border-brand-dark'
+                                : 'bg-white-warm border-ink-900/[0.08] hover:border-ink-900/20'
+                              }`}
+                          >
+                            <span className={`font-mono text-sm font-bold truncate
+                              ${active ? 'text-white-warm' : 'text-ink-900'}`}>
+                              {v.word}
+                            </span>
+                            {dotCls && <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotCls}`} />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {!isSearching && (
+                      <button
+                        type="button"
+                        onClick={() => setShowAllVerbs(prev => !prev)}
+                        className="mt-1 inline-flex items-center gap-1.5 text-[12px] font-bold
+                          text-brand-muted hover:text-ink-900 transition-colors duration-micro ease-smooth"
+                      >
+                        <i className={`ph-bold ${showAllVerbs ? 'ph-caret-up' : 'ph-caret-down'} text-[11px]`} aria-hidden="true" />
+                        {showAllVerbs
+                          ? 'Weniger anzeigen'
+                          : `Alle ${config.filteredVerbs.length} Verben anzeigen`
+                        }
+                      </button>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </div>
 
