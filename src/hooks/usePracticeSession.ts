@@ -45,7 +45,7 @@ export type PracticeSessionResult = {
 // ── Utilities ─────────────────────────────────────────────────────────────────
 
 const normalize = (s: string) =>
-  s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
