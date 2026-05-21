@@ -63,9 +63,12 @@ export function useSessionConfig(): SessionConfigResult {
     );
   }
 
-  const allQuestionsCount = filter.effectiveVerbs.length * selectedTenses.length;
-  const totalQuestions    = length === null ? allQuestionsCount : length;
-  const estimatedMinutes  = Math.max(2, Math.round(totalQuestions * 0.4));
+  const PRONOUNS_PER_BLOCK = 6;
+  const allQuestionsCount = filter.effectiveVerbs.length * selectedTenses.length * PRONOUNS_PER_BLOCK;
+  const totalQuestions    = length === null
+    ? allQuestionsCount
+    : length * selectedTenses.length * PRONOUNS_PER_BLOCK;
+  const estimatedMinutes  = Math.max(1, Math.round(totalQuestions * 0.25));
   const canStart          = filter.effectiveVerbs.length > 0 && selectedTenses.length > 0;
 
   function buildConfig(): SessionConfig {
