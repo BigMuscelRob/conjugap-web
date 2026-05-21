@@ -97,8 +97,7 @@
     "setup": {
       "title": "Configura tu sesión",
       "subtitle": "Tres pasos. Luego a conjugar. ¡Vamos!",
-      "streak_label": "{days} días",
-      "section_verbs": "Verbos",
+"section_verbs": "Verbos",
       "verbs_count": "{count} seleccionados",
       "by_group": "Por grupo",
       "search_placeholder": "Buscar verbo…",

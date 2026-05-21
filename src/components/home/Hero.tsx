@@ -12,7 +12,7 @@ export default function Hero() {
       className="relative overflow-hidden"
       style={{ background: 'radial-gradient(900px 500px at 30% 0%, #FFE6BD 0%, transparent 60%), #FBF4E6' }}
     >
-      <div className="max-w-content mx-auto px-6 py-20 pb-24 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-14 items-center">
+      <div className="max-w-content mx-auto px-4 sm:px-6 py-12 sm:py-20 sm:pb-24 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-14 items-center">
 
         {/* Copy */}
         <div className="flex flex-col">
@@ -30,7 +30,7 @@ export default function Hero() {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-bodyL text-ink-700 max-w-[480px] mb-8">
+          <p className="text-bodyL text-ink-700 max-w-[480px] w-full mb-8">
             {t('subtitle')}
           </p>
 

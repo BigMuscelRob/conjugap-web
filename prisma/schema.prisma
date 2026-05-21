@@ -24,4 +24,6 @@ model Conjugation {
   pronoun String
   form    String
   verb    Verb   @relation(fields: [verbId], references: [id])
+
+  @@unique([verbId, tense, pronoun])
 }

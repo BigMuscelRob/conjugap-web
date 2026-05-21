@@ -1,9 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useSessionConfig, SETUP_TENSES } from '@/hooks/useSessionConfig';
-import { SETUP_CLASSES } from '@/hooks/useVerbFilter';
+import { SETUP_CLASSES, TOP_VERBS } from '@/hooks/useVerbFilter';
 
 export type { SessionConfig } from '@/hooks/useSessionConfig';
 
@@ -26,6 +27,7 @@ interface SetupScreenProps {
 export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
   const t      = useTranslations('practice.setup');
   const config = useSessionConfig();
+  const [showAllVerbs, setShowAllVerbs] = useState(false);
 
   if (config.isLoading) {
     return (
@@ -45,7 +47,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
   }
 
   return (
-    <div className="relative min-h-[90vh] px-6 pt-10 pb-[120px] bg-brand-bg overflow-hidden">
+    <div className="relative min-h-[90vh] px-4 sm:px-6 pt-10 pb-[120px] bg-brand-bg overflow-hidden">
 
       {/* Radial glow — can't be expressed as a Tailwind class */}
       <div
@@ -53,7 +55,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
         style={{ background: 'radial-gradient(900px 360px at 30% 0%, #FFE6BD 0%, transparent 60%)' }}
       />
 
-      <div className="relative max-w-content mx-auto grid grid-cols-[1.4fr_1fr] gap-8 items-start">
+      <div className="relative max-w-content mx-auto grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-8 items-start">
 
         {/* ── Page header ── */}
         <div className="col-span-full flex items-center justify-between mb-3">
@@ -78,12 +80,6 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
             </div>
           </div>
 
-          {/* Streak badge */}
-          <div className="inline-flex items-center gap-2.5 bg-brand-dark text-brand-yellow
-            pl-2.5 pr-3.5 py-2 rounded-full font-bold text-sm whitespace-nowrap shrink-0">
-            <i className="ph-fill ph-flame text-brand-orange text-base" aria-hidden="true" />
-            {t('streak_label', { days: 12 })}
-          </div>
         </div>
 
         {/* ── Left column ── */}
@@ -170,32 +166,58 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                 <RowLabel>{t('specific_verbs')}</RowLabel>
                 <span className="text-[11px] font-semibold text-ink-300">{t('most_common')}</span>
               </div>
-              <div className="grid grid-cols-4 gap-2">
-                {config.filteredVerbs.map(v => {
-                  const active = config.selectedVerbs.includes(v.word);
-                  const dotCls = SETUP_CLASSES.find(c => c.key === v.cls)?.dotClass;
-                  return (
-                    <button
-                      key={v.word}
-                      type="button"
-                      onClick={() => config.toggleVerb(v.word)}
-                      className={`px-3 py-2.5 rounded-[12px] border-2
-                        flex items-center justify-between gap-1
-                        transition-colors duration-micro ease-smooth
-                        ${active
-                          ? 'bg-brand-dark border-brand-dark'
-                          : 'bg-white-warm border-ink-900/[0.08] hover:border-ink-900/20'
-                        }`}
-                    >
-                      <span className={`font-mono text-sm font-bold truncate
-                        ${active ? 'text-white-warm' : 'text-ink-900'}`}>
-                        {v.word}
-                      </span>
-                      {dotCls && <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotCls}`} />}
-                    </button>
-                  );
-                })}
-              </div>
+              {(() => {
+                const isSearching = config.verbSearch.trim() !== '';
+                const verbsToShow = (showAllVerbs || isSearching)
+                  ? config.filteredVerbs
+                  : config.filteredVerbs.filter(v =>
+                      TOP_VERBS.includes(v.word) || config.selectedVerbs.includes(v.word)
+                    );
+                return (
+                  <>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                      {verbsToShow.map(v => {
+                        const active = config.selectedVerbs.includes(v.word);
+                        const dotCls = SETUP_CLASSES.find(c => c.key === v.cls)?.dotClass;
+                        return (
+                          <button
+                            key={v.word}
+                            type="button"
+                            onClick={() => config.toggleVerb(v.word)}
+                            className={`px-3 py-2.5 rounded-[12px] border-2
+                              flex items-center justify-between gap-1
+                              transition-colors duration-micro ease-smooth
+                              ${active
+                                ? 'bg-brand-dark border-brand-dark'
+                                : 'bg-white-warm border-ink-900/[0.08] hover:border-ink-900/20'
+                              }`}
+                          >
+                            <span className={`font-mono text-sm font-bold truncate
+                              ${active ? 'text-white-warm' : 'text-ink-900'}`}>
+                              {v.word}
+                            </span>
+                            {dotCls && <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotCls}`} />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {!isSearching && (
+                      <button
+                        type="button"
+                        onClick={() => setShowAllVerbs(prev => !prev)}
+                        className="mt-1 inline-flex items-center gap-1.5 text-[12px] font-bold
+                          text-brand-muted hover:text-ink-900 transition-colors duration-micro ease-smooth"
+                      >
+                        <i className={`ph-bold ${showAllVerbs ? 'ph-caret-up' : 'ph-caret-down'} text-[11px]`} aria-hidden="true" />
+                        {showAllVerbs
+                          ? 'Weniger anzeigen'
+                          : `Alle ${config.filteredVerbs.length} Verben anzeigen`
+                        }
+                      </button>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </div>
 
@@ -252,7 +274,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
             </div>
 
             {/* Mode cards */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 max-[480px]:grid-cols-1">
               {MODES.map(m => {
                 const active = config.mode === m.key;
                 return (
@@ -268,7 +290,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                       }`}
                   >
                     <span className="font-bricolage font-bold text-[17px] tracking-tight-1
-                      text-ink-900 flex items-center gap-2 whitespace-nowrap">
+                      text-ink-900 flex items-center gap-2">
                       <i className={`ph-bold ph-${m.icon} text-[20px] text-brand-orange`} aria-hidden="true" />
                       {m.key === 'structured' ? t('mode_structured_label') : t('mode_random_label')}
                     </span>
@@ -332,7 +354,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
         </div>
 
         {/* ── Right column — Summary panel ── */}
-        <div className="sticky top-24 bg-paper border-2 border-brand-dark rounded-[24px] p-6
+        <div className="md:sticky md:top-24 bg-paper border-2 border-brand-dark rounded-[24px] p-6
           shadow-stamp-big flex flex-col gap-[18px]">
 
           {/* Panel header */}
@@ -396,23 +418,25 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
             ))}
           </div>
 
-          {/* Start CTA */}
-          <button
-            type="button"
-            disabled={!config.canStart}
-            onClick={() => { if (config.canStart) onStart?.(config.buildConfig()); }}
-            className="w-full inline-flex items-center justify-center gap-2
-              font-body font-bold text-[17px] text-white-warm
-              px-7 py-4 bg-terracotta-500 border-2 border-ink-900 rounded-md
-              shadow-stamp-primary transition-all duration-micro ease-smooth
-              hover:-translate-y-px hover:shadow-stamp-primary-hover
-              active:translate-y-0.5 active:shadow-none active:bg-terracotta-600
-              disabled:opacity-50 disabled:cursor-not-allowed
-              disabled:translate-y-0 disabled:shadow-stamp-primary"
-          >
-            {config.canStart ? t('start') : t('start_disabled')}
-            <i className="ph-bold ph-arrow-right" aria-hidden="true" />
-          </button>
+          {/* Start CTA — desktop only; mobile uses the fixed bottom bar */}
+          <div className="hidden md:block">
+            <button
+              type="button"
+              disabled={!config.canStart}
+              onClick={() => { if (config.canStart) onStart?.(config.buildConfig()); }}
+              className="w-full inline-flex items-center justify-center gap-2
+                font-body font-bold text-[17px] text-white-warm
+                px-7 py-4 bg-terracotta-500 border-2 border-ink-900 rounded-md
+                shadow-stamp-primary transition-all duration-micro ease-smooth
+                hover:-translate-y-px hover:shadow-stamp-primary-hover
+                active:translate-y-0.5 active:shadow-none active:bg-terracotta-600
+                disabled:opacity-50 disabled:cursor-not-allowed
+                disabled:translate-y-0 disabled:shadow-stamp-primary"
+            >
+              {config.canStart ? t('start') : t('start_disabled')}
+              <i className="ph-bold ph-arrow-right" aria-hidden="true" />
+            </button>
+          </div>
 
           {/* Pro tip */}
           <p className="text-[11px] font-semibold text-brand-muted text-center leading-snug">
@@ -420,6 +444,33 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
           </p>
         </div>
 
+      </div>
+
+      {/* Mobile sticky bottom CTA bar */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-30
+        bg-cream/90 backdrop-blur-md border-t border-ink-900/[0.08]
+        px-4 py-3 flex items-center gap-3">
+        <div className="flex-1">
+          <p className="text-[10px] font-bold text-brand-muted uppercase tracking-[0.06em]">
+            {t('stat_questions')}
+          </p>
+          <p className="font-bricolage font-bold text-[22px] text-ink-900 leading-none">
+            {config.totalQuestions}
+          </p>
+        </div>
+        <button
+          type="button"
+          disabled={!config.canStart}
+          onClick={() => { if (config.canStart) onStart?.(config.buildConfig()); }}
+          className="inline-flex items-center justify-center gap-2
+            font-body font-bold text-[15px] text-white-warm
+            px-5 py-3 bg-terracotta-500 border-2 border-ink-900 rounded-md
+            shadow-stamp-primary transition-all duration-micro ease-smooth
+            disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {config.canStart ? t('start') : t('start_disabled')}
+          <i className="ph-bold ph-arrow-right" aria-hidden="true" />
+        </button>
       </div>
     </div>
   );

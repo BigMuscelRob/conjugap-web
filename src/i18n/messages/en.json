@@ -97,8 +97,7 @@
     "setup": {
       "title": "Configure your session",
       "subtitle": "Three steps. Then conjugate. Let's go!",
-      "streak_label": "{days} days",
-      "section_verbs": "Verbs",
+"section_verbs": "Verbs",
       "verbs_count": "{count} selected",
       "by_group": "By group",
       "search_placeholder": "Search verb…",
