@@ -80,12 +80,6 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
             </div>
           </div>
 
-          {/* Streak badge */}
-          <div className="inline-flex items-center gap-2.5 bg-brand-dark text-brand-yellow
-            pl-2.5 pr-3.5 py-2 rounded-full font-bold text-sm whitespace-nowrap shrink-0">
-            <i className="ph-fill ph-flame text-brand-orange text-base" aria-hidden="true" />
-            {t('streak_label', { days: 12 })}
-          </div>
         </div>
 
         {/* ── Left column ── */}

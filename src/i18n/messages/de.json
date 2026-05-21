@@ -97,8 +97,7 @@
     "setup": {
       "title": "Sitzung konfigurieren",
       "subtitle": "Drei Schritte. Dann konjugieren. Los!",
-      "streak_label": "{days} Tage",
-      "section_verbs": "Verben",
+"section_verbs": "Verben",
       "verbs_count": "{count} ausgewählt",
       "by_group": "Nach Gruppe",
       "search_placeholder": "Verb suchen…",
