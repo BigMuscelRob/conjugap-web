@@ -83,7 +83,7 @@ export function usePracticeRetry(config: SessionConfig): PracticeRetryResult {
   const done        = !build.loading && build.totalItems > 0 && masteredN === build.totalItems;
   const progressPct = build.totalItems > 0 ? (masteredN / build.totalItems) * 100 : 0;
   const retryCount  = structured
-    ? queue.length - (currentBlockSize - masteredInCurrentBlock)
+    ? queue.filter(item => attempted.has(item.key) && !mastered.has(item.key)).length
     : attempted.size - masteredN;
 
   // ── advance ───────────────────────────────────────────────────────────────
