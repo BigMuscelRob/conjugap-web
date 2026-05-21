@@ -286,7 +286,7 @@ export default function PracticeCard({ config, onReset }: Props) {
         <div className="text-[14px] font-bold text-ink-500 tracking-wide-08 uppercase">
           {PRONOUN_LABELS[current.pronoun] ?? current.pronoun}
         </div>
-        <div className="font-display text-[56px] font-bold tracking-tightest text-ink-900 leading-none">
+        <div className="font-display text-[36px] sm:text-[56px] font-bold tracking-tightest text-ink-900 leading-none">
           {current.infinitive}
         </div>
         <div className="text-ink-500 italic text-[14px] mt-1">
@@ -303,8 +303,8 @@ export default function PracticeCard({ config, onReset }: Props) {
         readOnly={session.answerState !== 'idle'}
         placeholder={t('placeholder')}
         className={[
-          'w-full font-mono text-[32px] font-bold text-center',
-          'px-5 py-[18px] rounded-[18px] border-2 outline-none',
+          'w-full font-mono text-[24px] sm:text-[32px] font-bold text-center',
+          'px-5 py-3 sm:py-[18px] rounded-[18px] border-2 outline-none',
           'transition-[border-color,background-color] duration-micro shadow-inset',
           session.answerState === 'correct' ? 'border-sage-700 bg-sage-50 text-sage-700'
             : session.answerState === 'wrong' ? 'border-berry-500 bg-warn-soft text-berry-700'
@@ -333,7 +333,7 @@ export default function PracticeCard({ config, onReset }: Props) {
       )}
 
       {/* Footer: mascot + buttons */}
-      <div className="flex justify-between items-center gap-3 mt-1">
+      <div className="flex justify-between items-center flex-wrap gap-3 gap-y-2 mt-1">
         <div className="flex items-center gap-2.5">
           <img
             key={session.answerState}
@@ -367,7 +367,7 @@ export default function PracticeCard({ config, onReset }: Props) {
 
 function CardShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-paper border-2 border-ink-900 rounded-[28px] p-9 shadow-[0_6px_0_#2A1F1A] max-w-[560px] mx-auto flex flex-col gap-5">
+    <div className="bg-paper border-2 border-ink-900 rounded-[28px] p-5 sm:p-9 shadow-[0_6px_0_#2A1F1A] max-w-[560px] mx-auto flex flex-col gap-5">
       {children}
     </div>
   );

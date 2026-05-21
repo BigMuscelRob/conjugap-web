@@ -45,7 +45,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
   }
 
   return (
-    <div className="relative min-h-[90vh] px-6 pt-10 pb-[120px] bg-brand-bg overflow-hidden">
+    <div className="relative min-h-[90vh] px-4 sm:px-6 pt-10 pb-[120px] bg-brand-bg overflow-hidden">
 
       {/* Radial glow — can't be expressed as a Tailwind class */}
       <div
@@ -53,7 +53,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
         style={{ background: 'radial-gradient(900px 360px at 30% 0%, #FFE6BD 0%, transparent 60%)' }}
       />
 
-      <div className="relative max-w-content mx-auto grid grid-cols-[1.4fr_1fr] gap-8 items-start">
+      <div className="relative max-w-content mx-auto grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-8 items-start">
 
         {/* ── Page header ── */}
         <div className="col-span-full flex items-center justify-between mb-3">
@@ -170,7 +170,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
                 <RowLabel>{t('specific_verbs')}</RowLabel>
                 <span className="text-[11px] font-semibold text-ink-300">{t('most_common')}</span>
               </div>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                 {config.filteredVerbs.map(v => {
                   const active = config.selectedVerbs.includes(v.word);
                   const dotCls = SETUP_CLASSES.find(c => c.key === v.cls)?.dotClass;
@@ -332,7 +332,7 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
         </div>
 
         {/* ── Right column — Summary panel ── */}
-        <div className="sticky top-24 bg-paper border-2 border-brand-dark rounded-[24px] p-6
+        <div className="md:sticky md:top-24 bg-paper border-2 border-brand-dark rounded-[24px] p-6
           shadow-stamp-big flex flex-col gap-[18px]">
 
           {/* Panel header */}
@@ -396,23 +396,25 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
             ))}
           </div>
 
-          {/* Start CTA */}
-          <button
-            type="button"
-            disabled={!config.canStart}
-            onClick={() => { if (config.canStart) onStart?.(config.buildConfig()); }}
-            className="w-full inline-flex items-center justify-center gap-2
-              font-body font-bold text-[17px] text-white-warm
-              px-7 py-4 bg-terracotta-500 border-2 border-ink-900 rounded-md
-              shadow-stamp-primary transition-all duration-micro ease-smooth
-              hover:-translate-y-px hover:shadow-stamp-primary-hover
-              active:translate-y-0.5 active:shadow-none active:bg-terracotta-600
-              disabled:opacity-50 disabled:cursor-not-allowed
-              disabled:translate-y-0 disabled:shadow-stamp-primary"
-          >
-            {config.canStart ? t('start') : t('start_disabled')}
-            <i className="ph-bold ph-arrow-right" aria-hidden="true" />
-          </button>
+          {/* Start CTA — desktop only; mobile uses the fixed bottom bar */}
+          <div className="hidden md:block">
+            <button
+              type="button"
+              disabled={!config.canStart}
+              onClick={() => { if (config.canStart) onStart?.(config.buildConfig()); }}
+              className="w-full inline-flex items-center justify-center gap-2
+                font-body font-bold text-[17px] text-white-warm
+                px-7 py-4 bg-terracotta-500 border-2 border-ink-900 rounded-md
+                shadow-stamp-primary transition-all duration-micro ease-smooth
+                hover:-translate-y-px hover:shadow-stamp-primary-hover
+                active:translate-y-0.5 active:shadow-none active:bg-terracotta-600
+                disabled:opacity-50 disabled:cursor-not-allowed
+                disabled:translate-y-0 disabled:shadow-stamp-primary"
+            >
+              {config.canStart ? t('start') : t('start_disabled')}
+              <i className="ph-bold ph-arrow-right" aria-hidden="true" />
+            </button>
+          </div>
 
           {/* Pro tip */}
           <p className="text-[11px] font-semibold text-brand-muted text-center leading-snug">
@@ -420,6 +422,33 @@ export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
           </p>
         </div>
 
+      </div>
+
+      {/* Mobile sticky bottom CTA bar */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-30
+        bg-cream/90 backdrop-blur-md border-t border-ink-900/[0.08]
+        px-4 py-3 flex items-center gap-3">
+        <div className="flex-1">
+          <p className="text-[10px] font-bold text-brand-muted uppercase tracking-[0.06em]">
+            {t('stat_questions')}
+          </p>
+          <p className="font-bricolage font-bold text-[22px] text-ink-900 leading-none">
+            {config.totalQuestions}
+          </p>
+        </div>
+        <button
+          type="button"
+          disabled={!config.canStart}
+          onClick={() => { if (config.canStart) onStart?.(config.buildConfig()); }}
+          className="inline-flex items-center justify-center gap-2
+            font-body font-bold text-[15px] text-white-warm
+            px-5 py-3 bg-terracotta-500 border-2 border-ink-900 rounded-md
+            shadow-stamp-primary transition-all duration-micro ease-smooth
+            disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {config.canStart ? t('start') : t('start_disabled')}
+          <i className="ph-bold ph-arrow-right" aria-hidden="true" />
+        </button>
       </div>
     </div>
   );
