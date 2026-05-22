@@ -9,13 +9,15 @@ const mockQueue = usePracticeQueue as jest.Mock;
 
 function makeItem(infinitive: string): QueueItem {
   return {
-    key:        `${infinitive}|pres|yo`,
+    key:           `${infinitive}|pres|yo`,
+    conjugationId: 1,
+    verbId:        1,
     infinitive,
-    cls:        '-ar',
-    meaningDe:  'test',
-    tense:      'pres',
-    pronoun:    'yo',
-    form:       `${infinitive}_form`,
+    cls:           '-ar',
+    meaningDe:     'test',
+    tense:         'pres',
+    pronoun:       'yo',
+    form:          `${infinitive}_form`,
   };
 }
 

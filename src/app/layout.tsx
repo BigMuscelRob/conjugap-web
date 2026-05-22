@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { LanguageProvider } from '@/i18n/LanguageProvider';
+import AuthSessionProvider from '@/components/providers/SessionProvider';
 
 export const metadata: Metadata = {
   title: 'ConjuGap — Spanisch konjugieren, endlich kein Stress mehr',
@@ -31,9 +32,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
       </head>
       <body className="min-h-screen flex flex-col bg-cream text-ink-900 font-body antialiased">
-        <LanguageProvider>
-          {children}
-        </LanguageProvider>
+        <AuthSessionProvider>
+          <LanguageProvider>
+            {children}
+          </LanguageProvider>
+        </AuthSessionProvider>
       </body>
     </html>
   );

@@ -16,14 +16,23 @@ export default function DesktopAuth({ loggedIn, userName, userImage, signOutActi
   if (loggedIn) {
     return (
       <div className="hidden md:flex items-center gap-3 shrink-0 ml-6">
-        {userImage && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={userImage}
-            alt={userName ?? ''}
-            className="w-8 h-8 rounded-full border-2 border-ink-900/20"
-          />
-        )}
+        <div className="relative w-8 h-8 rounded-full border-2 border-ink-900/20 overflow-hidden bg-saffron-100 flex items-center justify-center shrink-0">
+          <span className="font-bold text-[13px] text-saffron-700 select-none">
+            {userName?.[0]?.toUpperCase() ?? '?'}
+          </span>
+          {userImage && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={userImage}
+              alt={userName ?? ''}
+              width={32}
+              height={32}
+              referrerPolicy="no-referrer"
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            />
+          )}
+        </div>
         <span className="font-bold text-small text-ink-700">
           {userName?.split(' ')[0]}
         </span>

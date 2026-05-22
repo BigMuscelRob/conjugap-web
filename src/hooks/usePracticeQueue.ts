@@ -27,13 +27,15 @@ type ApiVerbFull = ApiVerb & { conjugations: ApiConjugation[] };
 // ── Public types ──────────────────────────────────────────────────────────────
 
 export type QueueItem = {
-  key:        string;   // `${infinitive}|${tense}|${pronoun}`
-  infinitive: string;
-  cls:        string;
-  meaningDe:  string;
-  tense:      string;
-  pronoun:    string;
-  form:       string;
+  key:           string;   // `${infinitive}|${tense}|${pronoun}`
+  conjugationId: number;
+  verbId:        number;
+  infinitive:    string;
+  cls:           string;
+  meaningDe:     string;
+  tense:         string;
+  pronoun:       string;
+  form:          string;
 };
 
 export type QueueBuild = {
@@ -115,13 +117,15 @@ export function usePracticeQueue(config: SessionConfig): QueueBuild {
                 );
                 if (conj && conj.form !== '—') {
                   block.push({
-                    key:        `${verb.infinitive}|${tenseKey}|${pronoun}`,
-                    infinitive: verb.infinitive,
-                    cls:        verb.cls,
-                    meaningDe:  verb.meaningDe,
-                    tense:      tenseKey,
+                    key:           `${verb.infinitive}|${tenseKey}|${pronoun}`,
+                    conjugationId: conj.id,
+                    verbId:        verb.id,
+                    infinitive:    verb.infinitive,
+                    cls:           verb.cls,
+                    meaningDe:     verb.meaningDe,
+                    tense:         tenseKey,
                     pronoun,
-                    form:       conj.form,
+                    form:          conj.form,
                   });
                 }
               }
@@ -147,13 +151,15 @@ export function usePracticeQueue(config: SessionConfig): QueueBuild {
                 if (conj && conj.form !== '—') {
                   hits++;
                   items.push({
-                    key:        `${verb.infinitive}|${tenseKey}|${pronoun}`,
-                    infinitive: verb.infinitive,
-                    cls:        verb.cls,
-                    meaningDe:  verb.meaningDe,
-                    tense:      tenseKey,
+                    key:           `${verb.infinitive}|${tenseKey}|${pronoun}`,
+                    conjugationId: conj.id,
+                    verbId:        verb.id,
+                    infinitive:    verb.infinitive,
+                    cls:           verb.cls,
+                    meaningDe:     verb.meaningDe,
+                    tense:         tenseKey,
                     pronoun,
-                    form:       conj.form,
+                    form:          conj.form,
                   });
                 }
               }

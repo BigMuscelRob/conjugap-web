@@ -4,17 +4,20 @@ import { usePracticeRetry } from '../usePracticeRetry';
 import type { QueueItem } from '../usePracticeRetry';
 
 jest.mock('../usePracticeRetry');
+jest.mock('next-auth/react', () => ({ useSession: () => ({ data: null }) }));
 
 const mockRetryHook = usePracticeRetry as jest.Mock;
 
 function makeItem(form: string): QueueItem {
   return {
-    key:        'hablar|pres|yo',
-    infinitive: 'hablar',
-    cls:        '-ar',
-    meaningDe:  'sprechen',
-    tense:      'pres',
-    pronoun:    'yo',
+    key:           'hablar|pres|yo',
+    conjugationId: 1,
+    verbId:        1,
+    infinitive:    'hablar',
+    cls:           '-ar',
+    meaningDe:     'sprechen',
+    tense:         'pres',
+    pronoun:       'yo',
     form,
   };
 }

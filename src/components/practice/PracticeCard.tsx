@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button';
 import type { SessionConfig } from './SetupScreen';
@@ -45,6 +47,7 @@ export default function PracticeCard({ config, onReset }: Props) {
   const t          = useTranslations('practice.card');
   const structured = config.mode === 'structured';
   const session    = usePracticeSession(config);
+  const { status: authStatus } = useSession();
 
   // Pure UI state
   const [value,       setValue]       = useState('');
@@ -205,11 +208,26 @@ export default function PracticeCard({ config, onReset }: Props) {
   if (session.sessionStatus === 'finished') {
     const elapsed     = Date.now() - session.startedAtRef.current;
     const neededRetry = session.masteredN - session.firstTryCorrectN;
+    const sr          = session.sessionResult;
+
+    const total          = sr ? sr.correctCount + sr.incorrectCount : 0;
+    const avgSeconds     = total > 0 ? Math.round(sr!.durationSeconds / total) : 0;
+    const totalAnswered  = sr ? sr.totalCorrectAllTime + sr.totalIncorrectAllTime : 0;
+    const allTimeAcc     = totalAnswered > 0
+      ? Math.round(sr!.totalCorrectAllTime / totalAnswered * 100)
+      : 0;
+    const accuracyColor  = !sr            ? '' :
+      sr.accuracy >= 70 ? 'text-sage-600'     :
+      sr.accuracy >= 50 ? 'text-saffron-600'  :
+                          'text-berry-600';
+
     return (
       <>
         {exitOverlay}
         <CardShell>
           <div className="flex flex-col items-center gap-6 py-6">
+
+            {/* Header */}
             <i className="ph-fill ph-check-circle text-[56px] text-sage-500" aria-hidden="true" />
             <div className="text-center">
               <p className="font-bricolage font-bold text-[28px] text-brand-dark leading-tight">
@@ -219,11 +237,62 @@ export default function PracticeCard({ config, onReset }: Props) {
                 {session.totalItems} Fragen beantwortet
               </p>
             </div>
+
+            {/* API stats — logged in + result loaded */}
+            {sr && (
+              <div className="w-full flex flex-col gap-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <ResultTile
+                    value={`${sr.accuracy}%`}
+                    label="Trefferquote"
+                    valueClass={accuracyColor}
+                  />
+                  <ResultTile
+                    value={`${sr.correctCount} / ${total}`}
+                    label="Richtig beantwortet"
+                  />
+                  <ResultTile
+                    value={`${avgSeconds}s`}
+                    label="Ø pro Frage"
+                    className={sr.currentStreak === 0 ? 'col-span-2' : ''}
+                  />
+                  {sr.currentStreak > 0 && (
+                    <ResultTile value={String(sr.currentStreak)} label="Tage in Folge 🔥" />
+                  )}
+                </div>
+                {totalAnswered > 0 && (
+                  <p className="text-center text-[12px] font-semibold text-ink-400">
+                    Gesamt: {allTimeAcc}% Trefferquote über {totalAnswered} Antworten
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Loading state — authenticated but API call still pending */}
+            {!sr && authStatus === 'authenticated' && (
+              <div className="flex items-center justify-center py-2">
+                <div className="w-5 h-5 border-2 border-terracotta-200 border-t-terracotta-500 rounded-full animate-spin" />
+              </div>
+            )}
+
+            {/* Login hint — not logged in */}
+            {authStatus === 'unauthenticated' && (
+              <Link
+                href="/login"
+                className="text-[13px] font-semibold text-ink-400 hover:text-terracotta-500
+                  transition-colors duration-micro text-center"
+              >
+                Melde dich an um deinen Fortschritt zu speichern →
+              </Link>
+            )}
+
+            {/* Session breakdown */}
             <div className="w-full grid grid-cols-3 gap-3">
               <StatBox icon="check-circle"    iconColor="text-sage-500"       label="Beim 1. Versuch"   value={String(session.firstTryCorrectN)} />
               <StatBox icon="arrow-clockwise" iconColor="text-saffron-500"    label="Mit Wdh. gelernt"  value={String(neededRetry)} />
               <StatBox icon="timer"           iconColor="text-terracotta-500" label="Gesamtzeit"         value={formatTime(elapsed)} />
             </div>
+
           </div>
         </CardShell>
       </>
@@ -384,6 +453,20 @@ function StatBox({ icon, iconColor, label, value }: {
       <i className={`ph-fill ph-${icon} text-[24px] ${iconColor}`} aria-hidden="true" />
       <p className="font-bricolage font-bold text-[22px] text-brand-dark leading-none">{value}</p>
       <p className="text-[10px] font-bold text-brand-muted uppercase tracking-[0.06em] text-center leading-tight">{label}</p>
+    </div>
+  );
+}
+
+function ResultTile({ value, label, valueClass = '', className = '' }: {
+  value:       string;
+  label:       string;
+  valueClass?: string;
+  className?:  string;
+}) {
+  return (
+    <div className={`flex flex-col items-center gap-1.5 p-4 rounded-[16px] bg-cream border border-ink-900/[0.08] text-center ${className}`}>
+      <p className={`font-bricolage font-bold text-[28px] leading-none ${valueClass || 'text-brand-dark'}`}>{value}</p>
+      <p className="text-[11px] font-bold text-brand-muted uppercase tracking-[0.06em] leading-tight">{label}</p>
     </div>
   );
 }
