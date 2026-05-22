@@ -77,6 +77,14 @@ export default function MobileNav({ loggedIn, userName, signOutAction }: MobileN
                 <span className="font-bold text-[17px] text-ink-700 py-1">
                   {userName?.split(' ')[0]}
                 </span>
+                <Link
+                  href="/profil"
+                  className={`font-bold text-[17px] no-underline py-1
+                    transition-colors duration-micro ease-smooth
+                    ${pathname === '/profil' ? 'text-terracotta-500' : 'text-ink-700'}`}
+                >
+                  {t('nav.profil')}
+                </Link>
                 <form action={signOutAction}>
                   <button type="submit" className="font-bold text-[17px] text-ink-500 py-1 text-left">
                     Abmelden
