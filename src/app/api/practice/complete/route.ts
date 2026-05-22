@@ -1,0 +1,147 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/../auth';
+import { prisma } from '@/lib/prisma';
+
+// ── Request body ──────────────────────────────────────────────────────────────
+
+interface ResultEntry {
+  conjugationId: number;
+  correct:       boolean;
+}
+
+interface CompleteBody {
+  mode:        string;
+  tenses:      string[];
+  verbIds:     number[];
+  results:     ResultEntry[];
+  startedAt:   string;
+  completedAt: string;
+}
+
+// ── Streak helpers ────────────────────────────────────────────────────────────
+
+function isSameDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth()    === b.getMonth()    &&
+    a.getDate()     === b.getDate()
+  );
+}
+
+function isYesterday(date: Date, today: Date): boolean {
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  return isSameDay(date, yesterday);
+}
+
+// ── POST /api/practice/complete ───────────────────────────────────────────────
+
+export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const userId = session.user.id;
+
+  let body: CompleteBody;
+  try {
+    body = await req.json() as CompleteBody;
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  }
+
+  const { mode, tenses, verbIds, results, startedAt, completedAt } = body;
+
+  if (!Array.isArray(results) || results.length === 0) {
+    return NextResponse.json({ error: 'results must be a non-empty array' }, { status: 400 });
+  }
+
+  const startedAtDate   = new Date(startedAt);
+  const completedAtDate = new Date(completedAt);
+  const durationSeconds = Math.round((completedAtDate.getTime() - startedAtDate.getTime()) / 1000);
+
+  const correctCount   = results.filter(r => r.correct).length;
+  const incorrectCount = results.length - correctCount;
+
+  const [sessionRecord, totals] = await prisma.$transaction(async (tx) => {
+    // a) Upsert UserProgress for each result
+    for (const r of results) {
+      await tx.userProgress.upsert({
+        where:  { userId_conjugationId: { userId, conjugationId: r.conjugationId } },
+        create: {
+          userId,
+          conjugationId: r.conjugationId,
+          correct:       r.correct ? 1 : 0,
+          incorrect:     r.correct ? 0 : 1,
+          lastPracticed: completedAtDate,
+        },
+        update: {
+          correct:       r.correct ? { increment: 1 } : undefined,
+          incorrect:     r.correct ? undefined : { increment: 1 },
+          lastPracticed: completedAtDate,
+        },
+      });
+    }
+
+    // b) Create PracticeSession
+    const newSession = await tx.practiceSession.create({
+      data: {
+        userId,
+        mode,
+        tenses,
+        verbIds,
+        startedAt:       startedAtDate,
+        completedAt:     completedAtDate,
+        totalQuestions:  results.length,
+        correctCount,
+        incorrectCount,
+        durationSeconds,
+      },
+    });
+
+    // c) Update streak on User
+    const user = await tx.user.findUniqueOrThrow({ where: { id: userId } });
+    const today = new Date();
+
+    let newStreak: number;
+    if (user.lastPracticeDate && isSameDay(user.lastPracticeDate, today)) {
+      newStreak = user.currentStreak; // already practiced today
+    } else if (user.lastPracticeDate && isYesterday(user.lastPracticeDate, today)) {
+      newStreak = user.currentStreak + 1;
+    } else {
+      newStreak = 1; // streak broken or first session
+    }
+
+    const updatedUser = await tx.user.update({
+      where: { id: userId },
+      data: {
+        lastPracticeDate: today,
+        currentStreak:    newStreak,
+        longestStreak:    Math.max(user.longestStreak, newStreak),
+      },
+    });
+
+    // d) Aggregate all-time totals for this user
+    const agg = await tx.userProgress.aggregate({
+      where:  { userId },
+      _sum:   { correct: true, incorrect: true },
+    });
+
+    return [newSession, { agg, currentStreak: updatedUser.currentStreak }] as const;
+  });
+
+  const accuracy = results.length > 0
+    ? Math.round((correctCount / results.length) * 100)
+    : 0;
+
+  return NextResponse.json({
+    sessionId:             sessionRecord.id,
+    correctCount,
+    incorrectCount,
+    accuracy,
+    durationSeconds:       sessionRecord.durationSeconds ?? durationSeconds,
+    currentStreak:         totals.currentStreak,
+    totalCorrectAllTime:   totals.agg._sum.correct   ?? 0,
+    totalIncorrectAllTime: totals.agg._sum.incorrect ?? 0,
+  });
+}
