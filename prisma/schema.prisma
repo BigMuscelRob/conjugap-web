@@ -18,12 +18,13 @@ model Verb {
 }
 
 model Conjugation {
-  id      Int    @id @default(autoincrement())
-  verbId  Int
-  tense   String
-  pronoun String
-  form    String
-  verb    Verb   @relation(fields: [verbId], references: [id])
+  id       Int            @id @default(autoincrement())
+  verbId   Int
+  tense    String
+  pronoun  String
+  form     String
+  verb     Verb           @relation(fields: [verbId], references: [id])
+  progress UserProgress[]
 
   @@unique([verbId, tense, pronoun])
 }
@@ -31,14 +32,19 @@ model Conjugation {
 // ── Auth.js (NextAuth v5) ─────────────────────────────────────────────────────
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  createdAt     DateTime  @default(now())
+  id                 String            @id @default(cuid())
+  name               String?
+  email              String?           @unique
+  emailVerified      DateTime?
+  image              String?
+  accounts           Account[]
+  sessions           Session[]
+  createdAt          DateTime          @default(now())
+  currentStreak      Int               @default(0)
+  longestStreak      Int               @default(0)
+  lastPracticeDate   DateTime?
+  progress           UserProgress[]
+  practiceSessions   PracticeSession[]
 }
 
 model Account {
@@ -73,4 +79,36 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// ── Progress Tracking ─────────────────────────────────────────────────────────
+
+model UserProgress {
+  id            String      @id @default(cuid())
+  userId        String
+  conjugationId Int
+  correct       Int         @default(0)
+  incorrect     Int         @default(0)
+  lastPracticed DateTime?
+  easeFactor    Float?
+  nextReview    DateTime?
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conjugation   Conjugation @relation(fields: [conjugationId], references: [id])
+
+  @@unique([userId, conjugationId])
+}
+
+model PracticeSession {
+  id               String    @id @default(cuid())
+  userId           String
+  startedAt        DateTime  @default(now())
+  completedAt      DateTime?
+  mode             String
+  tenses           String[]
+  verbIds          Int[]
+  totalQuestions   Int
+  correctCount     Int       @default(0)
+  incorrectCount   Int       @default(0)
+  durationSeconds  Int?
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
