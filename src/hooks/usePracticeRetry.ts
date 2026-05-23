@@ -41,7 +41,6 @@ export function usePracticeRetry(config: SessionConfig): PracticeRetryResult {
   const [pendingBlocks,          setPendingBlocks]          = useState<QueueItem[][]>([]);
   const [blockTransition,        setBlockTransition]        = useState<QueueItem[] | null>(null);
   const [blocksCompleted,        setBlocksCompleted]        = useState(0);
-  const [currentBlockSize,       setCurrentBlockSize]       = useState(0);
   const [masteredInCurrentBlock, setMasteredInCurrentBlock] = useState(0);
 
   // ── Mastery tracking ──────────────────────────────────────────────────────
@@ -59,7 +58,6 @@ export function usePracticeRetry(config: SessionConfig): PracticeRetryResult {
       setPendingBlocks([]);
       setBlockTransition(null);
       setBlocksCompleted(0);
-      setCurrentBlockSize(0);
       setMasteredInCurrentBlock(0);
       setMastered(new Set());
       setAttempted(new Set());
@@ -67,7 +65,6 @@ export function usePracticeRetry(config: SessionConfig): PracticeRetryResult {
     } else if (!build.error) {
       setQueue(build.firstBlock);
       setPendingBlocks(build.pendingBlocks);
-      setCurrentBlockSize(build.firstBlock.length);
       setBlockTransition(null);
       setBlocksCompleted(0);
       setMasteredInCurrentBlock(0);
@@ -138,7 +135,6 @@ export function usePracticeRetry(config: SessionConfig): PracticeRetryResult {
   function loadNextBlock() {
     if (!blockTransition) return;
     setQueue(blockTransition);
-    setCurrentBlockSize(blockTransition.length);
     setBlockTransition(null);
   }
 

@@ -3,9 +3,12 @@
     "nav": {
       "practice": "Practicar",
       "tenses": "Tiempos",
-      "pricing": "Precios"
+      "pricing": "Precios",
+      "dashboard": "Panel",
+      "profil": "Cuenta"
     },
     "login": "Iniciar sesión",
+    "signout": "Cerrar sesión",
     "cta": "Empezar gratis"
   },
   "hero": {
@@ -136,7 +139,8 @@
       "mascot_wrong": "Casi. Otra vez.",
       "btn_hint": "Pista",
       "btn_check": "Comprobar",
-      "btn_next": "Siguiente"
+      "btn_next": "Siguiente",
+      "transition_heading": "Siguiente bloque"
     }
   },
   "tenses": {
@@ -163,5 +167,66 @@
     "title": "Verbos en español –\nsin estrés, de verdad.",
     "subtitle": "ConjuGap es un entrenador de conjugación inteligente que te ayuda exactamente donde lo necesitas. Cinco minutos al día.",
     "eta": "Verano 2026"
+  },
+  "dashboard": {
+    "page_title": "Panel — ConjuGap",
+    "identity_level": "Nivel {level} · {count} respuestas",
+    "xp_label": "XP",
+    "streak_days": "{n} días",
+    "streak_since": "desde {date}",
+    "kpi_speed": "Tiempo medio",
+    "kpi_speed_sub": "segundos por verbo",
+    "kpi_accuracy": "Precisión",
+    "kpi_accuracy_sub": "{correct} correctas · {total} total",
+    "kpi_answers": "Respuestas",
+    "kpi_answers_sub": "{correct} correctas",
+    "kpi_streak": "Racha actual",
+    "kpi_streak_best": "Mejor racha · {n} días",
+    "heatmap_title": "Actividad · últimas 13 semanas",
+    "heatmap_active": "{n} días activos",
+    "heatmap_less": "Menos",
+    "heatmap_more": "Más",
+    "weekly_title": "Minutos esta semana",
+    "tenses_title": "Tiempos · precisión",
+    "weak_title": "Puntos débiles",
+    "weak_train": "Entrenar →",
+    "weak_empty": "¡Sin puntos débiles aún!",
+    "tenses_empty": "Sin datos aún — ¡empieza a practicar!",
+    "settings_title": "Ajustes de práctica",
+    "setting_reminder": "Recordatorio diario",
+    "setting_reminder_sub": "Cada día a las 19:00",
+    "setting_sound": "Efectos de sonido",
+    "setting_sound_sub": "Ding al acertar",
+    "setting_hard": "Modo difícil",
+    "setting_hard_sub": "Sin pistas, sin segundo intento",
+    "setting_autonext": "Avanzar automáticamente",
+    "setting_autonext_sub": "Siguiente verbo tras 1,5s",
+    "btn_practice": "Practicar ahora",
+    "error_title": "Error al cargar",
+    "error_retry": "Intentar de nuevo"
+  },
+  "profil": {
+    "page_title": "Cuenta — ConjuGap",
+    "title": "Cuenta",
+    "variant_label": "Variante del español",
+    "variant_sub": "vosotros vs. ustedes",
+    "variant_es": "España (vosotros)",
+    "variant_mx": "México (ustedes)",
+    "variant_ar": "Argentina (vos)",
+    "email_label": "Email",
+    "stats_label": "Estadísticas",
+    "stats_sub": "{answers} respuestas · {days} días activos",
+    "signout": "Cerrar sesión"
+  },
+  "levels": {
+    "novato":      "Novato",
+    "aprendiz":    "Aprendiz",
+    "practicante": "Practicante",
+    "avanzado":    "Avanzado",
+    "experto":     "Experto",
+    "maestro":     "Maestro",
+    "xp_label":    "XP",
+    "level_label": "Nivel",
+    "next_level":  "Siguiente nivel: {xp} XP"
   }
 }

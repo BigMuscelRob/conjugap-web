@@ -3,9 +3,12 @@
     "nav": {
       "practice": "Üben",
       "tenses": "Zeiten",
-      "pricing": "Preise"
+      "pricing": "Preise",
+      "dashboard": "Dashboard",
+      "profil": "Konto"
     },
     "login": "Anmelden",
+    "signout": "Abmelden",
     "cta": "Kostenlos starten"
   },
   "hero": {
@@ -136,7 +139,8 @@
       "mascot_wrong": "Fast. Noch mal.",
       "btn_hint": "Tipp",
       "btn_check": "Prüfen",
-      "btn_next": "Weiter"
+      "btn_next": "Weiter",
+      "transition_heading": "Nächster Block"
     }
   },
   "tenses": {
@@ -163,5 +167,66 @@
     "title": "Spanische Verben –\nendlich kein Stress mehr.",
     "subtitle": "ConjuGap ist ein smarter Konjugationstrainer, der dich genau dort abholt, wo du stehst. Fünf Minuten täglich reichen.",
     "eta": "Sommer 2026"
+  },
+  "dashboard": {
+    "page_title": "Dashboard — ConjuGap",
+    "identity_level": "Nivel {level} · {count} Antworten",
+    "xp_label": "XP",
+    "streak_days": "{n} Tage",
+    "streak_since": "seit {date}",
+    "kpi_speed": "Ø-Zeit",
+    "kpi_speed_sub": "Sekunden pro Verb",
+    "kpi_accuracy": "Accuracy",
+    "kpi_accuracy_sub": "{correct} richtige · {total} gesamt",
+    "kpi_answers": "Antworten",
+    "kpi_answers_sub": "{correct} richtige",
+    "kpi_streak": "Aktuelle Streak",
+    "kpi_streak_best": "Beste Streak · {n} Tage",
+    "heatmap_title": "Aktivität · letzte 13 Wochen",
+    "heatmap_active": "{n} aktive Tage",
+    "heatmap_less": "Weniger",
+    "heatmap_more": "Mehr",
+    "weekly_title": "Minuten diese Woche",
+    "tenses_title": "Zeiten · Accuracy",
+    "weak_title": "Schwachstellen",
+    "weak_train": "Üben →",
+    "weak_empty": "Noch keine Schwachstellen!",
+    "tenses_empty": "Noch keine Daten — fang an zu üben!",
+    "settings_title": "Übungseinstellungen",
+    "setting_reminder": "Tägliche Erinnerung",
+    "setting_reminder_sub": "Jeden Tag um 19:00",
+    "setting_sound": "Soundeffekte",
+    "setting_sound_sub": "Ding bei richtiger Antwort",
+    "setting_hard": "Schwieriger Modus",
+    "setting_hard_sub": "Keine Hinweise, kein zweiter Versuch",
+    "setting_autonext": "Automatisch weiterspringen",
+    "setting_autonext_sub": "Nächstes Verb nach 1,5s",
+    "btn_practice": "Jetzt üben",
+    "error_title": "Fehler beim Laden",
+    "error_retry": "Erneut versuchen"
+  },
+  "profil": {
+    "page_title": "Konto — ConjuGap",
+    "title": "Konto",
+    "variant_label": "Spanisch-Variante",
+    "variant_sub": "vosotros vs. ustedes",
+    "variant_es": "Spanien (vosotros)",
+    "variant_mx": "Mexiko (ustedes)",
+    "variant_ar": "Argentinien (vos)",
+    "email_label": "E-Mail",
+    "stats_label": "Statistiken",
+    "stats_sub": "{answers} Antworten · {days} aktive Tage",
+    "signout": "Abmelden"
+  },
+  "levels": {
+    "novato":      "Anfänger",
+    "aprendiz":    "Lernender",
+    "practicante": "Übender",
+    "avanzado":    "Fortgeschritten",
+    "experto":     "Experte",
+    "maestro":     "Meister",
+    "xp_label":    "XP",
+    "level_label": "Stufe",
+    "next_level":  "Nächste Stufe: {xp} XP"
   }
 }

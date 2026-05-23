@@ -20,6 +20,7 @@ jobs:
             cd /var/www/conjugap-web
             git pull origin main
             npx prisma migrate deploy
+            npx prisma generate
             npm install
             npm run build
             pm2 restart conjugap

@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button';
 import type { SessionConfig } from './SetupScreen';
 import { usePracticeSession } from '@/hooks/usePracticeSession';
+import { playCorrect } from '@/lib/sounds';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -91,7 +92,8 @@ export default function PracticeCard({ config, onReset }: Props) {
 
   // ── Input handlers ────────────────────────────────────────────────────────
   function handleCheck() {
-    session.checkAnswer(value);
+    const outcome = session.checkAnswer(value);
+    if (outcome === 'correct') playCorrect();
   }
 
   function handleNext() {
@@ -185,7 +187,7 @@ export default function PracticeCard({ config, onReset }: Props) {
             </div>
             <div>
               <p className="text-[12px] font-bold text-brand-muted uppercase tracking-[0.08em] mb-2">
-                Nächste Zeitform
+                {t('transition_heading')}
               </p>
               <p className="font-bricolage font-bold text-[30px] text-brand-dark leading-tight">
                 {nextTense}
@@ -291,6 +293,35 @@ export default function PracticeCard({ config, onReset }: Props) {
               <StatBox icon="check-circle"    iconColor="text-sage-500"       label="Beim 1. Versuch"   value={String(session.firstTryCorrectN)} />
               <StatBox icon="arrow-clockwise" iconColor="text-saffron-500"    label="Mit Wdh. gelernt"  value={String(neededRetry)} />
               <StatBox icon="timer"           iconColor="text-terracotta-500" label="Gesamtzeit"         value={formatTime(elapsed)} />
+            </div>
+
+            {/* Navigation buttons */}
+            <div className="flex gap-3 w-full pt-1">
+              <button
+                type="button"
+                onClick={onReset}
+                className="flex-1 inline-flex items-center justify-center gap-2
+                  font-body font-bold text-small text-ink-900
+                  px-4 py-3 bg-paper border-2 border-ink-900 rounded-xl
+                  shadow-stamp transition-all duration-micro ease-smooth
+                  hover:-translate-y-px hover:shadow-stamp-hover
+                  active:translate-y-0.5 active:shadow-none cursor-pointer"
+              >
+                <i className="ph-bold ph-arrow-clockwise text-[16px]" aria-hidden="true" />
+                Weiter üben
+              </button>
+              <Link
+                href="/dashboard"
+                className="flex-1 inline-flex items-center justify-center gap-2
+                  font-body font-bold text-small text-white-warm no-underline
+                  px-4 py-3 bg-terracotta-500 border-2 border-ink-900 rounded-xl
+                  shadow-stamp-primary transition-all duration-micro ease-smooth
+                  hover:-translate-y-px hover:shadow-stamp-primary-hover
+                  active:translate-y-0.5 active:shadow-none active:bg-terracotta-600"
+              >
+                <i className="ph-bold ph-chart-bar text-[16px]" aria-hidden="true" />
+                Zum Dashboard
+              </Link>
             </div>
 
           </div>
