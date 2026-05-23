@@ -55,10 +55,36 @@ export async function POST(req: NextRequest) {
   if (!Array.isArray(results) || results.length === 0) {
     return NextResponse.json({ error: 'results must be a non-empty array' }, { status: 400 });
   }
+  if (results.length > 500) {
+    return NextResponse.json({ error: 'Too many results' }, { status: 400 });
+  }
+  if (!results.every(r => Number.isInteger(r.conjugationId) && r.conjugationId > 0 && typeof r.correct === 'boolean')) {
+    return NextResponse.json({ error: 'Malformed result entry' }, { status: 400 });
+  }
 
   const startedAtDate   = new Date(startedAt);
   const completedAtDate = new Date(completedAt);
   const durationSeconds = Math.round((completedAtDate.getTime() - startedAtDate.getTime()) / 1000);
+
+  if (isNaN(startedAtDate.getTime()) || isNaN(completedAtDate.getTime())) {
+    return NextResponse.json({ error: 'Invalid date format' }, { status: 400 });
+  }
+  if (durationSeconds < 0 || durationSeconds > 86400) {
+    return NextResponse.json({ error: 'Invalid duration' }, { status: 400 });
+  }
+
+  // Validate that all conjugationIds actually exist in the DB
+  // (prevents clients from writing progress for arbitrary IDs)
+  const validConjugations = await prisma.conjugation.findMany({
+    where: { id: { in: results.map(r => r.conjugationId) } },
+    select: { id: true },
+  });
+  const validIds = new Set(validConjugations.map(c => c.id));
+  const allValid = results.every(r => validIds.has(r.conjugationId));
+
+  if (!allValid) {
+    return NextResponse.json({ error: 'Invalid conjugationId in results' }, { status: 400 });
+  }
 
   const correctCount   = results.filter(r => r.correct).length;
   const incorrectCount = results.length - correctCount;
@@ -101,7 +127,9 @@ export async function POST(req: NextRequest) {
 
     // c) Update streak on User
     const user = await tx.user.findUniqueOrThrow({ where: { id: userId } });
-    const today = new Date();
+    // Use the client-reported completion time for date comparisons
+    // so streak logic respects the user's local calendar day.
+    const today = completedAtDate;
 
     let newStreak: number;
     if (user.lastPracticeDate && isSameDay(user.lastPracticeDate, today)) {

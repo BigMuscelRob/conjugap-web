@@ -139,7 +139,8 @@
       "mascot_wrong": "Casi. Otra vez.",
       "btn_hint": "Pista",
       "btn_check": "Comprobar",
-      "btn_next": "Siguiente"
+      "btn_next": "Siguiente",
+      "transition_heading": "Siguiente bloque"
     }
   },
   "tenses": {
@@ -216,5 +217,16 @@
     "stats_label": "Estadísticas",
     "stats_sub": "{answers} respuestas · {days} días activos",
     "signout": "Cerrar sesión"
+  },
+  "levels": {
+    "novato":      "Novato",
+    "aprendiz":    "Aprendiz",
+    "practicante": "Practicante",
+    "avanzado":    "Avanzado",
+    "experto":     "Experto",
+    "maestro":     "Maestro",
+    "xp_label":    "XP",
+    "level_label": "Nivel",
+    "next_level":  "Siguiente nivel: {xp} XP"
   }
 }

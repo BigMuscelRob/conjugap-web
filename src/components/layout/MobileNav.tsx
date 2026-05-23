@@ -87,7 +87,7 @@ export default function MobileNav({ loggedIn, userName, signOutAction }: MobileN
                 </Link>
                 <form action={signOutAction}>
                   <button type="submit" className="font-bold text-[17px] text-ink-500 py-1 text-left">
-                    Abmelden
+                    {t('signout')}
                   </button>
                 </form>
               </>

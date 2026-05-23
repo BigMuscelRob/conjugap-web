@@ -220,11 +220,26 @@ export default function ProfileClient({ onPractice }: { onPractice?: () => void 
   const [error, setError]     = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Settings state (local only for now)
-  const [reminderOn, setReminderOn] = useState(true);
-  const [soundOn,    setSoundOn]    = useState(true);
-  const [hardMode,   setHardMode]   = useState(false);
-  const [autoNext,   setAutoNext]   = useState(true);
+  const [reminderOn, setReminderOn] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    const s = localStorage.getItem('cg_reminder');
+    return s === null ? true : s !== 'false';
+  });
+  const [soundOn,    setSoundOn]    = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    const s = localStorage.getItem('cg_sound');
+    return s === null ? true : s !== 'false';
+  });
+  const [hardMode,   setHardMode]   = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const s = localStorage.getItem('cg_hard');
+    return s === null ? false : s === 'true';
+  });
+  const [autoNext,   setAutoNext]   = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    const s = localStorage.getItem('cg_autonext');
+    return s === null ? true : s !== 'false';
+  });
 
   useEffect(() => {
     fetch('/api/profile')
@@ -580,10 +595,10 @@ export default function ProfileClient({ onPractice }: { onPractice?: () => void 
               <h3 style={s.sectionTitle}>Ajustes de práctica</h3>
             </div>
             {([
-              { title: 'Recordatorio diario', sub: 'Cada día a las 19:00', on: reminderOn, toggle: () => setReminderOn(v => !v) },
-              { title: 'Efectos de sonido',   sub: 'Ding al acertar',      on: soundOn,    toggle: () => setSoundOn(v => !v) },
-              { title: 'Modo difícil',        sub: 'Sin pistas, sin segundo intento', on: hardMode, toggle: () => setHardMode(v => !v) },
-              { title: 'Avanzar automáticamente', sub: 'Siguiente verbo tras 1.5s', on: autoNext, toggle: () => setAutoNext(v => !v) },
+              { title: 'Recordatorio diario', sub: 'Cada día a las 19:00', on: reminderOn, toggle: () => setReminderOn(v => { const next = !v; localStorage.setItem('cg_reminder',  String(next)); return next; }) },
+              { title: 'Efectos de sonido',   sub: 'Ding al acertar',      on: soundOn,    toggle: () => setSoundOn(v =>    { const next = !v; localStorage.setItem('cg_sound',    String(next)); return next; }) },
+              { title: 'Modo difícil',        sub: 'Sin pistas, sin segundo intento', on: hardMode, toggle: () => setHardMode(v => { const next = !v; localStorage.setItem('cg_hard',     String(next)); return next; }) },
+              { title: 'Avanzar automáticamente', sub: 'Siguiente verbo tras 1.5s', on: autoNext, toggle: () => setAutoNext(v =>  { const next = !v; localStorage.setItem('cg_autonext', String(next)); return next; }) },
             ] as const).map((row, i, arr) => (
               <div key={i} style={{ ...s.settingRow, ...(i === arr.length - 1 ? { borderBottom: 'none' } : {}) }}>
                 <div>

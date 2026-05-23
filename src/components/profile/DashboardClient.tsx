@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button';
+import { getLevelInfo, LEVEL_KEYS } from '@/lib/xpSystem';
 
 // ── API types ─────────────────────────────────────────────────────────────────
 
@@ -98,23 +99,6 @@ function buildHeatGrid(raw: ProfileData['heatmap']): number[] {
   return cells;
 }
 
-function levelFromAnswered(n: number): { label: string; nextLabel: string; xpInLevel: number; xpToNext: number } {
-  const thresholds: Array<[string, string, number]> = [
-    ['A1', 'A2', 100],
-    ['A2', 'B1', 400],
-    ['B1', 'B2', 1000],
-    ['B2', 'C1', 2000],
-    ['C1', 'C2', 4000],
-    ['C2', '🏆', 8000],
-  ];
-  let base = 0;
-  for (const [label, nextLabel, span] of thresholds) {
-    if (n < base + span) return { label, nextLabel, xpInLevel: n - base, xpToNext: span };
-    base += span;
-  }
-  return { label: 'C2', nextLabel: '🏆', xpInLevel: n - base, xpToNext: 8000 };
-}
-
 function tenseColor(pct: number): string {
   if (pct >= 80) return '#7AB89B';
   if (pct >= 60) return '#F5B948';
@@ -202,18 +186,35 @@ function DashboardSkeleton() {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function DashboardClient({ onPractice }: { onPractice?: () => void }) {
-  const router = useRouter();
-  const t      = useTranslations('dashboard');
+  const router   = useRouter();
+  const t        = useTranslations('dashboard');
+  const tLevels  = useTranslations('levels');
 
   const [data,    setData]    = useState<ProfileData | null>(null);
   const [error,   setError]   = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Practice settings (local only)
-  const [reminderOn, setReminderOn] = useState(true);
-  const [soundOn,    setSoundOn]    = useState(true);
-  const [hardMode,   setHardMode]   = useState(false);
-  const [autoNext,   setAutoNext]   = useState(true);
+  const [reminderOn, setReminderOn] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    const s = localStorage.getItem('cg_reminder');
+    return s === null ? true : s !== 'false';
+  });
+  const [soundOn,    setSoundOn]    = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    const stored = localStorage.getItem('cg_sound');
+    return stored === null ? true : stored !== 'false';
+  });
+  const [hardMode,   setHardMode]   = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const s = localStorage.getItem('cg_hard');
+    return s === null ? false : s === 'true';
+  });
+  const [autoNext,   setAutoNext]   = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    const s = localStorage.getItem('cg_autonext');
+    return s === null ? true : s !== 'false';
+  });
 
   useEffect(() => {
     fetch('/api/profile')
@@ -240,8 +241,8 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
 
   const { user, stats, tenseBreakdown, weakSpots, heatmap, weeklyMinutes } = data;
   const initial  = (user.name ?? user.email ?? '?')[0].toUpperCase();
-  const lvl      = levelFromAnswered(stats.totalAnswered);
-  const levelPct = Math.round((lvl.xpInLevel / lvl.xpToNext) * 100);
+  const lvlInfo  = getLevelInfo(stats.totalCorrect);
+  const levelPct = Math.round(lvlInfo.progress * 100);
   const heatGrid = buildHeatGrid(heatmap);
 
   const weekBars   = DAY_LABELS.map((day, i) => ({ day, mins: weeklyMinutes.find(w => w.dayIndex === i)?.minutes ?? 0 }));
@@ -324,12 +325,12 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
               ? <img src={user.image} alt={user.name ?? ''} referrerPolicy="no-referrer" style={{ ...s.avatar, objectFit: 'cover' as const }} />
               : <div style={s.avatar}>{initial}</div>
             }
-            <div style={s.levelChip}>{lvl.label}</div>
+            <div style={s.levelChip}>{tLevels('level_label')} {lvlInfo.level}</div>
           </div>
 
           <div>
             <h1 style={s.idName}>{user.name ?? user.email}</h1>
-            <div style={s.idTitle}>{t('identity_level', { level: lvl.label, count: stats.totalAnswered })}</div>
+            <div style={s.idTitle}>{t('identity_level', { level: tLevels(lvlInfo.key), count: stats.totalAnswered })}</div>
             <div style={s.idMeta}>
               <span style={s.metaChip}>
                 <i className="ph-fill ph-flame" style={{ color: '#E8623D', fontSize: 13 }} />
@@ -337,7 +338,7 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
               </span>
               <span style={s.metaChip}>
                 <i className="ph-fill ph-lightning" style={{ color: '#F5B948', fontSize: 13 }} />
-                {stats.totalAnswered.toLocaleString()} {t('xp_label')}
+                {stats.totalCorrect.toLocaleString()} {tLevels('xp_label')}
               </span>
               <span style={s.metaChip}>
                 <i className="ph ph-calendar" style={{ fontSize: 13 }} />
@@ -347,11 +348,13 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
             <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ flex: 1, maxWidth: 280 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, color: 'rgba(255,252,247,0.6)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                  <span>Nivel {lvl.label} → {lvl.nextLabel}</span>
-                  <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>{lvl.xpInLevel} / {lvl.xpToNext}</span>
+                  <span>{tLevels(lvlInfo.key)}{!lvlInfo.isMax && ` → ${tLevels(LEVEL_KEYS[lvlInfo.level])}`}</span>
+                  <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                    {lvlInfo.isMax ? '∞' : `${lvlInfo.xpInLevel} / ${lvlInfo.xpForLevel}`} {tLevels('xp_label')}
+                  </span>
                 </div>
                 <div style={{ height: 10, background: 'rgba(255,252,247,0.1)', borderRadius: 999, overflow: 'hidden' }}>
-                  <div style={{ width: `${levelPct}%`, height: '100%', borderRadius: 999, background: 'linear-gradient(90deg, #E8623D, #F5B948)' }} />
+                  <div style={{ width: `${levelPct}%`, height: '100%', borderRadius: 999, background: 'linear-gradient(90deg, #E8623D, #F5B948)', transition: 'width 0.6s ease' }} />
                 </div>
               </div>
             </div>
@@ -539,10 +542,10 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
             <h3 style={s.sectionTitle}>{t('settings_title')}</h3>
           </div>
           {([
-            { title: t('setting_reminder'), sub: t('setting_reminder_sub'), on: reminderOn, toggle: () => setReminderOn(v => !v) },
-            { title: t('setting_sound'),    sub: t('setting_sound_sub'),    on: soundOn,    toggle: () => setSoundOn(v => !v) },
-            { title: t('setting_hard'),     sub: t('setting_hard_sub'),     on: hardMode,   toggle: () => setHardMode(v => !v) },
-            { title: t('setting_autonext'), sub: t('setting_autonext_sub'), on: autoNext,   toggle: () => setAutoNext(v => !v) },
+            { title: t('setting_reminder'), sub: t('setting_reminder_sub'), on: reminderOn, toggle: () => setReminderOn(v => { const next = !v; localStorage.setItem('cg_reminder',  String(next)); return next; }) },
+            { title: t('setting_sound'),    sub: t('setting_sound_sub'),    on: soundOn,    toggle: () => setSoundOn(v =>    { const next = !v; localStorage.setItem('cg_sound',    String(next)); return next; }) },
+            { title: t('setting_hard'),     sub: t('setting_hard_sub'),     on: hardMode,   toggle: () => setHardMode(v =>   { const next = !v; localStorage.setItem('cg_hard',     String(next)); return next; }) },
+            { title: t('setting_autonext'), sub: t('setting_autonext_sub'), on: autoNext,   toggle: () => setAutoNext(v =>   { const next = !v; localStorage.setItem('cg_autonext', String(next)); return next; }) },
           ] as const).map((row, i, arr) => (
             <div key={i} style={{ ...s.settingRow, ...(i === arr.length - 1 ? { borderBottom: 'none' } : {}) }}>
               <div>

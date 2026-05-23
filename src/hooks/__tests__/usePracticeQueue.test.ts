@@ -105,6 +105,37 @@ describe('usePracticeQueue', () => {
     expect(result.current.firstBlock.filter(i => i.infinitive === 'comer')).toHaveLength(6);
   });
 
+  it('structured mode with 2 tenses: blocks are ordered tense-first, then verb', async () => {
+    setupFetch(
+      [makeVerb(1, 'poner'), makeVerb(2, 'venir', 'irregulares')],
+      [
+        makeFullVerb(1, 'poner',  'irregulares', ['pres', 'pi']),
+        makeFullVerb(2, 'venir', 'irregulares', ['pres', 'pi']),
+      ],
+    );
+
+    const { result } = renderHook(() =>
+      usePracticeQueue({ ...BASE, verbs: ['poner', 'venir'], tenses: ['pres', 'pi'] }),
+    );
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    // Block order should be: poner/pres, venir/pres, poner/pi, venir/pi
+    expect(result.current.firstBlock[0].infinitive).toBe('poner');
+    expect(result.current.firstBlock[0].tense).toBe('pres');
+
+    expect(result.current.pendingBlocks[0][0].infinitive).toBe('venir');
+    expect(result.current.pendingBlocks[0][0].tense).toBe('pres');
+
+    expect(result.current.pendingBlocks[1][0].infinitive).toBe('poner');
+    expect(result.current.pendingBlocks[1][0].tense).toBe('pi');
+
+    expect(result.current.pendingBlocks[2][0].infinitive).toBe('venir');
+    expect(result.current.pendingBlocks[2][0].tense).toBe('pi');
+
+    expect(result.current.totalBlocks).toBe(4);
+    expect(result.current.totalItems).toBe(24);
+  });
+
   it('structured mode: first block is first verb in pronoun order, second block follows', async () => {
     setupFetch(
       [makeVerb(1, 'hablar'), makeVerb(2, 'comer', '-er')],

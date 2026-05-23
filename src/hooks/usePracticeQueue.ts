@@ -105,11 +105,11 @@ export function usePracticeQueue(config: SessionConfig): QueueBuild {
 
         if (cancelled) return;
 
-        // ── Structured: verb × tense blocks ──────────────────────────────────
+        // ── Structured: tense × verb blocks ──────────────────────────────────
         if (structured) {
           const blocks: QueueItem[][] = [];
-          for (const verb of verbsFull) {
-            for (const tenseKey of config.tenses) {
+          for (const tenseKey of config.tenses) {
+            for (const verb of verbsFull) {
               const block: QueueItem[] = [];
               for (const pronoun of PRONOUN_ORDER) {
                 const conj = verb.conjugations.find(

@@ -139,7 +139,8 @@
       "mascot_wrong": "Fast. Noch mal.",
       "btn_hint": "Tipp",
       "btn_check": "Prüfen",
-      "btn_next": "Weiter"
+      "btn_next": "Weiter",
+      "transition_heading": "Nächster Block"
     }
   },
   "tenses": {
@@ -216,5 +217,16 @@
     "stats_label": "Statistiken",
     "stats_sub": "{answers} Antworten · {days} aktive Tage",
     "signout": "Abmelden"
+  },
+  "levels": {
+    "novato":      "Anfänger",
+    "aprendiz":    "Lernender",
+    "practicante": "Übender",
+    "avanzado":    "Fortgeschritten",
+    "experto":     "Experte",
+    "maestro":     "Meister",
+    "xp_label":    "XP",
+    "level_label": "Stufe",
+    "next_level":  "Nächste Stufe: {xp} XP"
   }
 }
