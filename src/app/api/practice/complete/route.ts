@@ -55,6 +55,32 @@ export async function POST(req: NextRequest) {
   if (!Array.isArray(results) || results.length === 0) {
     return NextResponse.json({ error: 'results must be a non-empty array' }, { status: 400 });
   }
+
+  const ALLOWED_MODES  = ['structured', 'random'] as const;
+  const ALLOWED_TENSES = ['pres', 'pi', 'imp', 'pp', 'fut', 'cond', 'sub', 'imper'] as const;
+
+  if (!ALLOWED_MODES.includes(mode as typeof ALLOWED_MODES[number])) {
+    return NextResponse.json({ error: 'Invalid mode' }, { status: 400 });
+  }
+
+  if (
+    !Array.isArray(tenses) ||
+    tenses.length === 0 ||
+    tenses.length > 8 ||
+    !tenses.every(t => ALLOWED_TENSES.includes(t as typeof ALLOWED_TENSES[number]))
+  ) {
+    return NextResponse.json({ error: 'Invalid tenses' }, { status: 400 });
+  }
+
+  if (
+    !Array.isArray(verbIds) ||
+    verbIds.length === 0 ||
+    verbIds.length > 100 ||
+    !verbIds.every(id => Number.isInteger(id) && id > 0)
+  ) {
+    return NextResponse.json({ error: 'Invalid verbIds' }, { status: 400 });
+  }
+
   if (results.length > 500) {
     return NextResponse.json({ error: 'Too many results' }, { status: 400 });
   }
