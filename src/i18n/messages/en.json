@@ -39,18 +39,9 @@
   },
   "stats": {
     "items": [
-      {
-        "label": "Learning now",
-        "description": "Spanish learners in 38 countries."
-      },
-      {
-        "label": "Verbs in the app",
-        "description": "Conjugated in 14 tenses. Yes, all of them."
-      },
-      {
-        "label": "Average streak",
-        "description": "More consistency than most apps."
-      }
+      { "label": "Currently learning", "description": "" },
+      { "label": "Forms in the App",   "description": "Conjugated in 14 tenses. Yes, all of them." },
+      { "label": "Average streak",     "description": "" }
     ]
   },
   "footer": {

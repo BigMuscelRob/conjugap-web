@@ -39,18 +39,9 @@
   },
   "stats": {
     "items": [
-      {
-        "label": "Aprendiendo ahora",
-        "description": "Estudiantes de español en 38 países."
-      },
-      {
-        "label": "Verbos en la app",
-        "description": "Conjugados en 14 tiempos. Sí, todos."
-      },
-      {
-        "label": "Racha promedio",
-        "description": "Más constancia que la mayoría de las apps."
-      }
+      { "label": "Aprendiendo ahora", "description": "" },
+      { "label": "Formas en la App",  "description": "Conjugado en 14 tiempos. Sí, todos." },
+      { "label": "Racha media",       "description": "" }
     ]
   },
   "footer": {
