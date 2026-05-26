@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/../auth';
 import { prisma } from '@/lib/prisma';
-import { Prisma } from '@/generated/prisma/client';
+import { Prisma as PrismaTypes } from '@/generated/prisma/client';
 
 // bigint / Decimal / string → number (handles all pg adapter return types)
 const n = (v: unknown): number => Number(v ?? 0);
@@ -15,6 +15,7 @@ export async function GET() {
   }
   const userId = session.user.id;
 
+  try {
   const [
     user,
     progressAgg,
@@ -47,7 +48,7 @@ export async function GET() {
 
     // c) Tense breakdown (UserProgress JOIN Conjugation, grouped by tense)
     prisma.$queryRaw<Array<{ tense: string; correct: unknown; incorrect: unknown }>>(
-      Prisma.sql`
+      PrismaTypes.sql`
         SELECT c.tense,
                SUM(up.correct)   AS correct,
                SUM(up.incorrect) AS incorrect
@@ -68,7 +69,7 @@ export async function GET() {
       incorrect:      unknown;
       accuracy:       unknown;
     }>>(
-      Prisma.sql`
+      PrismaTypes.sql`
         SELECT v.infinitive                                                         AS "verbInfinitive",
                c.pronoun,
                c.tense,
@@ -87,7 +88,7 @@ export async function GET() {
 
     // e) Heatmap — session counts + minutes per day for last 90 days
     prisma.$queryRaw<Array<{ date: string; sessionCount: unknown; totalMinutes: unknown }>>(
-      Prisma.sql`
+      PrismaTypes.sql`
         SELECT TO_CHAR("startedAt", 'YYYY-MM-DD')        AS date,
                COUNT(*)                                   AS "sessionCount",
                COALESCE(SUM("durationSeconds"), 0) / 60  AS "totalMinutes"
@@ -101,7 +102,7 @@ export async function GET() {
 
     // f) Weekly minutes — last 7 days grouped by weekday (0=Mon … 6=Sun)
     prisma.$queryRaw<Array<{ dayIndex: unknown; minutes: unknown }>>(
-      Prisma.sql`
+      PrismaTypes.sql`
         SELECT ((EXTRACT(DOW FROM "startedAt")::int + 6) % 7)  AS "dayIndex",
                COALESCE(SUM("durationSeconds"), 0) / 60        AS minutes
         FROM   "PracticeSession"
@@ -183,4 +184,17 @@ export async function GET() {
     heatmap,
     weeklyMinutes,
   });
+
+  } catch (err) {
+    // User record deleted but session still valid
+    if (
+      err instanceof PrismaTypes.PrismaClientKnownRequestError &&
+      err.code === 'P2025'
+    ) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+    // Any other DB/runtime error — log server-side, return generic message
+    console.error('[GET /api/profile] Unexpected error:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
