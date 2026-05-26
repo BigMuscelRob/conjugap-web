@@ -1,8 +1,4 @@
-'use client';
-
-import { useTranslations } from 'next-intl';
-
-const STAT_VALUES = ['12.430', '2.840', '9.2 Tage'];
+import { getTranslations } from 'next-intl/server';
 
 const STAT_STYLES = [
   { className: 'bg-terracotta-500 text-white-warm', labelClass: 'text-terracotta-100', descClass: 'text-terracotta-200' },
@@ -10,8 +6,36 @@ const STAT_STYLES = [
   { className: 'bg-sage-300 text-ink-900',          labelClass: 'text-sage-700',         descClass: 'text-ink-700'        },
 ];
 
-export default function Stats() {
-  const t = useTranslations('stats');
+export default async function Stats() {
+  const t = await getTranslations('stats');
+
+  // Fetch from own API route (cached for 1 hour via revalidate)
+  let userCount        = 0;
+  let conjugationCount = 0;
+  let avgStreakDays     = 0;
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/stats`, {
+      next: { revalidate: 3600 },
+    });
+    if (res.ok) {
+      const data   = await res.json();
+      userCount        = data.userCount        ?? 0;
+      conjugationCount = data.conjugationCount ?? 0;
+      avgStreakDays    = data.avgStreakDays     ?? 0;
+    }
+  } catch {
+    // Stats are non-critical — fall back to zeros silently
+  }
+
+  // Format numbers with locale-aware thousands separator
+  const fmt = (n: number) => n.toLocaleString('de-DE');
+
+  const STAT_VALUES = [
+    fmt(userCount),
+    fmt(conjugationCount),
+    `${avgStreakDays} Tage`,
+  ];
 
   return (
     <section className="bg-cream-deep py-20 px-6">
