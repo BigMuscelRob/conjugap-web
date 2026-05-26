@@ -35,7 +35,7 @@ export default function Hero() {
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-wrap gap-3 items-center mb-5 max-[480px]:flex-col max-[480px]:items-stretch">
+          <div className="flex flex-wrap gap-3 items-center max-[480px]:flex-col max-[480px]:items-stretch">
             <Link
               href="/practice"
               className="inline-flex items-center justify-center gap-2 font-body font-bold text-[17px] text-white-warm no-underline
@@ -60,27 +60,7 @@ export default function Hero() {
             </button>
           </div>
 
-          {/* Social proof */}
-          <div className="flex items-center gap-3 text-[13px] font-semibold text-ink-500">
-            <div className="flex">
-              {[
-                { bg: 'bg-terracotta-500', text: 'text-white-warm', label: 'M' },
-                { bg: 'bg-sage-300',       text: 'text-ink-900',    label: 'L' },
-                { bg: 'bg-saffron-500',    text: 'text-ink-900',    label: 'K' },
-                { bg: 'bg-terracotta-100', text: 'text-ink-900',    label: 'A' },
-              ].map((a, i) => (
-                <span
-                  key={i}
-                  className={`w-8 h-8 rounded-full border-2 border-cream ${a.bg} ${a.text}
-                    inline-flex items-center justify-center font-extrabold text-xs
-                    ${i > 0 ? '-ml-2' : ''}`}
-                >
-                  {a.label}
-                </span>
-              ))}
-            </div>
-            <span>{t('social_proof')}</span>
-          </div>
+
         </div>
 
         {/* Art — hidden on small screens */}

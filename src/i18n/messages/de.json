@@ -39,18 +39,9 @@
   },
   "stats": {
     "items": [
-      {
-        "label": "Lernen gerade",
-        "description": "Spanischlernende in 38 Ländern."
-      },
-      {
-        "label": "Verben in der App",
-        "description": "In 14 Tempi konjugiert. Ja, alle."
-      },
-      {
-        "label": "Streak im Durchschnitt",
-        "description": "Mehr Konstanz als die meisten Apps."
-      }
+      { "label": "Lernen gerade",          "description": "" },
+      { "label": "Formen in der App",      "description": "In 14 Tempi konjugiert. Ja, alle." },
+      { "label": "Streak im Durchschnitt", "description": "" }
     ]
   },
   "footer": {
