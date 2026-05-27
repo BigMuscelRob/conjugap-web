@@ -229,6 +229,8 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
     return s === null ? true : s !== 'false';
   });
 
+  const handlePractice = () => { onPractice ? onPractice() : router.push('/practice'); };
+
   const hover1 = useHover();
   const hover2 = useHover();
   const hover3 = useHover();
@@ -379,7 +381,7 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
           </div>
 
           <div style={s.idActions}>
-            <Button variant="primary" size="md" iconAfter="arrow-right" onClick={onPractice}>
+            <Button variant="primary" size="md" iconAfter="arrow-right" onClick={handlePractice}>
               {t('btn_practice')}
             </Button>
           </div>
@@ -568,7 +570,7 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
               <div style={s.sectionHead}>
                 <h3 style={s.sectionTitle}>{t('weak_title')}</h3>
                 {weakSpots.length > 0 && (
-                  <span style={s.sectionMore} onClick={onPractice}>{t('weak_train')}</span>
+                  <span style={s.sectionMore} onClick={handlePractice}>{t('weak_train')}</span>
                 )}
               </div>
               {weakSpots.length === 0
