@@ -129,8 +129,8 @@ export function usePracticeSession(config: SessionConfig): PracticeSessionResult
 
   function checkAnswer(input: string): AnswerState {
     if (!retry.current) return 'idle';
-    const outcome: AnswerState =
-      normalize(input.trim()) === normalize(retry.current.form) ? 'correct' : 'wrong';
+    const variants = retry.current.form.split('|').map(f => normalize(f.trim()));
+    const outcome: AnswerState = variants.includes(normalize(input.trim())) ? 'correct' : 'wrong';
     setAnswerState(outcome);
     resultsRef.current.push({
       conjugationId: retry.current.conjugationId,

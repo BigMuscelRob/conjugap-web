@@ -417,7 +417,7 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
       {/* Input */}
       <input
         ref={inputRef}
-        value={session.answerState === 'wrong' ? current.form : value}
+        value={session.answerState === 'wrong' ? current.form.split('|')[0].trim() : value}
         onChange={e => setValue(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter') handleEnterKey(); }}
         readOnly={session.answerState !== 'idle'}
@@ -445,7 +445,7 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
           <span>
             {t.rich('hint_wrong', {
               typed:   value || '—',
-              correct: current.form,
+              correct: current.form.split('|')[0].trim(),
               mono:    (chunks) => <span className="font-mono">{chunks}</span>,
             })}
           </span>
