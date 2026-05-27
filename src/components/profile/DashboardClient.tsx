@@ -183,6 +183,17 @@ function DashboardSkeleton() {
   );
 }
 
+// ── Hover helper ─────────────────────────────────────────────────────────────
+
+function useHover() {
+  const [hovered, setHovered] = useState(false);
+  return {
+    hovered,
+    onMouseEnter: () => setHovered(true),
+    onMouseLeave: () => setHovered(false),
+  };
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function DashboardClient({ onPractice }: { onPractice?: () => void }) {
@@ -215,6 +226,11 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
     const s = localStorage.getItem('cg_autonext');
     return s === null ? true : s !== 'false';
   });
+
+  const hover1 = useHover();
+  const hover2 = useHover();
+  const hover3 = useHover();
+  const hover4 = useHover();
 
   useEffect(() => {
     fetch('/api/profile')
@@ -371,7 +387,17 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
         <div style={s.statsGrid}>
 
           {/* Speed */}
-          <div style={{ ...s.statCard, background: '#E8623D', color: '#FFFCF7', boxShadow: '0 4px 0 #A33E22' }}>
+          <div
+            {...hover1}
+            className="transition-transform duration-150 ease-out"
+            style={{
+              ...s.statCard,
+              background:  '#E8623D',
+              color:       '#FFFCF7',
+              boxShadow:   hover1.hovered ? '0 6px 0 #A33E22' : '0 4px 0 #A33E22',
+              transform:   hover1.hovered ? 'translateY(-2px)' : 'translateY(0)',
+            }}
+          >
             <div style={s.statHead}>
               <span style={s.statLab}>{t('kpi_speed')}</span>
               <i className="ph-fill ph-lightning" style={{ fontSize: 18, color: '#F5B948' }} />
@@ -388,7 +414,16 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
           </div>
 
           {/* Accuracy */}
-          <div style={{ ...s.statCard, background: '#FFFBF1' }}>
+          <div
+            {...hover2}
+            className="transition-transform duration-150 ease-out"
+            style={{
+              ...s.statCard,
+              background: '#FFFBF1',
+              boxShadow:  hover2.hovered ? '0 6px 0 #2A1F1A' : '0 4px 0 #2A1F1A',
+              transform:  hover2.hovered ? 'translateY(-2px)' : 'translateY(0)',
+            }}
+          >
             <div style={s.statHead}>
               <span style={{ ...s.statLab, color: '#7A6A60' }}>{t('kpi_accuracy')}</span>
               <i className="ph-fill ph-target" style={{ fontSize: 18, color: '#7AB89B' }} />
@@ -407,7 +442,16 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
           </div>
 
           {/* Total answers */}
-          <div style={{ ...s.statCard, background: '#FFFBF1' }}>
+          <div
+            {...hover3}
+            className="transition-transform duration-150 ease-out"
+            style={{
+              ...s.statCard,
+              background: '#FFFBF1',
+              boxShadow:  hover3.hovered ? '0 6px 0 #2A1F1A' : '0 4px 0 #2A1F1A',
+              transform:  hover3.hovered ? 'translateY(-2px)' : 'translateY(0)',
+            }}
+          >
             <div style={s.statHead}>
               <span style={{ ...s.statLab, color: '#7A6A60' }}>{t('kpi_answers')}</span>
               <i className="ph-fill ph-book-open-text" style={{ fontSize: 18, color: '#F5B948' }} />
@@ -425,7 +469,16 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
           </div>
 
           {/* Streak */}
-          <div style={{ ...s.statCard, background: '#F5B948', color: '#2A1F1A', boxShadow: '0 4px 0 #A8761A' }}>
+          <div
+            {...hover4}
+            className="transition-transform duration-150 ease-out"
+            style={{
+              ...s.statCard,
+              background: '#FFFBF1',
+              boxShadow:  hover4.hovered ? '0 6px 0 #2A1F1A' : '0 4px 0 #2A1F1A',
+              transform:  hover4.hovered ? 'translateY(-2px)' : 'translateY(0)',
+            }}
+          >
             <div style={s.statHead}>
               <span style={s.statLab}>{t('kpi_streak')}</span>
               <i className="ph-fill ph-flame" style={{ fontSize: 18, color: '#E8623D' }} />
@@ -498,7 +551,7 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
               {coloredTenses.length === 0
                 ? <p style={{ color: '#7A6A60', fontSize: 14 }}>{t('tenses_empty')}</p>
                 : coloredTenses.map((tb, i, arr) => (
-                  <div key={i} style={{ ...s.tenseRow, ...(i === arr.length - 1 ? { borderBottom: 'none' } : {}) }}>
+                  <div key={i} className="transition-colors duration-150 ease-out rounded-lg hover:bg-black/[0.03] cursor-default" style={{ ...s.tenseRow, ...(i === arr.length - 1 ? { borderBottom: 'none' } : {}) }}>
                     <span style={s.tenseLabel}>{tb.label}</span>
                     <div style={s.tenseTrack}>
                       <div style={{ ...s.tenseFill, width: `${tb.accuracy}%`, background: tb.color }} />
@@ -521,7 +574,7 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
                 : weakSpots.map((w, i, arr) => {
                     const { bg, color } = weakColors(w.accuracy);
                     return (
-                      <div key={i} style={{ ...s.weakRow, ...(i === arr.length - 1 ? { borderBottom: 'none' } : {}) }}>
+                      <div key={i} className="transition-colors duration-150 ease-out rounded-lg hover:bg-black/[0.03] cursor-default" style={{ ...s.weakRow, ...(i === arr.length - 1 ? { borderBottom: 'none' } : {}) }}>
                         <span style={{ ...s.weakIcon, background: bg, color }}>{w.pronoun}</span>
                         <div style={s.weakBody}>
                           <span style={s.weakVerb}>{w.verbInfinitive}</span>
