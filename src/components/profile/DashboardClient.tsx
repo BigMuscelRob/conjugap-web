@@ -189,8 +189,10 @@ function useHover() {
   const [hovered, setHovered] = useState(false);
   return {
     hovered,
-    onMouseEnter: () => setHovered(true),
-    onMouseLeave: () => setHovered(false),
+    handlers: {
+      onMouseEnter: () => setHovered(true),
+      onMouseLeave: () => setHovered(false),
+    },
   };
 }
 
@@ -388,7 +390,7 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
 
           {/* Speed */}
           <div
-            {...hover1}
+            {...hover1.handlers}
             className="transition-transform duration-150 ease-out"
             style={{
               ...s.statCard,
@@ -415,7 +417,7 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
 
           {/* Accuracy */}
           <div
-            {...hover2}
+            {...hover2.handlers}
             className="transition-transform duration-150 ease-out"
             style={{
               ...s.statCard,
@@ -443,7 +445,7 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
 
           {/* Total answers */}
           <div
-            {...hover3}
+            {...hover3.handlers}
             className="transition-transform duration-150 ease-out"
             style={{
               ...s.statCard,
@@ -470,7 +472,7 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
 
           {/* Streak */}
           <div
-            {...hover4}
+            {...hover4.handlers}
             className="transition-transform duration-150 ease-out"
             style={{
               ...s.statCard,
