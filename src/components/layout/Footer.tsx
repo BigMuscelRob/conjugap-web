@@ -6,11 +6,11 @@ import { useTranslations } from 'next-intl';
 
 const FOOTER_HREFS = {
   product:   ['/practice', '/tenses', '/pricing'],
-  resources: ['/blog', '/faq', '/changelog'],
+  resources: ['/faq'],
   legal:     ['/imprint', '/privacy', '/terms'],
 };
 
-const RESOURCE_LABELS = ['Blog', 'FAQ', 'Changelog'];
+const RESOURCE_LABELS = ['FAQ'];
 const LEGAL_LABELS_DE = ['Impressum', 'Datenschutz', 'AGB'];
 
 export default function Footer() {
