@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
@@ -37,14 +37,20 @@ function formatTime(ms: number) {
   return `${m}:${String(s % 60).padStart(2, '0')}`;
 }
 
+export const SPECIAL_CHARS = ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'] as const;
+
 // ── Component ─────────────────────────────────────────────────────────────────
+
+export type PracticeCardHandle = {
+  insertChar: (ch: string) => void;
+};
 
 interface Props {
   config:  SessionConfig;
   onReset: () => void;
 }
 
-export default function PracticeCard({ config, onReset }: Props) {
+const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard({ config, onReset }, ref) {
   const t          = useTranslations('practice.card');
   const structured = config.mode === 'structured';
   const session    = usePracticeSession(config);
@@ -55,6 +61,20 @@ export default function PracticeCard({ config, onReset }: Props) {
   const [confirmExit, setConfirmExit] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    insertChar(ch: string) {
+      const el = inputRef.current;
+      if (!el) return;
+      const start = el.selectionStart ?? value.length;
+      const end   = el.selectionEnd   ?? value.length;
+      setValue(v => v.slice(0, start) + ch + v.slice(end));
+      requestAnimationFrame(() => {
+        el.focus();
+        el.setSelectionRange(start + 1, start + 1);
+      });
+    },
+  }));
 
   // ── Back-button guard ────────────────────────────────────────────────────
   useEffect(() => {
@@ -118,21 +138,6 @@ export default function PracticeCard({ config, onReset }: Props) {
     celebrate: 'animate-celebrate',
     wrong:     'animate-shake',
   };
-
-  const SPECIAL_CHARS = ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'];
-
-  function insertChar(ch: string) {
-    const el = inputRef.current;
-    if (!el) return;
-    const start = el.selectionStart ?? value.length;
-    const end   = el.selectionEnd   ?? value.length;
-    const next  = value.slice(0, start) + ch + value.slice(end);
-    setValue(next);
-    requestAnimationFrame(() => {
-      el.focus();
-      el.setSelectionRange(start + 1, start + 1);
-    });
-  }
 
   // ── Exit confirmation overlay (shown on all screens) ─────────────────────
   const exitOverlay = confirmExit ? (
@@ -427,26 +432,6 @@ export default function PracticeCard({ config, onReset }: Props) {
         ].join(' ')}
       />
 
-      {/* Special chars bar */}
-      {session.answerState === 'idle' && (
-        <div className="flex flex-wrap gap-1.5 bg-sage-50 border border-sage-300 rounded-[14px] px-3 py-2.5">
-          {SPECIAL_CHARS.map(ch => (
-            <button
-              key={ch}
-              type="button"
-              onMouseDown={e => { e.preventDefault(); insertChar(ch); }}
-              className="w-9 h-9 flex items-center justify-center rounded-lg
-                font-mono text-[17px] font-bold text-ink-700
-                bg-paper border border-ink-200
-                hover:border-terracotta-400 hover:text-terracotta-500
-                active:scale-95 transition-all duration-75 select-none"
-            >
-              {ch}
-            </button>
-          ))}
-        </div>
-      )}
-
       {/* Feedback */}
       {session.answerState === 'correct' && (
         <div className="flex items-center gap-2.5 px-4 py-3 rounded-md text-[14px] font-bold bg-sage-50 text-sage-700 border border-sage-300/40">
@@ -496,7 +481,9 @@ export default function PracticeCard({ config, onReset }: Props) {
     </CardShell>
     </>
   );
-}
+});
+
+export default PracticeCard;
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
