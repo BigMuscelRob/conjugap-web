@@ -434,7 +434,7 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
                         className={`flex items-center gap-3.5 py-3 transition-colors duration-150 ease-out rounded-lg hover:bg-black/[0.03] cursor-default${i < arr.length - 1 ? ' border-b border-dashed border-ink-900/[0.08]' : ''}`}
                       >
                         {/* bg and color are runtime-computed — keep inline */}
-                        <span className="w-9 h-9 rounded-[10px] inline-flex items-center justify-center font-mono text-[11px] font-bold shrink-0" style={{ background: bg, color }}>
+                        <span className="min-w-[36px] h-9 px-2 rounded-[10px] inline-flex items-center justify-center font-mono text-[11px] font-bold shrink-0 whitespace-nowrap" style={{ background: bg, color }}>
                           {w.pronoun}
                         </span>
                         <div className="flex-1 flex flex-col">
