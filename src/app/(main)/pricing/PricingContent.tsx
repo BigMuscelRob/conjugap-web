@@ -34,10 +34,11 @@ export default function PricingContent() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-[760px] mx-auto">
         {[0, 1].map((i) => {
           const featureCount = i === 0 ? 4 : 5;
-          return (
+          const card = (
             <div
               key={i}
-              className={`${PLAN_CARD_CLASS[i]} border-2 border-ink-900 rounded-xl p-8 shadow-stamp-big flex flex-col gap-5 relative`}
+              className={`${PLAN_CARD_CLASS[i]} border-2 border-ink-900 rounded-xl p-8 shadow-stamp-big flex flex-col gap-5 relative
+                ${i === 1 ? 'select-none' : ''}`}
             >
               {PLAN_HIGHLIGHT[i] && (
                 <span className="absolute -top-3.5 left-1/2 -translate-x-1/2
@@ -76,6 +77,30 @@ export default function PricingContent() {
               </Link>
             </div>
           );
+
+          if (i === 1) {
+            return (
+              <div key={i} className="relative">
+                <div className="blur-[3px] pointer-events-none opacity-60">
+                  {card}
+                </div>
+                {/* Coming Soon Overlay */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-xl">
+                  <div className="bg-ink-900 text-saffron-300 border-2 border-ink-900
+                    px-5 py-2.5 rounded-pill font-mono text-xs font-bold uppercase tracking-[0.08em]
+                    shadow-stamp flex items-center gap-2">
+                    <i className="ph-fill ph-clock text-saffron-400" aria-hidden="true" />
+                    Coming Soon
+                  </div>
+                  <p className="text-[13px] font-semibold text-ink-500 text-center max-w-[180px] leading-5">
+                    Pro wird verfügbar, sobald wir offiziell live gehen.
+                  </p>
+                </div>
+              </div>
+            );
+          }
+
+          return card;
         })}
       </div>
 
