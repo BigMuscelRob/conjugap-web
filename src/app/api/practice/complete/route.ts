@@ -117,22 +117,41 @@ export async function POST(req: NextRequest) {
 
   const [sessionRecord, totals] = await prisma.$transaction(async (tx) => {
     const serverNow = new Date(); // authoritative timestamp — never trust client for streak
-    // a) Upsert UserProgress for each result
-    for (const r of results) {
-      await tx.userProgress.upsert({
-        where:  { userId_conjugationId: { userId, conjugationId: r.conjugationId } },
-        create: {
+    // a) Bulk-upsert UserProgress — max. 4 DB-Ops statt bis zu N sequenzieller upserts
+    const existing = await tx.userProgress.findMany({
+      where:  { userId, conjugationId: { in: results.map(r => r.conjugationId) } },
+      select: { conjugationId: true },
+    });
+    const existingIds = new Set(existing.map(e => e.conjugationId));
+
+    const toCreate = results.filter(r => !existingIds.has(r.conjugationId));
+    const toUpdate = results.filter(r =>  existingIds.has(r.conjugationId));
+
+    if (toCreate.length > 0) {
+      await tx.userProgress.createMany({
+        data: toCreate.map(r => ({
           userId,
           conjugationId: r.conjugationId,
           correct:       r.correct ? 1 : 0,
           incorrect:     r.correct ? 0 : 1,
           lastPracticed: completedAtDate,
-        },
-        update: {
-          correct:       r.correct ? { increment: 1 } : undefined,
-          incorrect:     r.correct ? undefined : { increment: 1 },
-          lastPracticed: completedAtDate,
-        },
+        })),
+      });
+    }
+
+    const correctIds   = toUpdate.filter(r =>  r.correct).map(r => r.conjugationId);
+    const incorrectIds = toUpdate.filter(r => !r.correct).map(r => r.conjugationId);
+
+    if (correctIds.length > 0) {
+      await tx.userProgress.updateMany({
+        where: { userId, conjugationId: { in: correctIds } },
+        data:  { correct: { increment: 1 }, lastPracticed: completedAtDate },
+      });
+    }
+    if (incorrectIds.length > 0) {
+      await tx.userProgress.updateMany({
+        where: { userId, conjugationId: { in: incorrectIds } },
+        data:  { incorrect: { increment: 1 }, lastPracticed: completedAtDate },
       });
     }
 
