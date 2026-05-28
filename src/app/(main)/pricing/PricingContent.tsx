@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
-const PLAN_PRICES  = ['0 €', '4,99 €'];
+const PLAN_PRICES  = ['0 €', '2,99 €'];
 const PLAN_HIGHLIGHT = [false, true];
 const PLAN_CARD_CLASS = ['bg-paper', 'bg-terracotta-500 text-white-warm'];
 const PLAN_CTA_CLASS = [
@@ -81,20 +81,17 @@ export default function PricingContent() {
           if (i === 1) {
             return (
               <div key={i} className="relative">
-                <div className="blur-[3px] pointer-events-none opacity-60">
+                <div className="blur-[6px] pointer-events-none opacity-50">
                   {card}
                 </div>
                 {/* Coming Soon Overlay */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-xl">
+                <div className="absolute inset-0 flex items-center justify-center rounded-xl">
                   <div className="bg-ink-900 text-saffron-300 border-2 border-ink-900
                     px-5 py-2.5 rounded-pill font-mono text-xs font-bold uppercase tracking-[0.08em]
                     shadow-stamp flex items-center gap-2">
                     <i className="ph-fill ph-clock text-saffron-400" aria-hidden="true" />
                     Coming Soon
                   </div>
-                  <p className="text-[13px] font-semibold text-ink-500 text-center max-w-[180px] leading-5">
-                    Pro wird verfügbar, sobald wir offiziell live gehen.
-                  </p>
                 </div>
               </div>
             );
