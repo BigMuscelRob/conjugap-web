@@ -140,14 +140,14 @@
     "subtitle": "Wähle einen Tempus, um gezielt zu üben. ConjuGap führt dich durch alle Formen — Schritt für Schritt.",
     "practice_btn": "Üben",
     "items": {
-      "pres":  { "desc": "Gegenwart — was gerade passiert oder immer gilt." },
-      "pi":    { "desc": "Vergangenheit — abgeschlossene Handlungen." },
-      "imp":   { "desc": "Beschreibende Vergangenheit — Zustände und Gewohnheiten." },
-      "pp":    { "desc": "Vergangenheit mit Gegenwartsbezug — ich habe gemacht." },
-      "fut":   { "desc": "Zukunft — Pläne und Vorhersagen." },
-      "cond":  { "desc": "Konjunktiv II — was wäre wenn." },
-      "sub":   { "desc": "Subjuntivo Präsens — Wünsche und Zweifel." },
-      "imper": { "desc": "Imperativ — Aufforderungen und Befehle." }
+      "pres":  { "desc": "Gegenwart, was gerade passiert oder immer gilt." },
+      "pi":    { "desc": "Vergangenheit, abgeschlossene Handlungen." },
+      "imp":   { "desc": "Beschreibende Vergangenheit, Zustände und Gewohnheiten." },
+      "pp":    { "desc": "Vergangenheit mit Gegenwartsbezug, ich habe gemacht." },
+      "fut":   { "desc": "Zukunft, Pläne und Vorhersagen." },
+      "cond":  { "desc": "Konjunktiv II, was wäre wenn." },
+      "sub":   { "desc": "Subjuntivo Präsens, Wünsche und Zweifel." },
+      "imper": { "desc": "Imperativ, Aufforderungen und Befehle." }
     }
   },
   "language_switcher": {
