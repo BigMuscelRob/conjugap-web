@@ -111,14 +111,27 @@ function Toggle({ on, toggle }: { on: boolean; toggle: () => void }) {
   );
 }
 
-// ── Pro Teaser ────────────────────────────────────────────────────────────────
+// ── Pro Upgrade Banner ────────────────────────────────────────────────────────
 
-function ProTeaser({ label }: { label: string }) {
+function ProUpgradeBanner() {
   return (
-    <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col items-center justify-center min-h-[160px] gap-2.5 opacity-70">
-      <i className="ph-fill ph-lock text-[28px] text-ink-300" />
-      <span className="text-sm font-bold text-ink-400 uppercase tracking-[0.08em]">{label}</span>
-      <span className="text-xs font-semibold text-terracotta-500">Pro</span>
+    <div className="border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A]
+      bg-ink-900 flex items-center justify-between gap-4 flex-wrap">
+      <div className="flex items-center gap-3">
+        <i className="ph-fill ph-lock-open text-saffron-300 text-[22px]" />
+        <div>
+          <p className="font-bold text-[15px] text-white-warm">Pro freischalten</p>
+          <p className="text-[12px] text-white-warm/60 font-semibold">
+            Heatmap · Accuracy pro Tempus · Unbegrenzte Schwachstellen
+          </p>
+        </div>
+      </div>
+      <a href="/pricing"
+        className="inline-flex items-center gap-1.5 px-4 py-2 bg-saffron-500 text-ink-900
+          font-bold text-[13px] rounded-lg border-2 border-ink-900 shadow-stamp
+          hover:-translate-y-px hover:shadow-stamp-hover transition-all duration-micro no-underline">
+        Pläne ansehen <i className="ph-bold ph-arrow-right" />
+      </a>
     </div>
   );
 }
@@ -361,125 +374,123 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
           </div>
         </div>
 
-        {/* ── Activity heatmap + weekly bar ── */}
-        <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-3.5">
-
-          {/* Heatmap */}
-          {proUser
-            ? <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
-                <div className="flex items-baseline justify-between px-1 pt-1">
-                  <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('heatmap_title')}</h3>
-                  <span className="text-xs text-ink-500 font-bold">{t('heatmap_active', { n: activeDays })}</span>
-                </div>
-                {/* gridTemplateColumns is runtime-computed — keep inline */}
-                <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.ceil(heatGrid.length / 7)}, 1fr)`, gridAutoRows: '14px', gap: 4 }}>
-                  {heatGrid.map((v, i) => (
-                    /* background is runtime-computed from HEAT_COLORS — keep inline */
-                    <div key={i} className="rounded-[3px] cursor-default" style={{ background: HEAT_COLORS[v] }} />
-                  ))}
-                </div>
-                <div className="flex items-center justify-end gap-2 text-[11px] text-ink-500 font-bold">
-                  <span>{t('heatmap_less')}</span>
-                  <div className="inline-flex gap-[3px]">
-                    {HEAT_COLORS.map((c, i) => (
-                      <div key={i} className="w-3 h-3 rounded-[3px]" style={{ background: c }} />
-                    ))}
-                  </div>
-                  <span>{t('heatmap_more')}</span>
-                </div>
-              </div>
-            : <ProTeaser label={t('heatmap_title')} />
-          }
-
-          {/* Weekly bar chart */}
-          {proUser
-            ? <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
-                <div className="flex items-baseline justify-between px-1 pt-1">
-                  <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('weekly_title')}</h3>
-                  <span className="text-xs text-ink-500 font-bold">{weekTotal} min</span>
-                </div>
-                <div className="flex items-end gap-2 h-[140px] px-1">
-                  {weekBars.map((w, i) => (
-                    /* height is runtime-computed — keep inline */
-                    <div
-                      key={i}
-                      className="flex-1 relative rounded-t-[6px] rounded-b-[2px] bg-gradient-to-b from-[#E8623D] to-[#F5B948] flex flex-col justify-end"
-                      style={{ height: `${Math.max(4, (w.mins / barMax) * 100)}%` }}
-                    >
-                      {w.mins > 0 && (
-                        <span className="absolute top-[-18px] left-0 right-0 text-center text-[10px] font-mono text-ink-900 font-bold">{w.mins}</span>
-                      )}
-                      <span className="absolute bottom-[-22px] left-0 right-0 text-center text-[10px] font-mono text-ink-500 font-bold">{w.day}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            : <ProTeaser label={t('weekly_title')} />
-          }
-        </div>
-
-        {/* ── Tense breakdown + weak spots ── */}
-        {(weakSpots.length > 0 || (proUser && coloredTenses.length > 0)) && (
+        {/* ── Activity heatmap + weekly bar — Pro only ── */}
+        {proUser && (
           <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-3.5">
 
-            {/* Tense accuracy — Pro only */}
-            {proUser && coloredTenses.length > 0 && (
-              <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
-                <div className="flex items-baseline justify-between px-1 pt-1">
-                  <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('tenses_title')}</h3>
+            {/* Heatmap */}
+            <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
+              <div className="flex items-baseline justify-between px-1 pt-1">
+                <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('heatmap_title')}</h3>
+                <span className="text-xs text-ink-500 font-bold">{t('heatmap_active', { n: activeDays })}</span>
+              </div>
+              {/* gridTemplateColumns is runtime-computed — keep inline */}
+              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.ceil(heatGrid.length / 7)}, 1fr)`, gridAutoRows: '14px', gap: 4 }}>
+                {heatGrid.map((v, i) => (
+                  /* background is runtime-computed from HEAT_COLORS — keep inline */
+                  <div key={i} className="rounded-[3px] cursor-default" style={{ background: HEAT_COLORS[v] }} />
+                ))}
+              </div>
+              <div className="flex items-center justify-end gap-2 text-[11px] text-ink-500 font-bold">
+                <span>{t('heatmap_less')}</span>
+                <div className="inline-flex gap-[3px]">
+                  {HEAT_COLORS.map((c, i) => (
+                    <div key={i} className="w-3 h-3 rounded-[3px]" style={{ background: c }} />
+                  ))}
                 </div>
-                {coloredTenses.map((tb, i, arr) => (
+                <span>{t('heatmap_more')}</span>
+              </div>
+            </div>
+
+            {/* Weekly bar chart */}
+            <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
+              <div className="flex items-baseline justify-between px-1 pt-1">
+                <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('weekly_title')}</h3>
+                <span className="text-xs text-ink-500 font-bold">{weekTotal} min</span>
+              </div>
+              <div className="flex items-end gap-2 h-[140px] px-1">
+                {weekBars.map((w, i) => (
+                  /* height is runtime-computed — keep inline */
                   <div
                     key={i}
-                    className={`grid grid-cols-[100px_1fr_48px] sm:grid-cols-[160px_1fr_60px] items-center gap-3 sm:gap-3.5 py-2.5 transition-colors duration-150 ease-out rounded-lg hover:bg-black/[0.03] cursor-default${i < arr.length - 1 ? ' border-b border-dashed border-ink-900/[0.08]' : ''}`}
+                    className="flex-1 relative rounded-t-[6px] rounded-b-[2px] bg-gradient-to-b from-[#E8623D] to-[#F5B948] flex flex-col justify-end"
+                    style={{ height: `${Math.max(4, (w.mins / barMax) * 100)}%` }}
                   >
-                    <span className="font-bold text-ink-900 text-sm">{tb.label}</span>
-                    <div className="h-3 bg-cream rounded-full overflow-hidden">
-                      {/* width and background are runtime-computed — keep inline */}
-                      <div className="h-full rounded-full" style={{ width: `${tb.accuracy}%`, background: tb.color }} />
-                    </div>
-                    <span className="font-mono font-bold text-ink-900 text-sm text-right">{tb.accuracy}%</span>
+                    {w.mins > 0 && (
+                      <span className="absolute top-[-18px] left-0 right-0 text-center text-[10px] font-mono text-ink-900 font-bold">{w.mins}</span>
+                    )}
+                    <span className="absolute bottom-[-22px] left-0 right-0 text-center text-[10px] font-mono text-ink-500 font-bold">{w.day}</span>
                   </div>
                 ))}
               </div>
-            )}
-
-            {/* Weak spots — Top 3 for free, all for Pro */}
-            <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
-              <div className="flex items-baseline justify-between px-1 pt-1">
-                <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('weak_title')}</h3>
-                {proUser && weakSpots.length > 0 && (
-                  <span className="text-xs text-ink-500 font-bold uppercase tracking-[0.08em] cursor-pointer" onClick={handleWeakTrain}>
-                    {t('weak_train')}
-                  </span>
-                )}
-              </div>
-              {weakSpots.length === 0
-                ? <p className="text-sm text-ink-500">{t('weak_empty')}</p>
-                : visibleWeakSpots.map((w, i, arr) => {
-                    const { bg, color } = weakColors(w.accuracy);
-                    return (
-                      <div
-                        key={i}
-                        className={`grid grid-cols-[80px_1fr_auto] items-center gap-3 py-3 transition-colors duration-150 ease-out rounded-lg hover:bg-black/[0.03] cursor-default${i < arr.length - 1 ? ' border-b border-dashed border-ink-900/[0.08]' : ''}`}
-                      >
-                        {/* bg and color are runtime-computed — keep inline */}
-                        <span className="justify-self-start min-w-[36px] h-9 px-2 rounded-[10px] inline-flex items-center justify-center font-mono text-[11px] font-bold shrink-0 whitespace-nowrap" style={{ background: bg, color }}>
-                          {w.pronoun}
-                        </span>
-                        <div className="flex flex-col">
-                          <span className="font-mono text-[15px] font-bold text-ink-900">{w.verbInfinitive}</span>
-                          <span className="text-xs text-ink-500 font-semibold">{tenseLabel(w.tense)}</span>
-                        </div>
-                        {/* color is runtime-computed — keep inline */}
-                        <span className="font-mono font-bold text-sm" style={{ color }}>{w.accuracy}%</span>
-                      </div>
-                    );
-                  })
-              }
             </div>
           </div>
         )}
+
+        {/* ── Tense breakdown + weak spots ── */}
+        {/* Layout: two-col für Pro (Tense + Weak), volle Breite für Free (nur Weak) */}
+        <div className={proUser ? 'grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-3.5' : ''}>
+
+          {/* Tense accuracy — Pro only */}
+          {proUser && coloredTenses.length > 0 && (
+            <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
+              <div className="flex items-baseline justify-between px-1 pt-1">
+                <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('tenses_title')}</h3>
+              </div>
+              {coloredTenses.map((tb, i, arr) => (
+                <div
+                  key={i}
+                  className={`grid grid-cols-[100px_1fr_48px] sm:grid-cols-[160px_1fr_60px] items-center gap-3 sm:gap-3.5 py-2.5 transition-colors duration-150 ease-out rounded-lg hover:bg-black/[0.03] cursor-default${i < arr.length - 1 ? ' border-b border-dashed border-ink-900/[0.08]' : ''}`}
+                >
+                  <span className="font-bold text-ink-900 text-sm">{tb.label}</span>
+                  <div className="h-3 bg-cream rounded-full overflow-hidden">
+                    {/* width and background are runtime-computed — keep inline */}
+                    <div className="h-full rounded-full" style={{ width: `${tb.accuracy}%`, background: tb.color }} />
+                  </div>
+                  <span className="font-mono font-bold text-ink-900 text-sm text-right">{tb.accuracy}%</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Weak spots — Top 3 für Free, alle für Pro */}
+          <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
+            <div className="flex items-baseline justify-between px-1 pt-1">
+              <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('weak_title')}</h3>
+              {proUser && weakSpots.length > 0 && (
+                <span className="text-xs text-ink-500 font-bold uppercase tracking-[0.08em] cursor-pointer" onClick={handleWeakTrain}>
+                  {t('weak_train')}
+                </span>
+              )}
+            </div>
+            {weakSpots.length === 0
+              ? <p className="text-sm text-ink-500">{t('weak_empty')}</p>
+              : visibleWeakSpots.map((w, i, arr) => {
+                  const { bg, color } = weakColors(w.accuracy);
+                  return (
+                    <div
+                      key={i}
+                      className={`grid grid-cols-[80px_1fr_auto] items-center gap-3 py-3 transition-colors duration-150 ease-out rounded-lg hover:bg-black/[0.03] cursor-default${i < arr.length - 1 ? ' border-b border-dashed border-ink-900/[0.08]' : ''}`}
+                    >
+                      {/* bg and color are runtime-computed — keep inline */}
+                      <span className="justify-self-start min-w-[36px] h-9 px-2 rounded-[10px] inline-flex items-center justify-center font-mono text-[11px] font-bold shrink-0 whitespace-nowrap" style={{ background: bg, color }}>
+                        {w.pronoun}
+                      </span>
+                      <div className="flex flex-col">
+                        <span className="font-mono text-[15px] font-bold text-ink-900">{w.verbInfinitive}</span>
+                        <span className="text-xs text-ink-500 font-semibold">{tenseLabel(w.tense)}</span>
+                      </div>
+                      {/* color is runtime-computed — keep inline */}
+                      <span className="font-mono font-bold text-sm" style={{ color }}>{w.accuracy}%</span>
+                    </div>
+                  );
+                })
+            }
+          </div>
+        </div>
+
+        {/* ── Upgrade Banner — nur für Free ── */}
+        {!proUser && <ProUpgradeBanner />}
 
         {/* ── Practice settings ── */}
         <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
