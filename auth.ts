@@ -11,11 +11,15 @@ declare module 'next-auth' {
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   adapter: PrismaAdapter(prisma as any),
+  session: { strategy: 'jwt' },
   callbacks: {
-    session({ session, user }) {
-      session.user.id = user.id;
+    async jwt({ token, user }) {
+      if (user?.id) token['id'] = user.id;
+      return token;
+    },
+    async session({ session, token }) {
+      session.user.id = token['id'] as string;
       return session;
     },
   },
