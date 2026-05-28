@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export const revalidate = 86400; // 24 Stunden
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -28,5 +30,9 @@ export async function GET(
     return NextResponse.json({ error: 'Verb not found' }, { status: 404 });
   }
 
-  return NextResponse.json(verb);
+  return NextResponse.json(verb, {
+    headers: {
+      'Cache-Control': 'public, max-age=86400, stale-while-revalidate=86400',
+    },
+  });
 }
