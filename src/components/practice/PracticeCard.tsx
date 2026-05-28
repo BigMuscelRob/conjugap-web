@@ -9,6 +9,7 @@ import type { SessionConfig } from './SetupScreen';
 import { usePracticeSession } from '@/hooks/usePracticeSession';
 import { playCorrect } from '@/lib/sounds';
 import { useHardModeTimer } from '@/hooks/useHardModeTimer';
+import { usePracticeSettings } from '@/hooks/usePracticeSettings';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -55,7 +56,7 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
   const t          = useTranslations('practice.card');
   const structured = config.mode === 'structured';
   const session    = usePracticeSession(config);
-  const hardMode   = typeof window !== 'undefined' && localStorage.getItem('cg_hard') === 'true';
+  const { hardMode } = usePracticeSettings();
 
   const timer = useHardModeTimer({
     enabled:  hardMode,

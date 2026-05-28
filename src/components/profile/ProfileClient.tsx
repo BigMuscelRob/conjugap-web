@@ -6,6 +6,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
+import { usePracticeSettings } from '@/hooks/usePracticeSettings';
 
 // ── API types ─────────────────────────────────────────────────────────────────
 
@@ -220,21 +221,7 @@ export default function ProfileClient({ onPractice }: { onPractice?: () => void 
   const [error, setError]     = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [soundOn,    setSoundOn]    = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
-    const s = localStorage.getItem('cg_sound');
-    return s === null ? true : s !== 'false';
-  });
-  const [hardMode,   setHardMode]   = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    const s = localStorage.getItem('cg_hard');
-    return s === null ? false : s === 'true';
-  });
-  const [autoNext,   setAutoNext]   = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
-    const s = localStorage.getItem('cg_autonext');
-    return s === null ? true : s !== 'false';
-  });
+  const { soundOn, toggleSound, hardMode, toggleHardMode, autoNext, toggleAutoNext } = usePracticeSettings();
 
   useEffect(() => {
     fetch('/api/profile')
@@ -590,9 +577,9 @@ export default function ProfileClient({ onPractice }: { onPractice?: () => void 
               <h3 style={s.sectionTitle}>Ajustes de práctica</h3>
             </div>
             {([
-              { title: 'Efectos de sonido',   sub: 'Ding al acertar',      on: soundOn,    toggle: () => setSoundOn(v =>    { const next = !v; localStorage.setItem('cg_sound',    String(next)); return next; }) },
-              { title: 'Modo difícil',        sub: 'Sin pistas, sin segundo intento', on: hardMode, toggle: () => setHardMode(v => { const next = !v; localStorage.setItem('cg_hard',     String(next)); return next; }) },
-              { title: 'Avanzar automáticamente', sub: 'Siguiente verbo tras 1.5s', on: autoNext, toggle: () => setAutoNext(v =>  { const next = !v; localStorage.setItem('cg_autonext', String(next)); return next; }) },
+              { title: 'Efectos de sonido',       sub: 'Ding al acertar',                on: soundOn,  toggle: toggleSound    },
+              { title: 'Modo difícil',            sub: 'Sin pistas, sin segundo intento', on: hardMode, toggle: toggleHardMode },
+              { title: 'Avanzar automáticamente', sub: 'Siguiente verbo tras 1.5s',       on: autoNext, toggle: toggleAutoNext },
             ] as const).map((row, i, arr) => (
               <div key={i} style={{ ...s.settingRow, ...(i === arr.length - 1 ? { borderBottom: 'none' } : {}) }}>
                 <div>

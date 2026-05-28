@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button';
 import { getLevelInfo, LEVEL_KEYS } from '@/lib/xpSystem';
+import { usePracticeSettings } from '@/hooks/usePracticeSettings';
 
 // ── API types ─────────────────────────────────────────────────────────────────
 
@@ -208,21 +209,7 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
   const [loading, setLoading] = useState(true);
 
   // Practice settings (local only)
-  const [soundOn,    setSoundOn]    = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
-    const stored = localStorage.getItem('cg_sound');
-    return stored === null ? true : stored !== 'false';
-  });
-  const [hardMode,   setHardMode]   = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    const s = localStorage.getItem('cg_hard');
-    return s === null ? false : s === 'true';
-  });
-  const [autoNext,   setAutoNext]   = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
-    const s = localStorage.getItem('cg_autonext');
-    return s === null ? true : s !== 'false';
-  });
+  const { soundOn, toggleSound, hardMode, toggleHardMode, autoNext, toggleAutoNext } = usePracticeSettings();
 
   const handlePractice = () => { onPractice ? onPractice() : router.push('/practice'); };
 
@@ -594,9 +581,9 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
             <h3 style={s.sectionTitle}>{t('settings_title')}</h3>
           </div>
           {([
-            { title: t('setting_sound'),    sub: t('setting_sound_sub'),    on: soundOn,    toggle: () => setSoundOn(v =>    { const next = !v; localStorage.setItem('cg_sound',    String(next)); return next; }) },
-            { title: t('setting_hard'),     sub: t('setting_hard_sub'),     on: hardMode,   toggle: () => setHardMode(v =>   { const next = !v; localStorage.setItem('cg_hard',     String(next)); return next; }) },
-            { title: t('setting_autonext'), sub: t('setting_autonext_sub'), on: autoNext,   toggle: () => setAutoNext(v =>   { const next = !v; localStorage.setItem('cg_autonext', String(next)); return next; }) },
+            { title: t('setting_sound'),    sub: t('setting_sound_sub'),    on: soundOn,  toggle: toggleSound    },
+            { title: t('setting_hard'),     sub: t('setting_hard_sub'),     on: hardMode, toggle: toggleHardMode },
+            { title: t('setting_autonext'), sub: t('setting_autonext_sub'), on: autoNext, toggle: toggleAutoNext },
           ] as const).map((row, i, arr) => (
             <div key={i} style={{ ...s.settingRow, ...(i === arr.length - 1 ? { borderBottom: 'none' } : {}) }}>
               <div>
