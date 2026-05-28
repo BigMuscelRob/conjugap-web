@@ -3,97 +3,13 @@
 // ConjuGap — Profile / Dashboard (client component)
 // Fetches /api/profile and renders the full profile screen.
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import Button from '@/components/ui/Button';
 import { usePracticeSettings } from '@/hooks/usePracticeSettings';
-import { TENSE_LABELS } from '@/lib/labels';
-
-// ── API types ─────────────────────────────────────────────────────────────────
-
-interface ProfileData {
-  user: {
-    name:             string | null;
-    email:            string | null;
-    image:            string | null;
-    currentStreak:    number;
-    longestStreak:    number;
-    lastPracticeDate: string | null;
-    createdAt:        string;
-  };
-  stats: {
-    totalCorrect:          number;
-    totalIncorrect:        number;
-    totalAnswered:         number;
-    overallAccuracy:       number;
-    avgSecondsPerQuestion: number;
-  };
-  tenseBreakdown: Array<{
-    tense:    string;
-    correct:  number;
-    incorrect:number;
-    accuracy: number;
-  }>;
-  weakSpots: Array<{
-    verbInfinitive: string;
-    pronoun:        string;
-    tense:          string;
-    correct:        number;
-    incorrect:      number;
-    accuracy:       number;
-  }>;
-  heatmap: Array<{
-    date:         string;
-    sessionCount: number;
-    totalMinutes: number;
-  }>;
-  weeklyMinutes: Array<{
-    dayIndex: number;
-    minutes:  number;
-  }>;
-}
+import { useProfileData } from '@/hooks/useProfileData';
+import { tenseLabel, buildHeatGrid, tenseColor, weakColors } from '@/lib/dashboardHelpers';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-function tenseLabel(t: string) {
-  return TENSE_LABELS[t] ?? t;
-}
-
-/** Returns 0–4 intensity from totalMinutes */
-function heatIntensity(mins: number): number {
-  if (mins === 0) return 0;
-  if (mins < 5)  return 1;
-  if (mins < 15) return 2;
-  if (mins < 30) return 3;
-  return 4;
-}
-
-/** Build a 90-day grid (13 full weeks × 7 = 91 cells, aligned to Mon) */
-function buildHeatGrid(
-  raw: ProfileData['heatmap'],
-): number[] {
-  const map = new Map(raw.map(r => [r.date, r.totalMinutes]));
-  // Anchor: today aligned to last Sunday so grid ends on a full week
-  const today = new Date();
-  // Start = 89 days ago, then rewind to Monday
-  const start = new Date(today);
-  start.setDate(today.getDate() - 89);
-  // Align to Monday (getDay() 0=Sun … 6=Sat → shift so 0=Mon)
-  const dow = (start.getDay() + 6) % 7; // 0=Mon
-  start.setDate(start.getDate() - dow);
-
-  const cells: number[] = [];
-  const cur = new Date(start);
-  const end = new Date(today);
-  end.setDate(today.getDate() + (6 - (today.getDay() + 6) % 7)); // pad to Sunday
-
-  while (cur <= end) {
-    const key = cur.toISOString().slice(0, 10);
-    cells.push(heatIntensity(map.get(key) ?? 0));
-    cur.setDate(cur.getDate() + 1);
-  }
-  return cells;
-}
 
 /** Derive a pseudo-level from total answers */
 function levelFromAnswered(n: number): { label: string; nextLabel: string; xpInLevel: number; xpToNext: number } {
@@ -115,19 +31,6 @@ function levelFromAnswered(n: number): { label: string; nextLabel: string; xpInL
   return { label: 'C2', nextLabel: '🏆', xpInLevel: n - base, xpToNext: 8000 };
 }
 
-/** Tense accuracy color */
-function tenseColor(pct: number): string {
-  if (pct >= 80) return '#7AB89B';
-  if (pct >= 60) return '#F5B948';
-  return '#C2456E';
-}
-
-/** Weak-spot accent colors */
-function weakColors(acc: number): { bg: string; color: string } {
-  if (acc < 50)  return { bg: '#FBE6EC', color: '#8C2A4D' };
-  if (acc < 65)  return { bg: '#FEF7E3', color: '#A8761A' };
-  return { bg: '#E8F5EE', color: '#1F6B45' };
-}
 
 const DAY_LABELS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 const HEAT_COLORS = ['#ECE2D5', '#F9D97A', '#F5B948', '#EC7450', '#E8623D'];
@@ -206,23 +109,9 @@ function ProfileSkeleton() {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function ProfileClient({ onPractice }: { onPractice?: () => void }) {
-  const router = useRouter();
-  const [data, setData]       = useState<ProfileData | null>(null);
-  const [error, setError]     = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data, loading, error } = useProfileData();
 
   const { soundOn, toggleSound, hardMode, toggleHardMode, autoNext, toggleAutoNext } = usePracticeSettings();
-
-  useEffect(() => {
-    fetch('/api/profile')
-      .then(async res => {
-        if (res.status === 401) { router.push('/login'); return; }
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        setData(await res.json());
-      })
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false));
-  }, [router]);
 
   if (loading)        return <ProfileSkeleton />;
   if (error || !data) return (
