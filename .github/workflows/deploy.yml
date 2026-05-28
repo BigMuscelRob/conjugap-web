@@ -16,6 +16,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            set -e
             export PATH="/root/.nvm/versions/node/v24.15.0/bin:$PATH"
             cd /var/www/conjugap-web
             git pull origin main
