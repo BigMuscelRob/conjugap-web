@@ -120,16 +120,23 @@ function ProUpgradeBanner() {
       <div className="flex items-center gap-3">
         <i className="ph-fill ph-lock-open text-saffron-300 text-[22px]" />
         <div>
-          <p className="font-bold text-[15px] text-white-warm">Pro freischalten</p>
-          <p className="text-[12px] text-white-warm/60 font-semibold">
-            Heatmap · Accuracy pro Tempus · Unbegrenzte Schwachstellen
-          </p>
+          <p className="font-bold text-[15px] text-white-warm mb-1">Pro freischalten</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[12px] text-white-warm/60 font-semibold">
+              Heatmap · Accuracy pro Tempus · Unbegrenzte Schwachstellen
+            </span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5
+              bg-saffron-500 text-ink-900 font-bold text-[11px] rounded-full border border-saffron-600">
+              <i className="ph-fill ph-brain text-[11px]" />
+              Spaced Repetition
+            </span>
+          </div>
         </div>
       </div>
       <a href="/pricing"
         className="inline-flex items-center gap-1.5 px-4 py-2 bg-saffron-500 text-ink-900
           font-bold text-[13px] rounded-lg border-2 border-ink-900 shadow-stamp
-          hover:-translate-y-px hover:shadow-stamp-hover transition-all duration-micro no-underline">
+          hover:-translate-y-px hover:shadow-stamp-hover transition-all duration-micro no-underline whitespace-nowrap">
         Pläne ansehen <i className="ph-bold ph-arrow-right" />
       </a>
     </div>
