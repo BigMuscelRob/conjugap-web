@@ -19,14 +19,15 @@ const MODES = [
 
 interface SetupScreenProps {
   onStart?: (config: import('@/hooks/useSessionConfig').SessionConfig) => void;
-  onBack?:  () => void;
+  onBack?:        () => void;
+  initialTenses?: string[];
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function SetupScreen({ onStart, onBack }: SetupScreenProps) {
+export default function SetupScreen({ onStart, onBack, initialTenses }: SetupScreenProps) {
   const t      = useTranslations('practice.setup');
-  const config = useSessionConfig();
+  const config = useSessionConfig(initialTenses);
   const [showAllVerbs, setShowAllVerbs] = useState(false);
 
   if (config.isLoading) {

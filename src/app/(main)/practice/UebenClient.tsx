@@ -1,15 +1,20 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import SetupScreen, { type SessionConfig } from '@/components/practice/SetupScreen';
 import PracticeCard, { type PracticeCardHandle, SPECIAL_CHARS } from '@/components/practice/PracticeCard';
 
 export default function UebenClient() {
+  const searchParams  = useSearchParams();
+  const tenseParam    = searchParams.get('tense');
+  const initialTenses = tenseParam ? [tenseParam] : undefined;
+
   const [config, setConfig] = useState<SessionConfig | null>(null);
   const cardRef = useRef<PracticeCardHandle>(null);
 
   if (!config) {
-    return <SetupScreen onStart={setConfig} />;
+    return <SetupScreen onStart={setConfig} initialTenses={initialTenses} />;
   }
 
   return (

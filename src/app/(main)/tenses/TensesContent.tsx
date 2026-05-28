@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
 const TENSES_META = [
@@ -51,14 +52,14 @@ export default function TensesContent() {
               </span>
             </div>
             <p className="text-small text-ink-700 flex-1">{t(`items.${tense.key}.desc`)}</p>
-            <button
-              type="button"
+            <Link
+              href={`/practice?tense=${tense.key}`}
               className={`inline-flex items-center gap-1 font-body font-bold text-small
                 bg-transparent border-none cursor-pointer mt-auto p-0
-                transition-gap duration-micro ease-smooth ${tense.btnClass}`}
+                transition-gap duration-micro ease-smooth no-underline ${tense.btnClass}`}
             >
               {t('practice_btn')} <i className="ph-bold ph-arrow-right" aria-hidden="true" />
-            </button>
+            </Link>
           </div>
         ))}
       </div>

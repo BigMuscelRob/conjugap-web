@@ -50,10 +50,12 @@ export type SessionConfigResult = VerbFilterResult & {
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
-export function useSessionConfig(): SessionConfigResult {
+export function useSessionConfig(initialTenses?: string[]): SessionConfigResult {
   const filter = useVerbFilter();
 
-  const [selectedTenses, setSelectedTenses] = useState<string[]>(['pres']);
+  const [selectedTenses, setSelectedTenses] = useState<string[]>(
+    initialTenses ?? ['pres']
+  );
   const [mode,           setMode]           = useState<Mode>('structured');
   const [length,         setLength]         = useState<number | null>(null);
 
