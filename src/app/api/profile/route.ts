@@ -37,6 +37,8 @@ export async function GET() {
         longestStreak:    true,
         lastPracticeDate: true,
         createdAt:        true,
+        plan:             true,
+        planUntil:        true,
       },
     }),
 
@@ -171,7 +173,11 @@ export async function GET() {
   }));
 
   return NextResponse.json({
-    user,
+    user: {
+      ...user,
+      plan:      user.plan,
+      planUntil: user.planUntil,
+    },
     stats: {
       totalCorrect,
       totalIncorrect,

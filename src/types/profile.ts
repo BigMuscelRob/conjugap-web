@@ -7,6 +7,8 @@ export interface ProfileData {
     longestStreak:    number;
     lastPracticeDate: string | null;
     createdAt:        string;
+    plan:             string;
+    planUntil:        string | null;
   };
   stats: {
     totalCorrect:          number;
