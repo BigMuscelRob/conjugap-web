@@ -40,11 +40,11 @@ export type VerbFilterResult = {
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
-export function useVerbFilter(): VerbFilterResult {
+export function useVerbFilter(initialVerbs?: string[]): VerbFilterResult {
   const { verbs, isLoading, error } = useVerbData();
 
   const [selectedClasses, setSelectedClasses] = useState<string[]>(['-ar', '-er']);
-  const [selectedVerbs,   setSelectedVerbs]   = useState<string[]>([]);
+  const [selectedVerbs,   setSelectedVerbs]   = useState<string[]>(initialVerbs ?? []);
   const [verbSearch,      setVerbSearch]      = useState('');
 
   function toggleClass(cls: string) {

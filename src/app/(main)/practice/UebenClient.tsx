@@ -7,14 +7,16 @@ import PracticeCard, { type PracticeCardHandle, SPECIAL_CHARS } from '@/componen
 
 export default function UebenClient() {
   const searchParams  = useSearchParams();
-  const tenseParam    = searchParams.get('tense');
-  const initialTenses = tenseParam ? [tenseParam] : undefined;
+  const tenses        = searchParams.getAll('tense');
+  const verbs         = searchParams.getAll('verb');
+  const initialTenses = tenses.length > 0 ? tenses : undefined;
+  const initialVerbs  = verbs.length  > 0 ? verbs  : undefined;
 
   const [config, setConfig] = useState<SessionConfig | null>(null);
   const cardRef = useRef<PracticeCardHandle>(null);
 
   if (!config) {
-    return <SetupScreen onStart={setConfig} initialTenses={initialTenses} />;
+    return <SetupScreen onStart={setConfig} initialTenses={initialTenses} initialVerbs={initialVerbs} />;
   }
 
   return (
