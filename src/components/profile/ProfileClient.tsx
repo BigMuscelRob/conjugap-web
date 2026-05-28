@@ -220,11 +220,6 @@ export default function ProfileClient({ onPractice }: { onPractice?: () => void 
   const [error, setError]     = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [reminderOn, setReminderOn] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
-    const s = localStorage.getItem('cg_reminder');
-    return s === null ? true : s !== 'false';
-  });
   const [soundOn,    setSoundOn]    = useState<boolean>(() => {
     if (typeof window === 'undefined') return true;
     const s = localStorage.getItem('cg_sound');
@@ -595,7 +590,6 @@ export default function ProfileClient({ onPractice }: { onPractice?: () => void 
               <h3 style={s.sectionTitle}>Ajustes de práctica</h3>
             </div>
             {([
-              { title: 'Recordatorio diario', sub: 'Cada día a las 19:00', on: reminderOn, toggle: () => setReminderOn(v => { const next = !v; localStorage.setItem('cg_reminder',  String(next)); return next; }) },
               { title: 'Efectos de sonido',   sub: 'Ding al acertar',      on: soundOn,    toggle: () => setSoundOn(v =>    { const next = !v; localStorage.setItem('cg_sound',    String(next)); return next; }) },
               { title: 'Modo difícil',        sub: 'Sin pistas, sin segundo intento', on: hardMode, toggle: () => setHardMode(v => { const next = !v; localStorage.setItem('cg_hard',     String(next)); return next; }) },
               { title: 'Avanzar automáticamente', sub: 'Siguiente verbo tras 1.5s', on: autoNext, toggle: () => setAutoNext(v =>  { const next = !v; localStorage.setItem('cg_autonext', String(next)); return next; }) },

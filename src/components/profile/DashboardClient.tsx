@@ -208,11 +208,6 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
   const [loading, setLoading] = useState(true);
 
   // Practice settings (local only)
-  const [reminderOn, setReminderOn] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
-    const s = localStorage.getItem('cg_reminder');
-    return s === null ? true : s !== 'false';
-  });
   const [soundOn,    setSoundOn]    = useState<boolean>(() => {
     if (typeof window === 'undefined') return true;
     const stored = localStorage.getItem('cg_sound');
@@ -599,7 +594,6 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
             <h3 style={s.sectionTitle}>{t('settings_title')}</h3>
           </div>
           {([
-            { title: t('setting_reminder'), sub: t('setting_reminder_sub'), on: reminderOn, toggle: () => setReminderOn(v => { const next = !v; localStorage.setItem('cg_reminder',  String(next)); return next; }) },
             { title: t('setting_sound'),    sub: t('setting_sound_sub'),    on: soundOn,    toggle: () => setSoundOn(v =>    { const next = !v; localStorage.setItem('cg_sound',    String(next)); return next; }) },
             { title: t('setting_hard'),     sub: t('setting_hard_sub'),     on: hardMode,   toggle: () => setHardMode(v =>   { const next = !v; localStorage.setItem('cg_hard',     String(next)); return next; }) },
             { title: t('setting_autonext'), sub: t('setting_autonext_sub'), on: autoNext,   toggle: () => setAutoNext(v =>   { const next = !v; localStorage.setItem('cg_autonext', String(next)); return next; }) },

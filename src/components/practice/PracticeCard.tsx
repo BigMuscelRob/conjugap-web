@@ -54,6 +54,7 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
   const t          = useTranslations('practice.card');
   const structured = config.mode === 'structured';
   const session    = usePracticeSession(config);
+  const hardMode   = typeof window !== 'undefined' && localStorage.getItem('cg_hard') === 'true';
   const { status: authStatus } = useSession();
 
   // Pure UI state
@@ -114,6 +115,9 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
   function handleCheck() {
     const outcome = session.checkAnswer(value);
     if (outcome === 'correct') playCorrect();
+    if (outcome === 'wrong' && hardMode) {
+      setTimeout(() => handleNext(), 600);
+    }
   }
 
   function handleNext() {
@@ -471,7 +475,9 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
           </span>
         </div>
         <div className="flex gap-2">
-          <Button variant="ghost" size="md" icon="lightbulb">{t('btn_hint')}</Button>
+          {!hardMode && (
+            <Button variant="ghost" size="md" icon="lightbulb">{t('btn_hint')}</Button>
+          )}
           {session.answerState === 'idle'
             ? <Button variant="success" size="md" onClick={handleCheck} iconAfter="arrow-right">{t('btn_check')}</Button>
             : <Button variant="primary" size="md" onClick={handleNext}  iconAfter="arrow-right">{t('btn_next')}</Button>
