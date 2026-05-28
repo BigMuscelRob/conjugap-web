@@ -64,18 +64,18 @@ function SkeletonBlock({ w = '100%', h = 20, r = 8 }: { w?: string | number; h?:
 
 function DashboardSkeleton() {
   return (
-    <div style={{ background: '#FBF4E6', minHeight: '90vh', padding: '40px 24px 120px' }}>
+    <div className="bg-cream min-h-[90vh] px-4 sm:px-6 py-10 pb-[120px]">
       <style>{`@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
-      <div style={{ maxWidth: 1120, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
-        <div style={{ background: '#2A1F1A', borderRadius: 28, padding: 28, height: 160 }} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14 }}>
+      <div className="max-w-[1120px] mx-auto flex flex-col gap-6">
+        <div className="bg-ink-900 rounded-[28px] p-7 h-[160px]" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
           {[0,1,2,3].map(i => <SkeletonBlock key={i} h={152} r={20} />)}
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 14 }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           <SkeletonBlock h={200} r={20} />
           <SkeletonBlock h={200} r={20} />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 14 }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           <SkeletonBlock h={260} r={20} />
           <SkeletonBlock h={260} r={20} />
         </div>
@@ -97,6 +97,19 @@ function useHover() {
   };
 }
 
+// ── Toggle ────────────────────────────────────────────────────────────────────
+
+function Toggle({ on, toggle }: { on: boolean; toggle: () => void }) {
+  return (
+    <div
+      className={`w-11 h-[26px] rounded-pill p-[3px] cursor-pointer transition-colors duration-150 shrink-0 ${on ? 'bg-[#2E6B52]' : 'bg-[#ECE2D5]'}`}
+      onClick={toggle}
+    >
+      <div className={`w-5 h-5 bg-white-warm rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.18)] transition-transform duration-150 ${on ? 'translate-x-[18px]' : ''}`} />
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function DashboardClient({ onPractice }: { onPractice?: () => void }) {
@@ -106,7 +119,6 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
 
   const { data, loading, error } = useProfileData();
 
-  // Practice settings (local only)
   const { soundOn, toggleSound, hardMode, toggleHardMode, autoNext, toggleAutoNext } = usePracticeSettings();
 
   const handlePractice = () => { onPractice ? onPractice() : router.push('/practice'); };
@@ -118,12 +130,10 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
 
   if (loading) return <DashboardSkeleton />;
   if (error || !data) return (
-    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, background: '#FBF4E6' }}>
-      <i className="ph-fill ph-warning-circle" style={{ fontSize: 48, color: '#C2456E' }} />
-      <p style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 20, fontWeight: 700, color: '#2A1F1A' }}>
-        {t('error_title')}
-      </p>
-      <p style={{ color: '#7A6A60', fontSize: 14 }}>{error}</p>
+    <div className="min-h-[60vh] flex items-center justify-center flex-col gap-3 bg-cream">
+      <i className="ph-fill ph-warning-circle text-[48px] text-[#C2456E]" />
+      <p className="font-display text-xl font-bold text-ink-900">{t('error_title')}</p>
+      <p className="text-sm text-ink-500">{error}</p>
       <Button variant="primary" size="md" onClick={() => window.location.reload()}>{t('error_retry')}</Button>
     </div>
   );
@@ -142,114 +152,72 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
   const coloredTenses = tenseBreakdown.map(tb => ({ ...tb, label: tenseLabel(tb.tense), color: tenseColor(tb.accuracy) }));
   const joinedDate    = new Date(user.createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 
-  const s = {
-    outer:       { background: '#FBF4E6', minHeight: '90vh', padding: '40px 24px 120px', position: 'relative' as const, overflow: 'hidden' as const },
-    glow:        { position: 'absolute' as const, top: 0, left: 0, right: 0, height: 360, background: 'radial-gradient(900px 360px at 20% 0%, #FFE6BD 0%, transparent 60%)', pointerEvents: 'none' as const },
-    inner:       { maxWidth: 1120, margin: '0 auto', position: 'relative' as const, display: 'flex', flexDirection: 'column' as const, gap: 24 },
-    identity:    { background: '#2A1F1A', color: '#FFFCF7', borderRadius: 28, padding: 28, display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: 24, alignItems: 'center', boxShadow: '0 6px 0 #1a0f0a', position: 'relative' as const, overflow: 'hidden' as const },
-    avatarRing:  { position: 'relative' as const, width: 110, height: 110 },
-    avatar:      { width: 88, height: 88, borderRadius: '50%', background: '#E8623D', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 36, fontWeight: 700, color: '#FFFCF7', position: 'absolute' as const, top: 11, left: 11, border: '3px solid #2A1F1A' },
-    levelChip:   { position: 'absolute' as const, bottom: -6, right: -6, background: '#F5B948', color: '#2A1F1A', fontSize: 11, fontWeight: 700, padding: '4px 8px', borderRadius: 999, border: '2px solid #2A1F1A', fontFamily: "'JetBrains Mono', monospace" },
-    idName:      { fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 32, lineHeight: 1.05, fontWeight: 700, letterSpacing: '-0.02em', margin: 0 },
-    idTitle:     { fontSize: 13, fontWeight: 700, color: '#F7CB5B', textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginTop: 4 },
-    idMeta:      { display: 'flex', gap: 10, marginTop: 14, flexWrap: 'wrap' as const },
-    metaChip:    { background: 'rgba(255,252,247,0.08)', border: '1px solid rgba(255,252,247,0.16)', padding: '6px 12px', borderRadius: 999, fontSize: 12, fontWeight: 700, color: '#FFFCF7', display: 'inline-flex', alignItems: 'center', gap: 6 },
-    idActions:   { display: 'flex', flexDirection: 'column' as const, gap: 8, alignItems: 'flex-end' as const },
-    sectionHead: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '4px 4px 0' },
-    sectionTitle:{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 20, fontWeight: 700, letterSpacing: '-0.01em', color: '#2A1F1A', margin: 0 },
-    sectionMore: { fontSize: 12, color: '#7A6A60', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.08em', cursor: 'pointer' },
-    statsGrid:   { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 },
-    statCard:    { padding: 18, borderRadius: 20, border: '2px solid #2A1F1A', boxShadow: '0 4px 0 #2A1F1A', display: 'flex', flexDirection: 'column' as const, gap: 8, minHeight: 152, position: 'relative' as const, overflow: 'hidden' as const },
-    statHead:    { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
-    statLab:     { fontSize: 11, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
-    statNum:     { fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 40, fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1 },
-    statUnit:    { fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: 700, opacity: 0.8 },
-    statTrend:   { fontSize: 11, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 },
-    twoCol:      { display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 14 },
-    panel:       { background: '#FFFBF1', border: '2px solid #2A1F1A', borderRadius: 20, padding: 20, boxShadow: '0 4px 0 #2A1F1A', display: 'flex', flexDirection: 'column' as const, gap: 14 },
-    heatGrid:    { display: 'grid', gridTemplateColumns: `repeat(${Math.ceil(heatGrid.length / 7)}, 1fr)`, gridAutoRows: '14px', gap: 4 },
-    heatCell:    { borderRadius: 3, cursor: 'default' },
-    heatLegend:  { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, fontSize: 11, color: '#7A6A60', fontWeight: 700 },
-    chartBars:   { display: 'flex', alignItems: 'flex-end', gap: 8, height: 140, padding: '0 4px' },
-    bar:         { flex: 1, position: 'relative' as const, borderRadius: '6px 6px 2px 2px', background: 'linear-gradient(180deg, #E8623D, #F5B948)', minHeight: 4, display: 'flex', flexDirection: 'column' as const, justifyContent: 'flex-end' as const },
-    barLabel:    { position: 'absolute' as const, bottom: -22, left: 0, right: 0, textAlign: 'center' as const, fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: '#7A6A60', fontWeight: 700 },
-    barValue:    { position: 'absolute' as const, top: -18, left: 0, right: 0, textAlign: 'center' as const, fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: '#2A1F1A', fontWeight: 700 },
-    tenseRow:    { display: 'grid', gridTemplateColumns: '160px 1fr 60px', alignItems: 'center', gap: 14, padding: '10px 0', borderBottom: '1px dashed rgba(42,31,26,0.08)' },
-    tenseLabel:  { fontWeight: 700, color: '#2A1F1A', fontSize: 14 },
-    tenseTrack:  { height: 12, background: '#ECE2D5', borderRadius: 999, overflow: 'hidden' as const },
-    tenseFill:   { height: '100%', borderRadius: 999 },
-    tenseValue:  { fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: '#2A1F1A', fontSize: 14, textAlign: 'right' as const },
-    weakRow:     { display: 'flex', alignItems: 'center', gap: 14, padding: '12px 0', borderBottom: '1px dashed rgba(42,31,26,0.08)' },
-    weakIcon:    { width: 36, height: 36, borderRadius: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 700, flexShrink: 0 },
-    weakBody:    { flex: 1, display: 'flex', flexDirection: 'column' as const },
-    weakVerb:    { fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: 700, color: '#2A1F1A' },
-    weakMeta:    { fontSize: 12, color: '#7A6A60', fontWeight: 600 },
-    settingRow:  { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid rgba(42,31,26,0.06)' },
-    settingTitle:{ fontSize: 14, fontWeight: 700, color: '#2A1F1A' },
-    settingSub:  { fontSize: 12, color: '#7A6A60', fontWeight: 600, marginTop: 2 },
-    toggle:      { width: 44, height: 26, background: '#ECE2D5', borderRadius: 999, padding: 3, cursor: 'pointer', transition: 'background 140ms', boxSizing: 'border-box' as const, flexShrink: 0 },
-    toggleOn:    { background: '#2E6B52' },
-    toggleDot:   { width: 20, height: 20, background: '#FFFCF7', borderRadius: '50%', boxShadow: '0 1px 3px rgba(0,0,0,0.18)', transition: 'transform 140ms cubic-bezier(0.34,1.4,0.5,1)' },
-    toggleDotOn: { transform: 'translateX(18px)' },
-  };
-
-  function Toggle({ on, toggle }: { on: boolean; toggle: () => void }) {
-    return (
-      <div style={{ ...s.toggle, ...(on ? s.toggleOn : {}) }} onClick={toggle}>
-        <div style={{ ...s.toggleDot, ...(on ? s.toggleDotOn : {}) }} />
-      </div>
-    );
-  }
-
   return (
-    <div style={s.outer}>
-      <div style={s.glow} />
-      <div style={s.inner}>
+    <div className="relative min-h-[90vh] bg-cream overflow-hidden px-4 sm:px-6 py-10 pb-[120px]">
+
+      {/* Radial glow — runtime gradient, keep inline */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 360, background: 'radial-gradient(900px 360px at 20% 0%, #FFE6BD 0%, transparent 60%)', pointerEvents: 'none' }} />
+
+      <div className="relative max-w-[1120px] mx-auto flex flex-col gap-6">
 
         {/* ── Identity ── */}
-        <div style={s.identity}>
-          <div style={s.avatarRing}>
+        <div className="bg-ink-900 text-white-warm rounded-[28px] p-6 sm:p-7 grid grid-cols-1 sm:grid-cols-[auto_1fr_auto] gap-6 items-center shadow-[0_6px_0_#1a0f0a] relative overflow-hidden">
+
+          {/* Avatar + XP ring */}
+          <div className="relative w-[110px] h-[110px]">
             <Ring pct={levelPct} color="#F5B948" track="rgba(247,203,91,0.16)" size={110} stroke={6} />
             {user.image
-              ? <img src={user.image} alt={user.name ?? ''} referrerPolicy="no-referrer" style={{ ...s.avatar, objectFit: 'cover' as const }} />
-              : <div style={s.avatar}>{initial}</div>
+              ? <img src={user.image} alt={user.name ?? ''} referrerPolicy="no-referrer"
+                  className="w-[88px] h-[88px] rounded-full absolute top-[11px] left-[11px] border-[3px] border-ink-900 object-cover" />
+              : <div className="w-[88px] h-[88px] rounded-full bg-[#E8623D] flex items-center justify-center font-display text-[36px] font-bold text-white-warm absolute top-[11px] left-[11px] border-[3px] border-ink-900">
+                  {initial}
+                </div>
             }
-            <div style={s.levelChip}>{tLevels('level_label')} {lvlInfo.level}</div>
+            <div className="absolute bottom-[-6px] right-[-6px] bg-[#F5B948] text-ink-900 text-[11px] font-bold py-1 px-2 rounded-pill border-2 border-ink-900 font-mono">
+              {tLevels('level_label')} {lvlInfo.level}
+            </div>
           </div>
 
+          {/* Name + level + chips + XP bar */}
           <div>
-            <h1 style={s.idName}>{user.name ?? user.email}</h1>
-            <div style={s.idTitle}>{t('identity_level', { level: tLevels(lvlInfo.key), count: stats.totalAnswered })}</div>
-            <div style={s.idMeta}>
-              <span style={s.metaChip}>
+            <h1 className="font-display text-[32px] leading-[1.05] font-bold tracking-tightest m-0">
+              {user.name ?? user.email}
+            </h1>
+            <div className="text-[13px] font-bold text-[#F7CB5B] uppercase tracking-[0.1em] mt-1">
+              {t('identity_level', { level: tLevels(lvlInfo.key), count: stats.totalAnswered })}
+            </div>
+            <div className="flex gap-2.5 mt-3.5 flex-wrap">
+              <span className="bg-white/[0.08] border border-white/[0.16] py-1.5 px-3 rounded-pill text-xs font-bold text-white-warm inline-flex items-center gap-1.5">
                 <i className="ph-fill ph-flame" style={{ color: '#E8623D', fontSize: 13 }} />
                 {t('streak_days', { n: user.currentStreak })}
               </span>
-              <span style={s.metaChip}>
+              <span className="bg-white/[0.08] border border-white/[0.16] py-1.5 px-3 rounded-pill text-xs font-bold text-white-warm inline-flex items-center gap-1.5">
                 <i className="ph-fill ph-lightning" style={{ color: '#F5B948', fontSize: 13 }} />
                 {stats.totalCorrect.toLocaleString()} {tLevels('xp_label')}
               </span>
-              <span style={s.metaChip}>
+              <span className="bg-white/[0.08] border border-white/[0.16] py-1.5 px-3 rounded-pill text-xs font-bold text-white-warm inline-flex items-center gap-1.5">
                 <i className="ph ph-calendar" style={{ fontSize: 13 }} />
                 {t('streak_since', { date: joinedDate })}
               </span>
             </div>
-            <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ flex: 1, maxWidth: 280 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, color: 'rgba(255,252,247,0.6)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <div className="mt-3.5 flex items-center gap-3">
+              <div className="flex-1 max-w-[280px]">
+                <div className="flex justify-between text-[11px] font-bold text-white-warm/60 mb-1 uppercase tracking-[0.08em]">
                   <span>{tLevels(lvlInfo.key)}{!lvlInfo.isMax && ` → ${tLevels(LEVEL_KEYS[lvlInfo.level])}`}</span>
-                  <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                  <span className="font-mono">
                     {lvlInfo.isMax ? '∞' : `${lvlInfo.xpInLevel} / ${lvlInfo.xpForLevel}`} {tLevels('xp_label')}
                   </span>
                 </div>
-                <div style={{ height: 10, background: 'rgba(255,252,247,0.1)', borderRadius: 999, overflow: 'hidden' }}>
-                  <div style={{ width: `${levelPct}%`, height: '100%', borderRadius: 999, background: 'linear-gradient(90deg, #E8623D, #F5B948)', transition: 'width 0.6s ease' }} />
+                <div className="h-2.5 bg-white/[0.1] rounded-full overflow-hidden">
+                  {/* width is runtime-computed — keep inline */}
+                  <div style={{ width: `${levelPct}%` }} className="h-full rounded-full bg-gradient-to-r from-[#E8623D] to-[#F5B948] transition-[width] duration-[600ms] ease-out" />
                 </div>
               </div>
             </div>
           </div>
 
-          <div style={s.idActions}>
+          {/* CTA */}
+          <div className="flex flex-col gap-2 items-end">
             <Button variant="primary" size="md" iconAfter="arrow-right" onClick={handlePractice}>
               {t('btn_practice')}
             </Button>
@@ -257,29 +225,26 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
         </div>
 
         {/* ── KPI Grid ── */}
-        <div style={s.statsGrid}>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
 
           {/* Speed */}
           <div
             {...hover1.handlers}
-            className="transition-transform duration-150 ease-out"
+            className="p-4 sm:p-[18px] rounded-[20px] border-2 border-ink-900 bg-[#E8623D] text-white-warm flex flex-col gap-2 min-h-[140px] sm:min-h-[152px] relative overflow-hidden transition-transform duration-150 ease-out"
             style={{
-              ...s.statCard,
-              background:  '#E8623D',
-              color:       '#FFFCF7',
-              boxShadow:   hover1.hovered ? '0 6px 0 #A33E22' : '0 4px 0 #A33E22',
-              transform:   hover1.hovered ? 'translateY(-2px)' : 'translateY(0)',
+              boxShadow: hover1.hovered ? '0 6px 0 #A33E22' : '0 4px 0 #A33E22',
+              transform:  hover1.hovered ? 'translateY(-2px)' : 'translateY(0)',
             }}
           >
-            <div style={s.statHead}>
-              <span style={s.statLab}>{t('kpi_speed')}</span>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold uppercase tracking-[0.08em]">{t('kpi_speed')}</span>
               <i className="ph-fill ph-lightning" style={{ fontSize: 18, color: '#F5B948' }} />
             </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-              <span style={s.statNum}>{stats.avgSecondsPerQuestion}</span>
-              <span style={s.statUnit}>s</span>
+            <div className="flex items-baseline gap-1">
+              <span className="font-display text-[40px] font-bold tracking-[-0.025em] leading-none">{stats.avgSecondsPerQuestion}</span>
+              <span className="font-mono text-sm font-bold opacity-80">s</span>
             </div>
-            <div style={{ ...s.statTrend, color: '#FCEBB7' }}>
+            <div className="text-[11px] font-bold inline-flex items-center gap-1 text-[#FCEBB7]">
               <i className="ph-bold ph-timer" />
               {t('kpi_speed_sub')}
             </div>
@@ -289,26 +254,24 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
           {/* Accuracy */}
           <div
             {...hover2.handlers}
-            className="transition-transform duration-150 ease-out"
+            className="p-4 sm:p-[18px] rounded-[20px] border-2 border-ink-900 bg-paper flex flex-col gap-2 min-h-[140px] sm:min-h-[152px] relative overflow-hidden transition-transform duration-150 ease-out"
             style={{
-              ...s.statCard,
-              background: '#FFFBF1',
-              boxShadow:  hover2.hovered ? '0 6px 0 #2A1F1A' : '0 4px 0 #2A1F1A',
+              boxShadow: hover2.hovered ? '0 6px 0 #2A1F1A' : '0 4px 0 #2A1F1A',
               transform:  hover2.hovered ? 'translateY(-2px)' : 'translateY(0)',
             }}
           >
-            <div style={s.statHead}>
-              <span style={{ ...s.statLab, color: '#7A6A60' }}>{t('kpi_accuracy')}</span>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-500">{t('kpi_accuracy')}</span>
               <i className="ph-fill ph-target" style={{ fontSize: 18, color: '#7AB89B' }} />
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
-              <div style={{ position: 'relative', width: 72, height: 72 }}>
+            <div className="flex items-center gap-3 mt-1">
+              <div className="relative w-[72px] h-[72px]">
                 <Ring pct={stats.overallAccuracy} color="#7AB89B" track="#ECE2D5" size={72} stroke={8} />
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, fontSize: 14, color: '#2A1F1A' }}>
+                <div className="absolute inset-0 flex items-center justify-center font-mono font-bold text-sm text-ink-900">
                   {stats.overallAccuracy}%
                 </div>
               </div>
-              <div style={{ fontSize: 11, color: '#7A6A60', fontWeight: 600 }}>
+              <div className="text-[11px] text-ink-500 font-semibold">
                 {t('kpi_accuracy_sub', { correct: stats.totalCorrect.toLocaleString(), total: stats.totalAnswered.toLocaleString() })}
               </div>
             </div>
@@ -317,58 +280,56 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
           {/* Total answers */}
           <div
             {...hover3.handlers}
-            className="transition-transform duration-150 ease-out"
+            className="p-4 sm:p-[18px] rounded-[20px] border-2 border-ink-900 bg-paper flex flex-col gap-2 min-h-[140px] sm:min-h-[152px] relative overflow-hidden transition-transform duration-150 ease-out"
             style={{
-              ...s.statCard,
-              background: '#FFFBF1',
-              boxShadow:  hover3.hovered ? '0 6px 0 #2A1F1A' : '0 4px 0 #2A1F1A',
+              boxShadow: hover3.hovered ? '0 6px 0 #2A1F1A' : '0 4px 0 #2A1F1A',
               transform:  hover3.hovered ? 'translateY(-2px)' : 'translateY(0)',
             }}
           >
-            <div style={s.statHead}>
-              <span style={{ ...s.statLab, color: '#7A6A60' }}>{t('kpi_answers')}</span>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-500">{t('kpi_answers')}</span>
               <i className="ph-fill ph-book-open-text" style={{ fontSize: 18, color: '#F5B948' }} />
             </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, color: '#2A1F1A' }}>
-              <span style={s.statNum}>{stats.totalAnswered.toLocaleString()}</span>
+            <div className="flex items-baseline gap-1.5 text-ink-900">
+              <span className="font-display text-[40px] font-bold tracking-[-0.025em] leading-none">{stats.totalAnswered.toLocaleString()}</span>
             </div>
-            <div style={{ ...s.statTrend, color: '#2E6B52' }}>
+            <div className="text-[11px] font-bold inline-flex items-center gap-1 text-[#2E6B52]">
               <i className="ph-bold ph-trend-up" />
               {t('kpi_answers_sub', { correct: stats.totalCorrect.toLocaleString() })}
             </div>
-            <div style={{ height: 8, background: '#ECE2D5', borderRadius: 999, overflow: 'hidden', marginTop: 'auto' }}>
-              <div style={{ width: `${stats.overallAccuracy}%`, height: '100%', background: 'linear-gradient(90deg, #E8623D, #F5B948)', borderRadius: 999 }} />
+            <div className="h-2 bg-cream rounded-full overflow-hidden mt-auto">
+              {/* width is runtime-computed — keep inline */}
+              <div style={{ width: `${stats.overallAccuracy}%` }} className="h-full bg-gradient-to-r from-[#E8623D] to-[#F5B948] rounded-full" />
             </div>
           </div>
 
           {/* Streak */}
           <div
             {...hover4.handlers}
-            className="transition-transform duration-150 ease-out"
+            className="p-4 sm:p-[18px] rounded-[20px] border-2 border-ink-900 bg-paper flex flex-col gap-2 min-h-[140px] sm:min-h-[152px] relative overflow-hidden transition-transform duration-150 ease-out"
             style={{
-              ...s.statCard,
-              background: '#FFFBF1',
-              boxShadow:  hover4.hovered ? '0 6px 0 #2A1F1A' : '0 4px 0 #2A1F1A',
+              boxShadow: hover4.hovered ? '0 6px 0 #2A1F1A' : '0 4px 0 #2A1F1A',
               transform:  hover4.hovered ? 'translateY(-2px)' : 'translateY(0)',
             }}
           >
-            <div style={s.statHead}>
-              <span style={s.statLab}>{t('kpi_streak')}</span>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold uppercase tracking-[0.08em]">{t('kpi_streak')}</span>
               <i className="ph-fill ph-flame" style={{ fontSize: 18, color: '#E8623D' }} />
             </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-              <span style={s.statNum}>{user.currentStreak}</span>
-              <span style={s.statUnit}>d</span>
+            <div className="flex items-baseline gap-1">
+              <span className="font-display text-[40px] font-bold tracking-[-0.025em] leading-none">{user.currentStreak}</span>
+              <span className="font-mono text-sm font-bold opacity-80">d</span>
             </div>
-            <div style={{ ...s.statTrend, color: '#7A2D17' }}>
+            <div className="text-[11px] font-bold inline-flex items-center gap-1 text-[#7A2D17]">
               <i className="ph-bold ph-trophy" />
               {t('kpi_streak_best', { n: user.longestStreak })}
             </div>
-            <div style={{ display: 'flex', gap: 4, marginTop: 'auto' }}>
+            <div className="flex gap-1 mt-auto">
               {weekBars.map((w, i) => (
-                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                  <div style={{ width: '100%', height: 6, borderRadius: 3, background: w.mins > 0 ? '#2A1F1A' : 'rgba(42,31,26,0.16)' }} />
-                  <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, fontWeight: 700, color: '#7A2D17' }}>{w.day}</span>
+                <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                  {/* bar color is runtime-computed — keep inline */}
+                  <div className="w-full h-1.5 rounded-[3px]" style={{ background: w.mins > 0 ? '#2A1F1A' : 'rgba(42,31,26,0.16)' }} />
+                  <span className="font-mono text-[9px] font-bold text-[#7A2D17]">{w.day}</span>
                 </div>
               ))}
             </div>
@@ -376,38 +337,50 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
         </div>
 
         {/* ── Activity heatmap + weekly bar ── */}
-        <div style={s.twoCol}>
-          <div style={s.panel}>
-            <div style={s.sectionHead}>
-              <h3 style={s.sectionTitle}>{t('heatmap_title')}</h3>
-              <span style={{ fontSize: 12, color: '#7A6A60', fontWeight: 700 }}>{t('heatmap_active', { n: activeDays })}</span>
+        <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-3.5">
+
+          {/* Heatmap */}
+          <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
+            <div className="flex items-baseline justify-between px-1 pt-1">
+              <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('heatmap_title')}</h3>
+              <span className="text-xs text-ink-500 font-bold">{t('heatmap_active', { n: activeDays })}</span>
             </div>
-            <div style={s.heatGrid}>
+            {/* gridTemplateColumns is runtime-computed — keep inline */}
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.ceil(heatGrid.length / 7)}, 1fr)`, gridAutoRows: '14px', gap: 4 }}>
               {heatGrid.map((v, i) => (
-                <div key={i} style={{ ...s.heatCell, background: HEAT_COLORS[v] }} />
+                /* background is runtime-computed from HEAT_COLORS — keep inline */
+                <div key={i} className="rounded-[3px] cursor-default" style={{ background: HEAT_COLORS[v] }} />
               ))}
             </div>
-            <div style={s.heatLegend}>
+            <div className="flex items-center justify-end gap-2 text-[11px] text-ink-500 font-bold">
               <span>{t('heatmap_less')}</span>
-              <div style={{ display: 'inline-flex', gap: 3 }}>
+              <div className="inline-flex gap-[3px]">
                 {HEAT_COLORS.map((c, i) => (
-                  <div key={i} style={{ width: 12, height: 12, borderRadius: 3, background: c }} />
+                  <div key={i} className="w-3 h-3 rounded-[3px]" style={{ background: c }} />
                 ))}
               </div>
               <span>{t('heatmap_more')}</span>
             </div>
           </div>
 
-          <div style={s.panel}>
-            <div style={s.sectionHead}>
-              <h3 style={s.sectionTitle}>{t('weekly_title')}</h3>
-              <span style={{ fontSize: 12, color: '#7A6A60', fontWeight: 700 }}>{weekTotal} min</span>
+          {/* Weekly bar chart */}
+          <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
+            <div className="flex items-baseline justify-between px-1 pt-1">
+              <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('weekly_title')}</h3>
+              <span className="text-xs text-ink-500 font-bold">{weekTotal} min</span>
             </div>
-            <div style={s.chartBars}>
+            <div className="flex items-end gap-2 h-[140px] px-1">
               {weekBars.map((w, i) => (
-                <div key={i} style={{ ...s.bar, height: `${Math.max(4, (w.mins / barMax) * 100)}%` }}>
-                  {w.mins > 0 && <span style={s.barValue}>{w.mins}</span>}
-                  <span style={s.barLabel}>{w.day}</span>
+                /* height is runtime-computed — keep inline */
+                <div
+                  key={i}
+                  className="flex-1 relative rounded-t-[6px] rounded-b-[2px] bg-gradient-to-b from-[#E8623D] to-[#F5B948] flex flex-col justify-end"
+                  style={{ height: `${Math.max(4, (w.mins / barMax) * 100)}%` }}
+                >
+                  {w.mins > 0 && (
+                    <span className="absolute top-[-18px] left-0 right-0 text-center text-[10px] font-mono text-ink-900 font-bold">{w.mins}</span>
+                  )}
+                  <span className="absolute bottom-[-22px] left-0 right-0 text-center text-[10px] font-mono text-ink-500 font-bold">{w.day}</span>
                 </div>
               ))}
             </div>
@@ -416,44 +389,60 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
 
         {/* ── Tense breakdown + weak spots ── */}
         {(coloredTenses.length > 0 || weakSpots.length > 0) && (
-          <div style={s.twoCol}>
-            <div style={s.panel}>
-              <div style={s.sectionHead}>
-                <h3 style={s.sectionTitle}>{t('tenses_title')}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-3.5">
+
+            {/* Tense accuracy */}
+            <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
+              <div className="flex items-baseline justify-between px-1 pt-1">
+                <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('tenses_title')}</h3>
               </div>
               {coloredTenses.length === 0
-                ? <p style={{ color: '#7A6A60', fontSize: 14 }}>{t('tenses_empty')}</p>
+                ? <p className="text-sm text-ink-500">{t('tenses_empty')}</p>
                 : coloredTenses.map((tb, i, arr) => (
-                  <div key={i} className="transition-colors duration-150 ease-out rounded-lg hover:bg-black/[0.03] cursor-default" style={{ ...s.tenseRow, ...(i === arr.length - 1 ? { borderBottom: 'none' } : {}) }}>
-                    <span style={s.tenseLabel}>{tb.label}</span>
-                    <div style={s.tenseTrack}>
-                      <div style={{ ...s.tenseFill, width: `${tb.accuracy}%`, background: tb.color }} />
+                  <div
+                    key={i}
+                    className={`grid grid-cols-[100px_1fr_48px] sm:grid-cols-[160px_1fr_60px] items-center gap-3 sm:gap-3.5 py-2.5 transition-colors duration-150 ease-out rounded-lg hover:bg-black/[0.03] cursor-default${i < arr.length - 1 ? ' border-b border-dashed border-ink-900/[0.08]' : ''}`}
+                  >
+                    <span className="font-bold text-ink-900 text-sm">{tb.label}</span>
+                    <div className="h-3 bg-cream rounded-full overflow-hidden">
+                      {/* width and background are runtime-computed — keep inline */}
+                      <div className="h-full rounded-full" style={{ width: `${tb.accuracy}%`, background: tb.color }} />
                     </div>
-                    <span style={s.tenseValue}>{tb.accuracy}%</span>
+                    <span className="font-mono font-bold text-ink-900 text-sm text-right">{tb.accuracy}%</span>
                   </div>
                 ))
               }
             </div>
 
-            <div style={s.panel}>
-              <div style={s.sectionHead}>
-                <h3 style={s.sectionTitle}>{t('weak_title')}</h3>
+            {/* Weak spots */}
+            <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
+              <div className="flex items-baseline justify-between px-1 pt-1">
+                <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('weak_title')}</h3>
                 {weakSpots.length > 0 && (
-                  <span style={s.sectionMore} onClick={handlePractice}>{t('weak_train')}</span>
+                  <span className="text-xs text-ink-500 font-bold uppercase tracking-[0.08em] cursor-pointer" onClick={handlePractice}>
+                    {t('weak_train')}
+                  </span>
                 )}
               </div>
               {weakSpots.length === 0
-                ? <p style={{ color: '#7A6A60', fontSize: 14 }}>{t('weak_empty')}</p>
+                ? <p className="text-sm text-ink-500">{t('weak_empty')}</p>
                 : weakSpots.map((w, i, arr) => {
                     const { bg, color } = weakColors(w.accuracy);
                     return (
-                      <div key={i} className="transition-colors duration-150 ease-out rounded-lg hover:bg-black/[0.03] cursor-default" style={{ ...s.weakRow, ...(i === arr.length - 1 ? { borderBottom: 'none' } : {}) }}>
-                        <span style={{ ...s.weakIcon, background: bg, color }}>{w.pronoun}</span>
-                        <div style={s.weakBody}>
-                          <span style={s.weakVerb}>{w.verbInfinitive}</span>
-                          <span style={s.weakMeta}>{tenseLabel(w.tense)}</span>
+                      <div
+                        key={i}
+                        className={`flex items-center gap-3.5 py-3 transition-colors duration-150 ease-out rounded-lg hover:bg-black/[0.03] cursor-default${i < arr.length - 1 ? ' border-b border-dashed border-ink-900/[0.08]' : ''}`}
+                      >
+                        {/* bg and color are runtime-computed — keep inline */}
+                        <span className="w-9 h-9 rounded-[10px] inline-flex items-center justify-center font-mono text-[11px] font-bold shrink-0" style={{ background: bg, color }}>
+                          {w.pronoun}
+                        </span>
+                        <div className="flex-1 flex flex-col">
+                          <span className="font-mono text-[15px] font-bold text-ink-900">{w.verbInfinitive}</span>
+                          <span className="text-xs text-ink-500 font-semibold">{tenseLabel(w.tense)}</span>
                         </div>
-                        <span style={{ color, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, fontSize: 14 }}>{w.accuracy}%</span>
+                        {/* color is runtime-computed — keep inline */}
+                        <span className="font-mono font-bold text-sm" style={{ color }}>{w.accuracy}%</span>
                       </div>
                     );
                   })
@@ -463,19 +452,19 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
         )}
 
         {/* ── Practice settings ── */}
-        <div style={s.panel}>
-          <div style={s.sectionHead}>
-            <h3 style={s.sectionTitle}>{t('settings_title')}</h3>
+        <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
+          <div className="flex items-baseline justify-between px-1 pt-1">
+            <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('settings_title')}</h3>
           </div>
           {([
             { title: t('setting_sound'),    sub: t('setting_sound_sub'),    on: soundOn,  toggle: toggleSound    },
             { title: t('setting_hard'),     sub: t('setting_hard_sub'),     on: hardMode, toggle: toggleHardMode },
             { title: t('setting_autonext'), sub: t('setting_autonext_sub'), on: autoNext, toggle: toggleAutoNext },
           ] as const).map((row, i, arr) => (
-            <div key={i} style={{ ...s.settingRow, ...(i === arr.length - 1 ? { borderBottom: 'none' } : {}) }}>
+            <div key={i} className={`flex items-center justify-between py-3${i < arr.length - 1 ? ' border-b border-ink-900/[0.06]' : ''}`}>
               <div>
-                <div style={s.settingTitle}>{row.title}</div>
-                <div style={s.settingSub}>{row.sub}</div>
+                <div className="text-sm font-bold text-ink-900">{row.title}</div>
+                <div className="text-xs text-ink-500 font-semibold mt-0.5">{row.sub}</div>
               </div>
               <Toggle on={row.on} toggle={row.toggle} />
             </div>
