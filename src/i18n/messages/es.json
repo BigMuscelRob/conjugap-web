@@ -63,25 +63,25 @@
       {
         "name": "Gratis",
         "period": "para siempre",
-        "description": "Perfecto para probarlo.",
+        "description": "Perfecto para empezar.",
         "features": [
-          "10 verbos al día",
-          "Presente & Pretérito Indefinido",
-          "Seguimiento de racha",
-          "Feedback básico"
+          "Práctica completa sin restricciones",
+          "Racha, respuestas totales y precisión",
+          "Actividad de los últimos 7 días",
+          "Top 3 puntos débiles"
         ],
         "cta": "Empezar gratis"
       },
       {
         "name": "Pro",
-        "period": "por mes",
-        "description": "Para aprendientes serios.",
+        "period": "al mes",
+        "description": "Para quienes van en serio.",
         "features": [
-          "Verbos ilimitados",
-          "Los 14 tiempos verbales",
-          "Feedback avanzado",
-          "Estadísticas de aprendizaje",
-          "Modo sin conexión"
+          "Mapa de calor completo (13 semanas)",
+          "Precisión detallada por tiempo verbal",
+          "Lista ilimitada de puntos débiles",
+          "Gráfico de minutos semanales",
+          "Repetición espaciada — repaso inteligente"
         ],
         "cta": "Probar Pro"
       }

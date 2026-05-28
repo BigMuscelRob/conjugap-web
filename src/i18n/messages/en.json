@@ -63,12 +63,12 @@
       {
         "name": "Free",
         "period": "forever",
-        "description": "Perfect for trying it out.",
+        "description": "Perfect to get started.",
         "features": [
-          "10 verbs per day",
-          "Presente & Pretérito Indefinido",
-          "Streak tracking",
-          "Basic feedback"
+          "Full practice, no restrictions",
+          "Streak, total answers & accuracy",
+          "Last 7 days activity",
+          "Top 3 weak spots"
         ],
         "cta": "Start for free"
       },
@@ -77,11 +77,11 @@
         "period": "per month",
         "description": "For serious learners.",
         "features": [
-          "Unlimited verbs",
-          "All 14 tenses",
-          "Advanced feedback",
-          "Learning stats",
-          "Offline mode"
+          "Full heatmap (13 weeks)",
+          "Detailed accuracy per tense",
+          "Unlimited weak spots list",
+          "Weekly learning minutes chart",
+          "Spaced repetition — smart review"
         ],
         "cta": "Try Pro"
       }

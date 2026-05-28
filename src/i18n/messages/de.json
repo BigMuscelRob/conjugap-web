@@ -63,12 +63,12 @@
       {
         "name": "Gratis",
         "period": "für immer",
-        "description": "Perfekt zum Ausprobieren.",
+        "description": "Perfekt zum Einstieg.",
         "features": [
-          "10 Verben täglich",
-          "Presente & Pretérito Indefinido",
-          "Streak-Tracking",
-          "Basis-Feedback"
+          "Komplettes Üben ohne Einschränkung",
+          "Streak, Gesamtantworten & Accuracy",
+          "Aktivität der letzten 7 Tage",
+          "Top 3 Schwachstellen"
         ],
         "cta": "Kostenlos starten"
       },
@@ -77,11 +77,11 @@
         "period": "pro Monat",
         "description": "Für ernsthafte Lernende.",
         "features": [
-          "Unbegrenzte Verben",
-          "Alle 14 Tempi",
-          "Fortgeschrittenes Feedback",
-          "Lernstatistiken",
-          "Offline-Modus"
+          "Vollständige Heatmap (13 Wochen)",
+          "Detaillierte Accuracy pro Tempus",
+          "Unbegrenzte Schwachstellen-Liste",
+          "Wöchentliche Lernminuten-Grafik",
+          "Spaced Repetition — smarte Wiederholung"
         ],
         "cta": "Pro ausprobieren"
       }
