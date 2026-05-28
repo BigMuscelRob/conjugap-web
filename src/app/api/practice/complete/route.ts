@@ -116,6 +116,7 @@ export async function POST(req: NextRequest) {
   const incorrectCount = results.length - correctCount;
 
   const [sessionRecord, totals] = await prisma.$transaction(async (tx) => {
+    const serverNow = new Date(); // authoritative timestamp — never trust client for streak
     // a) Upsert UserProgress for each result
     for (const r of results) {
       await tx.userProgress.upsert({
@@ -153,9 +154,7 @@ export async function POST(req: NextRequest) {
 
     // c) Update streak on User
     const user = await tx.user.findUniqueOrThrow({ where: { id: userId } });
-    // Use the client-reported completion time for date comparisons
-    // so streak logic respects the user's local calendar day.
-    const today = completedAtDate;
+    const today = serverNow; // use server time — client timestamp is untrusted for streak
 
     let newStreak: number;
     if (user.lastPracticeDate && isSameDay(user.lastPracticeDate, today)) {
@@ -169,7 +168,7 @@ export async function POST(req: NextRequest) {
     const updatedUser = await tx.user.update({
       where: { id: userId },
       data: {
-        lastPracticeDate: today,
+        lastPracticeDate: serverNow,
         currentStreak:    newStreak,
         longestStreak:    Math.max(user.longestStreak, newStreak),
       },
