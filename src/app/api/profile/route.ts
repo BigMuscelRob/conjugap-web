@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/../auth';
 import { prisma } from '@/lib/prisma';
 import { Prisma as PrismaTypes } from '@/generated/prisma/client';
+import { isPro } from '@/lib/plan';
 
 // bigint / Decimal / string → number (handles all pg adapter return types)
 const n = (v: unknown): number => Number(v ?? 0);
@@ -172,6 +173,8 @@ export async function GET() {
     minutes:  Math.round(n(r.minutes)),
   }));
 
+  const proUser = isPro({ plan: user.plan, planUntil: user.planUntil });
+
   return NextResponse.json({
     user: {
       ...user,
@@ -186,9 +189,9 @@ export async function GET() {
       avgSecondsPerQuestion,
     },
     tenseBreakdown,
-    weakSpots,
-    heatmap,
-    weeklyMinutes,
+    weakSpots:    proUser ? weakSpots : weakSpots.slice(0, 3),
+    heatmap:      proUser ? heatmap : [],
+    weeklyMinutes: proUser ? weeklyMinutes : [],
   });
 
   } catch (err) {
