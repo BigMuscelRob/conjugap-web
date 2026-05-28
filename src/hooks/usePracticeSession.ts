@@ -129,6 +129,7 @@ export function usePracticeSession(config: SessionConfig): PracticeSessionResult
 
   function checkAnswer(input: string): AnswerState {
     if (!retry.current) return 'idle';
+    if (answerState !== 'idle') return answerState;
     const variants = retry.current.form.split('|').map(f => normalize(f.trim()));
     const outcome: AnswerState = variants.includes(normalize(input.trim())) ? 'correct' : 'wrong';
     setAnswerState(outcome);
