@@ -99,9 +99,8 @@ export function usePracticeQueue(config: SessionConfig): QueueBuild {
         const selected = allVerbs.filter(v => config.verbs.includes(v.infinitive));
         console.log('[Queue] matched verbs:', selected.map(v => v.infinitive));
 
-        const verbsFull: ApiVerbFull[] = await Promise.all(
-          selected.map(v => fetch(`/api/verbs/${v.id}/conjugations`).then(r => r.json()))
-        );
+        const ids = selected.map(v => v.id).join(',');
+        const verbsFull: ApiVerbFull[] = await fetch(`/api/conjugations?verbIds=${ids}`).then(r => r.json());
 
         if (cancelled) return;
 
