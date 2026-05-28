@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button';
 import { getLevelInfo, LEVEL_KEYS } from '@/lib/xpSystem';
 import { usePracticeSettings } from '@/hooks/usePracticeSettings';
+import { TENSE_LABELS } from '@/lib/labels';
 
 // ── API types ─────────────────────────────────────────────────────────────────
 
@@ -55,17 +56,6 @@ interface ProfileData {
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-const TENSE_LABELS: Record<string, string> = {
-  pres: 'Presente',
-  pi:   'Pretérito Indefinido',
-  imp:  'Imperfecto',
-  pp:   'Pretérito Perfecto',
-  fut:  'Futuro Simple',
-  cond: 'Condicional',
-  sub:  'Subjuntivo Presente',
-  subp: 'Subjuntivo Imperfecto',
-};
 
 function tenseLabel(t: string) {
   return TENSE_LABELS[t] ?? t;

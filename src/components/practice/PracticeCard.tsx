@@ -10,28 +10,8 @@ import { usePracticeSession } from '@/hooks/usePracticeSession';
 import { playCorrect } from '@/lib/sounds';
 import { useHardModeTimer } from '@/hooks/useHardModeTimer';
 import { usePracticeSettings } from '@/hooks/usePracticeSettings';
+import { TENSE_LABELS, PRONOUN_LABELS } from '@/lib/labels';
 
-// ── Constants ─────────────────────────────────────────────────────────────────
-
-const TENSE_LABELS: Record<string, string> = {
-  pres:  'Presente',
-  pi:    'Pretérito Indefinido',
-  imp:   'Imperfecto',
-  pp:    'Pretérito Perfecto',
-  fut:   'Futuro Simple',
-  cond:  'Condicional',
-  sub:   'Subjuntivo Presente',
-  imper: 'Imperativo',
-};
-
-const PRONOUN_LABELS: Record<string, string> = {
-  'yo':          'YO',
-  'tú':          'TÚ',
-  'él/ella':     'ÉL / ELLA',
-  'nosotros':    'NOSOTROS',
-  'vosotros':    'VOSOTROS',
-  'ellos/ellas': 'ELLOS / ELLAS',
-};
 
 function formatTime(ms: number) {
   const s = Math.floor(ms / 1000);
