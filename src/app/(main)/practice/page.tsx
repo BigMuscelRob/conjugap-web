@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import UebenClient from './UebenClient';
 
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function PracticePage() {
-  return <UebenClient />;
+  return (
+    <Suspense>
+      <UebenClient />
+    </Suspense>
+  );
 }
