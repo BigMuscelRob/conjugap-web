@@ -152,6 +152,15 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
   const coloredTenses = tenseBreakdown.map(tb => ({ ...tb, label: tenseLabel(tb.tense), color: tenseColor(tb.accuracy) }));
   const joinedDate    = new Date(user.createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 
+  const handleWeakTrain = () => {
+    const params       = new URLSearchParams();
+    const uniqueTenses = [...new Set(weakSpots.map(w => w.tense))];
+    const uniqueVerbs  = [...new Set(weakSpots.map(w => w.verbInfinitive))];
+    uniqueTenses.forEach(t => params.append('tense', t));
+    uniqueVerbs.forEach(v  => params.append('verb',  v));
+    router.push(`/practice?${params.toString()}`);
+  };
+
   return (
     <div className="relative min-h-[90vh] bg-cream overflow-hidden px-4 sm:px-6 py-10 pb-[120px]">
 
@@ -419,7 +428,7 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
               <div className="flex items-baseline justify-between px-1 pt-1">
                 <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('weak_title')}</h3>
                 {weakSpots.length > 0 && (
-                  <span className="text-xs text-ink-500 font-bold uppercase tracking-[0.08em] cursor-pointer" onClick={handlePractice}>
+                  <span className="text-xs text-ink-500 font-bold uppercase tracking-[0.08em] cursor-pointer" onClick={handleWeakTrain}>
                     {t('weak_train')}
                   </span>
                 )}

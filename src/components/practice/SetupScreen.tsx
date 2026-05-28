@@ -21,13 +21,14 @@ interface SetupScreenProps {
   onStart?: (config: import('@/hooks/useSessionConfig').SessionConfig) => void;
   onBack?:        () => void;
   initialTenses?: string[];
+  initialVerbs?:  string[];
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function SetupScreen({ onStart, onBack, initialTenses }: SetupScreenProps) {
+export default function SetupScreen({ onStart, onBack, initialTenses, initialVerbs }: SetupScreenProps) {
   const t      = useTranslations('practice.setup');
-  const config = useSessionConfig(initialTenses);
+  const config = useSessionConfig(initialTenses, initialVerbs);
   const [showAllVerbs, setShowAllVerbs] = useState(false);
 
   if (config.isLoading) {
