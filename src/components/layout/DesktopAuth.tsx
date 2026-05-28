@@ -113,7 +113,7 @@ export default function DesktopAuth({ loggedIn, userName, userImage, signOutActi
         {t('login')}
       </Link>
       <Link
-        href="/practice"
+        href="/login"
         className="inline-flex items-center font-body font-bold text-small text-white-warm no-underline
           px-4 py-2 bg-terracotta-500 border-2 border-ink-900 rounded-md
           shadow-stamp-primary transition-all duration-micro ease-smooth
