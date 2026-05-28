@@ -11,6 +11,7 @@ import { getLevelInfo, LEVEL_KEYS } from '@/lib/xpSystem';
 import { usePracticeSettings } from '@/hooks/usePracticeSettings';
 import { useProfileData } from '@/hooks/useProfileData';
 import { tenseLabel, buildHeatGrid, tenseColor, weakColors } from '@/lib/dashboardHelpers';
+import { isPro } from '@/lib/plan';
 
 const DAY_LABELS  = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 const HEAT_COLORS = ['#ECE2D5', '#F9D97A', '#F5B948', '#EC7450', '#E8623D'];
@@ -110,6 +111,18 @@ function Toggle({ on, toggle }: { on: boolean; toggle: () => void }) {
   );
 }
 
+// ── Pro Teaser ────────────────────────────────────────────────────────────────
+
+function ProTeaser({ label }: { label: string }) {
+  return (
+    <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col items-center justify-center min-h-[160px] gap-2.5 opacity-70">
+      <i className="ph-fill ph-lock text-[28px] text-ink-300" />
+      <span className="text-sm font-bold text-ink-400 uppercase tracking-[0.08em]">{label}</span>
+      <span className="text-xs font-semibold text-terracotta-500">Pro</span>
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function DashboardClient({ onPractice }: { onPractice?: () => void }) {
@@ -160,6 +173,9 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
     uniqueVerbs.forEach(v  => params.append('verb',  v));
     router.push(`/practice?${params.toString()}`);
   };
+
+  const proUser          = isPro({ plan: user.plan, planUntil: user.planUntil ? new Date(user.planUntil) : null });
+  const visibleWeakSpots = proUser ? weakSpots : weakSpots.slice(0, 3);
 
   return (
     <div className="relative min-h-[90vh] bg-cream overflow-hidden px-4 sm:px-6 py-10 pb-[120px]">
@@ -349,65 +365,70 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
         <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-3.5">
 
           {/* Heatmap */}
-          <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
-            <div className="flex items-baseline justify-between px-1 pt-1">
-              <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('heatmap_title')}</h3>
-              <span className="text-xs text-ink-500 font-bold">{t('heatmap_active', { n: activeDays })}</span>
-            </div>
-            {/* gridTemplateColumns is runtime-computed — keep inline */}
-            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.ceil(heatGrid.length / 7)}, 1fr)`, gridAutoRows: '14px', gap: 4 }}>
-              {heatGrid.map((v, i) => (
-                /* background is runtime-computed from HEAT_COLORS — keep inline */
-                <div key={i} className="rounded-[3px] cursor-default" style={{ background: HEAT_COLORS[v] }} />
-              ))}
-            </div>
-            <div className="flex items-center justify-end gap-2 text-[11px] text-ink-500 font-bold">
-              <span>{t('heatmap_less')}</span>
-              <div className="inline-flex gap-[3px]">
-                {HEAT_COLORS.map((c, i) => (
-                  <div key={i} className="w-3 h-3 rounded-[3px]" style={{ background: c }} />
-                ))}
+          {proUser
+            ? <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
+                <div className="flex items-baseline justify-between px-1 pt-1">
+                  <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('heatmap_title')}</h3>
+                  <span className="text-xs text-ink-500 font-bold">{t('heatmap_active', { n: activeDays })}</span>
+                </div>
+                {/* gridTemplateColumns is runtime-computed — keep inline */}
+                <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.ceil(heatGrid.length / 7)}, 1fr)`, gridAutoRows: '14px', gap: 4 }}>
+                  {heatGrid.map((v, i) => (
+                    /* background is runtime-computed from HEAT_COLORS — keep inline */
+                    <div key={i} className="rounded-[3px] cursor-default" style={{ background: HEAT_COLORS[v] }} />
+                  ))}
+                </div>
+                <div className="flex items-center justify-end gap-2 text-[11px] text-ink-500 font-bold">
+                  <span>{t('heatmap_less')}</span>
+                  <div className="inline-flex gap-[3px]">
+                    {HEAT_COLORS.map((c, i) => (
+                      <div key={i} className="w-3 h-3 rounded-[3px]" style={{ background: c }} />
+                    ))}
+                  </div>
+                  <span>{t('heatmap_more')}</span>
+                </div>
               </div>
-              <span>{t('heatmap_more')}</span>
-            </div>
-          </div>
+            : <ProTeaser label={t('heatmap_title')} />
+          }
 
           {/* Weekly bar chart */}
-          <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
-            <div className="flex items-baseline justify-between px-1 pt-1">
-              <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('weekly_title')}</h3>
-              <span className="text-xs text-ink-500 font-bold">{weekTotal} min</span>
-            </div>
-            <div className="flex items-end gap-2 h-[140px] px-1">
-              {weekBars.map((w, i) => (
-                /* height is runtime-computed — keep inline */
-                <div
-                  key={i}
-                  className="flex-1 relative rounded-t-[6px] rounded-b-[2px] bg-gradient-to-b from-[#E8623D] to-[#F5B948] flex flex-col justify-end"
-                  style={{ height: `${Math.max(4, (w.mins / barMax) * 100)}%` }}
-                >
-                  {w.mins > 0 && (
-                    <span className="absolute top-[-18px] left-0 right-0 text-center text-[10px] font-mono text-ink-900 font-bold">{w.mins}</span>
-                  )}
-                  <span className="absolute bottom-[-22px] left-0 right-0 text-center text-[10px] font-mono text-ink-500 font-bold">{w.day}</span>
+          {proUser
+            ? <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
+                <div className="flex items-baseline justify-between px-1 pt-1">
+                  <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('weekly_title')}</h3>
+                  <span className="text-xs text-ink-500 font-bold">{weekTotal} min</span>
                 </div>
-              ))}
-            </div>
-          </div>
+                <div className="flex items-end gap-2 h-[140px] px-1">
+                  {weekBars.map((w, i) => (
+                    /* height is runtime-computed — keep inline */
+                    <div
+                      key={i}
+                      className="flex-1 relative rounded-t-[6px] rounded-b-[2px] bg-gradient-to-b from-[#E8623D] to-[#F5B948] flex flex-col justify-end"
+                      style={{ height: `${Math.max(4, (w.mins / barMax) * 100)}%` }}
+                    >
+                      {w.mins > 0 && (
+                        <span className="absolute top-[-18px] left-0 right-0 text-center text-[10px] font-mono text-ink-900 font-bold">{w.mins}</span>
+                      )}
+                      <span className="absolute bottom-[-22px] left-0 right-0 text-center text-[10px] font-mono text-ink-500 font-bold">{w.day}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            : <ProTeaser label={t('weekly_title')} />
+          }
         </div>
 
         {/* ── Tense breakdown + weak spots ── */}
-        {(coloredTenses.length > 0 || weakSpots.length > 0) && (
+        {(weakSpots.length > 0 || (proUser && coloredTenses.length > 0)) && (
           <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-3.5">
 
-            {/* Tense accuracy */}
-            <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
-              <div className="flex items-baseline justify-between px-1 pt-1">
-                <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('tenses_title')}</h3>
-              </div>
-              {coloredTenses.length === 0
-                ? <p className="text-sm text-ink-500">{t('tenses_empty')}</p>
-                : coloredTenses.map((tb, i, arr) => (
+            {/* Tense accuracy — Pro only */}
+            {proUser && coloredTenses.length > 0 && (
+              <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
+                <div className="flex items-baseline justify-between px-1 pt-1">
+                  <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('tenses_title')}</h3>
+                </div>
+                {coloredTenses.map((tb, i, arr) => (
                   <div
                     key={i}
                     className={`grid grid-cols-[100px_1fr_48px] sm:grid-cols-[160px_1fr_60px] items-center gap-3 sm:gap-3.5 py-2.5 transition-colors duration-150 ease-out rounded-lg hover:bg-black/[0.03] cursor-default${i < arr.length - 1 ? ' border-b border-dashed border-ink-900/[0.08]' : ''}`}
@@ -419,15 +440,15 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
                     </div>
                     <span className="font-mono font-bold text-ink-900 text-sm text-right">{tb.accuracy}%</span>
                   </div>
-                ))
-              }
-            </div>
+                ))}
+              </div>
+            )}
 
-            {/* Weak spots */}
+            {/* Weak spots — Top 3 for free, all for Pro */}
             <div className="bg-paper border-2 border-ink-900 rounded-[20px] p-5 shadow-[0_4px_0_#2A1F1A] flex flex-col gap-3.5">
               <div className="flex items-baseline justify-between px-1 pt-1">
                 <h3 className="font-display text-xl font-bold tracking-tight text-ink-900 m-0">{t('weak_title')}</h3>
-                {weakSpots.length > 0 && (
+                {proUser && weakSpots.length > 0 && (
                   <span className="text-xs text-ink-500 font-bold uppercase tracking-[0.08em] cursor-pointer" onClick={handleWeakTrain}>
                     {t('weak_train')}
                   </span>
@@ -435,7 +456,7 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
               </div>
               {weakSpots.length === 0
                 ? <p className="text-sm text-ink-500">{t('weak_empty')}</p>
-                : weakSpots.map((w, i, arr) => {
+                : visibleWeakSpots.map((w, i, arr) => {
                     const { bg, color } = weakColors(w.accuracy);
                     return (
                       <div
