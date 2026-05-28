@@ -431,13 +431,13 @@ export default function DashboardClient({ onPractice }: { onPractice?: () => voi
                     return (
                       <div
                         key={i}
-                        className={`flex items-center gap-3.5 py-3 transition-colors duration-150 ease-out rounded-lg hover:bg-black/[0.03] cursor-default${i < arr.length - 1 ? ' border-b border-dashed border-ink-900/[0.08]' : ''}`}
+                        className={`grid grid-cols-[80px_1fr_auto] items-center gap-3 py-3 transition-colors duration-150 ease-out rounded-lg hover:bg-black/[0.03] cursor-default${i < arr.length - 1 ? ' border-b border-dashed border-ink-900/[0.08]' : ''}`}
                       >
                         {/* bg and color are runtime-computed — keep inline */}
-                        <span className="min-w-[36px] h-9 px-2 rounded-[10px] inline-flex items-center justify-center font-mono text-[11px] font-bold shrink-0 whitespace-nowrap" style={{ background: bg, color }}>
+                        <span className="justify-self-start min-w-[36px] h-9 px-2 rounded-[10px] inline-flex items-center justify-center font-mono text-[11px] font-bold shrink-0 whitespace-nowrap" style={{ background: bg, color }}>
                           {w.pronoun}
                         </span>
-                        <div className="flex-1 flex flex-col">
+                        <div className="flex flex-col">
                           <span className="font-mono text-[15px] font-bold text-ink-900">{w.verbInfinitive}</span>
                           <span className="text-xs text-ink-500 font-semibold">{tenseLabel(w.tense)}</span>
                         </div>
