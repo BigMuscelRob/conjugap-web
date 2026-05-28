@@ -9,7 +9,6 @@ import es from './messages/es.json';
 export type Locale = 'en' | 'de' | 'es';
 
 const MESSAGES: Record<Locale, typeof en> = { en, de, es };
-const STORAGE_KEY = 'conjugap-locale';
 const DEFAULT_LOCALE: Locale = 'de';
 
 interface LanguageContextValue {
@@ -26,12 +25,19 @@ export function useLanguage() {
   return useContext(LanguageContext);
 }
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
-  const [mounted, setMounted] = useState(false);
+export function LanguageProvider({
+  children,
+  initialLocale,
+}: {
+  children:      ReactNode;
+  initialLocale?: Locale;
+}) {
+  const [locale, setLocaleState] = useState<Locale>(initialLocale ?? DEFAULT_LOCALE);
+  const [mounted, setMounted]    = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY) as Locale | null;
+    const match  = document.cookie.match(/(?:^|;\s*)conjugap-locale=([^;]+)/);
+    const stored = match?.[1] as Locale | null;
     if (stored && stored in MESSAGES) {
       setLocaleState(stored);
     }
@@ -40,10 +46,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   function setLocale(next: Locale) {
     setLocaleState(next);
-    localStorage.setItem(STORAGE_KEY, next);
+    document.cookie = `conjugap-locale=${next}; path=/; max-age=31536000; SameSite=Lax`;
   }
 
-  const activeLocale = mounted ? locale : DEFAULT_LOCALE;
+  const activeLocale = mounted ? locale : (initialLocale ?? DEFAULT_LOCALE);
 
   return (
     <NextIntlClientProvider

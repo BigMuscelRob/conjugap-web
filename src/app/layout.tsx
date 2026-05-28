@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import './globals.css';
-import { LanguageProvider } from '@/i18n/LanguageProvider';
+import { LanguageProvider, type Locale } from '@/i18n/LanguageProvider';
 import AuthSessionProvider from '@/components/providers/SessionProvider';
 
 export const metadata: Metadata = {
@@ -14,7 +15,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const cookieStore = await cookies();
+  const locale = (cookieStore.get('conjugap-locale')?.value ?? 'de') as Locale;
+
   return (
     <html lang="de">
       <head>
@@ -33,7 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen flex flex-col bg-cream text-ink-900 font-body antialiased">
         <AuthSessionProvider>
-          <LanguageProvider>
+          <LanguageProvider initialLocale={locale}>
             {children}
           </LanguageProvider>
         </AuthSessionProvider>
