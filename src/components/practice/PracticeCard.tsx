@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button';
 import type { SessionConfig } from './SetupScreen';
 import { usePracticeSession } from '@/hooks/usePracticeSession';
 import { playCorrect } from '@/lib/sounds';
+import { useHardModeTimer } from '@/hooks/useHardModeTimer';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -55,6 +56,16 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
   const structured = config.mode === 'structured';
   const session    = usePracticeSession(config);
   const hardMode   = typeof window !== 'undefined' && localStorage.getItem('cg_hard') === 'true';
+
+  const timer = useHardModeTimer({
+    enabled:  hardMode,
+    active:   session.sessionStatus === 'running' && session.answerState === 'idle',
+    onExpire: () => {
+      session.checkAnswer('');
+      setTimeout(() => { session.nextQuestion(); setValue(''); }, 800);
+    },
+  });
+
   const { status: authStatus } = useSession();
 
   // Pure UI state
@@ -113,10 +124,11 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
 
   // ── Input handlers ────────────────────────────────────────────────────────
   function handleCheck() {
+    timer.clearTimer();
     const outcome = session.checkAnswer(value);
     if (outcome === 'correct') playCorrect();
     if (outcome === 'wrong' && hardMode) {
-      setTimeout(() => handleNext(), 600);
+      setTimeout(() => { session.nextQuestion(); setValue(''); }, 600);
     }
   }
 
@@ -435,6 +447,22 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
             : 'border-ink-200 bg-white-warm text-ink-900 focus:border-terracotta-400',
         ].join(' ')}
       />
+
+      {/* Hard mode timer bar */}
+      {hardMode && session.answerState === 'idle' && (
+        <div className="w-full h-1.5 bg-ink-100 rounded-full overflow-hidden -mt-2">
+          <div
+            className="h-full rounded-full transition-all duration-1000 ease-linear"
+            style={{
+              width: `${(timer.timeLeft / timer.totalSecs) * 100}%`,
+              backgroundColor:
+                timer.timeLeft > 3 ? '#C1440E' :
+                timer.timeLeft > 1 ? '#E8A023' :
+                                     '#C0392B',
+            }}
+          />
+        </div>
+      )}
 
       {/* Feedback */}
       {session.answerState === 'correct' && (
