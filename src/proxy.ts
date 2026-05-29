@@ -1,9 +1,26 @@
-import NextAuth from 'next-auth';
-import { authConfig } from '../auth.config';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
-const { auth } = NextAuth(authConfig);
+const PROTECTED_PATHS = ['/dashboard', '/practice', '/profil', '/profile'];
 
-export default auth;
+export default function proxy(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  const isProtected = PROTECTED_PATHS.some(p => pathname.startsWith(p));
+  if (!isProtected) return NextResponse.next();
+
+  // NextAuth v5 setzt diesen Cookie nach erfolgreichem Login
+  const sessionCookie =
+    req.cookies.get('__Secure-authjs.session-token') ??
+    req.cookies.get('authjs.session-token');
+
+  if (!sessionCookie) {
+    const loginUrl = new URL('/login', req.url);
+    loginUrl.searchParams.set('callbackUrl', pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [

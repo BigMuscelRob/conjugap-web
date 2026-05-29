@@ -8,13 +8,7 @@ export const authConfig = {
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
     }),
   ],
-  session: { strategy: 'jwt' },
   pages: {
     signIn: '/login',
-  },
-  callbacks: {
-    authorized({ auth }) {
-      return !!auth?.user;
-    },
   },
 } satisfies NextAuthConfig;
