@@ -1,9 +1,10 @@
+'use client';
 import Image from 'next/image';
-import { getTranslations } from 'next-intl/server';
-import { signIn } from '@/../auth';
+import { useTranslations } from 'next-intl';
+import { signInWithGoogle } from './actions';
 
-export default async function LoginPage() {
-  const t = await getTranslations('loginPage');
+export default function LoginPage() {
+  const t = useTranslations('loginPage');
 
   const BENEFITS = [
     { emoji: '🔥', text: t('benefit_streak') },
@@ -66,13 +67,7 @@ export default async function LoginPage() {
             </p>
           </div>
 
-          <form
-            action={async () => {
-              'use server';
-              await signIn('google', { redirectTo: '/practice' });
-            }}
-            className="w-full"
-          >
+          <form action={signInWithGoogle} className="w-full">
             <button
               type="submit"
               className="w-full inline-flex items-center justify-center gap-3
