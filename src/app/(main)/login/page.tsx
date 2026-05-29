@@ -2,10 +2,9 @@ import Image from 'next/image';
 import { signIn } from '@/../auth';
 
 const BENEFITS = [
-  { emoji: '🔥', text: 'Streak tracken — sieh wie viele Tage du am Stück übst' },
-  { emoji: '📊', text: 'Trefferquote — erkenne welche Zeiten dir noch schwerfallen' },
-  { emoji: '⏱',  text: 'Lerngeschwindigkeit — verfolge wie schnell du besser wirst' },
-  { emoji: '🔁', text: 'Spaced Repetition — bald verfügbar' },
+  { emoji: '🔥', text: 'Streak tracken, sieh wie viele Tage du am Stück übst' },
+  { emoji: '📊', text: 'Trefferquote, erkenne welche Zeiten dir noch schwerfallen' },
+  { emoji: '⏱',  text: 'Lerngeschwindigkeit, verfolge wie schnell du besser wirst' },
 ];
 
 export default function LoginPage() {
@@ -33,6 +32,14 @@ export default function LoginPage() {
               </li>
             ))}
           </ul>
+
+          <div className="mt-5 flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full
+              bg-terracotta-50 border border-terracotta-200
+              text-terracotta-600 text-[12px] font-bold tracking-wide">
+              🔜 Spaced Repetition — bald verfügbar
+            </span>
+          </div>
         </div>
 
         {/* ── Right: Login card ───────────────────────────────────────────── */}
