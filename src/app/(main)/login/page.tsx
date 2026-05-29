@@ -1,25 +1,29 @@
 import Image from 'next/image';
+import { getTranslations } from 'next-intl/server';
 import { signIn } from '@/../auth';
 
-const BENEFITS = [
-  { emoji: '🔥', text: 'Streak tracken, sieh wie viele Tage du am Stück übst' },
-  { emoji: '📊', text: 'Trefferquote, erkenne welche Zeiten dir noch schwerfallen' },
-  { emoji: '⏱',  text: 'Lerngeschwindigkeit, verfolge wie schnell du besser wirst' },
-];
+export default async function LoginPage() {
+  const t = await getTranslations('loginPage');
 
-export default function LoginPage() {
+  const BENEFITS = [
+    { emoji: '🔥', text: t('benefit_streak') },
+    { emoji: '📊', text: t('benefit_accuracy') },
+    { emoji: '⏱',  text: t('benefit_speed') },
+  ];
+
   return (
     <main className="bg-cream px-6 py-16">
       <div className="max-w-5xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
 
         {/* ── Left: Benefits ─────────────────────────────────────────────── */}
         <div>
-          <p className="text-sm font-bold text-terracotta-500">ConjuGap</p>
-          <h1 className="font-display font-bold text-[36px] text-ink-900 leading-tight mt-2">
-            Lerne smarter,<br />nicht härter.
+          <p className="text-sm font-bold text-terracotta-500">{t('eyebrow')}</p>
+          <h1 className="font-display font-bold text-[36px] text-ink-900 leading-tight mt-2"
+            style={{ whiteSpace: 'pre-line' }}>
+            {t('title')}
           </h1>
           <p className="text-ink-500 text-base mt-3">
-            Melde dich an und dein Fortschritt wird automatisch gespeichert.
+            {t('subtitle')}
           </p>
 
           <ul className="mt-8 flex flex-col gap-4">
@@ -37,7 +41,7 @@ export default function LoginPage() {
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full
               bg-terracotta-50 border border-terracotta-200
               text-terracotta-600 text-[12px] font-bold tracking-wide">
-              🔜 Spaced Repetition — bald verfügbar
+              🔜 {t('coming_soon_label')}
             </span>
           </div>
         </div>
@@ -55,10 +59,10 @@ export default function LoginPage() {
 
           <div>
             <h1 className="font-bricolage font-bold text-[28px] text-brand-dark leading-tight">
-              Anmelden
+              {t('card_title')}
             </h1>
             <p className="text-sm font-semibold text-brand-muted mt-2">
-              Speichere deinen Fortschritt und Streak.
+              {t('card_subtitle')}
             </p>
           </div>
 
@@ -84,12 +88,12 @@ export default function LoginPage() {
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
-              Mit Google anmelden
+              {t('google_btn')}
             </button>
           </form>
 
           <p className="text-[11px] font-semibold text-brand-muted leading-snug">
-            Mit der Anmeldung stimmst du unseren Nutzungsbedingungen zu.
+            {t('legal')}
           </p>
         </div>
 

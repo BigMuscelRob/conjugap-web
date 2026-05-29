@@ -153,6 +153,19 @@
   "language_switcher": {
     "label": "Language"
   },
+  "loginPage": {
+    "eyebrow": "ConjuGap",
+    "title": "Learn smarter,\nnot harder.",
+    "subtitle": "Sign in and your progress is saved automatically.",
+    "benefit_streak":   "Track your streak, see how many days in a row you practice",
+    "benefit_accuracy": "Hit rate, see which tenses you still struggle with",
+    "benefit_speed":    "Learning speed, track how quickly you improve",
+    "coming_soon_label": "Spaced Repetition — coming soon",
+    "card_title":    "Sign in",
+    "card_subtitle": "Save your progress and streak.",
+    "google_btn":    "Sign in with Google",
+    "legal":         "By signing in, you agree to our Terms of Service."
+  },
   "coming_soon": {
     "badge": "Coming Soon",
     "title": "Spanish verbs –\nfinally stress-free.",

@@ -153,6 +153,19 @@
   "language_switcher": {
     "label": "Sprache"
   },
+  "loginPage": {
+    "eyebrow": "ConjuGap",
+    "title": "Lerne smarter,\nnicht härter.",
+    "subtitle": "Melde dich an und dein Fortschritt wird automatisch gespeichert.",
+    "benefit_streak":   "Streak tracken, sieh wie viele Tage du am Stück übst",
+    "benefit_accuracy": "Trefferquote, erkenne welche Zeiten dir noch schwerfallen",
+    "benefit_speed":    "Lerngeschwindigkeit, verfolge wie schnell du besser wirst",
+    "coming_soon_label": "Spaced Repetition — bald verfügbar",
+    "card_title":    "Anmelden",
+    "card_subtitle": "Speichere deinen Fortschritt und Streak.",
+    "google_btn":    "Mit Google anmelden",
+    "legal":         "Mit der Anmeldung stimmst du unseren Nutzungsbedingungen zu."
+  },
   "coming_soon": {
     "badge": "Coming Soon",
     "title": "Spanische Verben –\nendlich kein Stress mehr.",

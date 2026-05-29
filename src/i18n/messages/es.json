@@ -153,6 +153,19 @@
   "language_switcher": {
     "label": "Idioma"
   },
+  "loginPage": {
+    "eyebrow": "ConjuGap",
+    "title": "Aprende mejor,\nno más duro.",
+    "subtitle": "Inicia sesión y tu progreso se guardará automáticamente.",
+    "benefit_streak":   "Sigue tu racha, mira cuántos días seguidos practicas",
+    "benefit_accuracy": "Tasa de aciertos, descubre qué tiempos aún te cuestan",
+    "benefit_speed":    "Velocidad de aprendizaje, comprueba cuánto avanzas",
+    "coming_soon_label": "Spaced Repetition — próximamente",
+    "card_title":    "Iniciar sesión",
+    "card_subtitle": "Guarda tu progreso y racha.",
+    "google_btn":    "Continuar con Google",
+    "legal":         "Al iniciar sesión, aceptas nuestros Términos de servicio."
+  },
   "coming_soon": {
     "badge": "Próximamente",
     "title": "Verbos en español –\nsin estrés, de verdad.",
