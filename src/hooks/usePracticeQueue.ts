@@ -92,15 +92,16 @@ export function usePracticeQueue(config: SessionConfig): QueueBuild {
       setLoading(true);
       setError(null);
       startedAtRef.current = Date.now();
-      console.log('[Queue] verbs:', config.verbs, '| tenses:', config.tenses, '| mode:', config.mode, '| length:', config.length);
 
       try {
         const allVerbs: ApiVerb[] = await fetch('/api/verbs').then(r => r.json());
         const selected = allVerbs.filter(v => config.verbs.includes(v.infinitive));
-        console.log('[Queue] matched verbs:', selected.map(v => v.infinitive));
 
-        const ids = selected.map(v => v.id).join(',');
-        const verbsFull: ApiVerbFull[] = await fetch(`/api/conjugations?verbIds=${ids}`).then(r => r.json());
+        const ids    = selected.map(v => v.id).join(',');
+        const tenses = config.tenses.join(',');
+        const verbsFull: ApiVerbFull[] = await fetch(
+          `/api/conjugations?verbIds=${ids}&tenses=${tenses}`
+        ).then(r => r.json());
 
         if (cancelled) return;
 
@@ -138,17 +139,14 @@ export function usePracticeQueue(config: SessionConfig): QueueBuild {
 
         // ── Random: flat 3× Fisher-Yates + anti-collision ─────────────────
         } else {
-          console.log('[Queue/random] building — tenses:', config.tenses);
           const items: QueueItem[] = [];
           for (const verb of verbsFull) {
             for (const tenseKey of config.tenses) {
-              let hits = 0;
               for (const pronoun of PRONOUN_ORDER) {
                 const conj = verb.conjugations.find(
                   c => c.tense === tenseKey && c.pronoun === pronoun
                 );
                 if (conj && conj.form !== '—') {
-                  hits++;
                   items.push({
                     key:           `${verb.infinitive}|${tenseKey}|${pronoun}`,
                     conjugationId: conj.id,
@@ -162,7 +160,6 @@ export function usePracticeQueue(config: SessionConfig): QueueBuild {
                   });
                 }
               }
-              console.log(`[Queue/random]   ${verb.infinitive}/${tenseKey}: ${hits} forms`);
             }
           }
 
@@ -180,12 +177,6 @@ export function usePracticeQueue(config: SessionConfig): QueueBuild {
               }
             }
           }
-
-          console.log(
-            '[Queue/random] total:', final.length,
-            '| first 15:',
-            final.slice(0, 15).map(i => `${i.tense}/${i.pronoun}`).join(', ')
-          );
 
           setTotalItems(final.length);
           setTotalBlocks(0);

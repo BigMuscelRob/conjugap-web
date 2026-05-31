@@ -14,13 +14,21 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'verbIds must be 1–100 comma-separated integers' }, { status: 400 });
   }
 
-  const tense = req.nextUrl.searchParams.get('tense');
+  const tense       = req.nextUrl.searchParams.get('tense');
+  const tensesParam = req.nextUrl.searchParams.get('tenses');
+  const tenseFilter = tensesParam
+    ? tensesParam.split(',').filter(t =>
+        ['pres', 'pi', 'imp', 'pp', 'fut', 'cond', 'sub', 'imper'].includes(t)
+      )
+    : null;
 
   const verbs = await prisma.verb.findMany({
     where: { id: { in: verbIds } },
     include: {
       conjugations: {
-        where: tense ? { tense } : undefined,
+        where: tenseFilter && tenseFilter.length > 0
+          ? { tense: { in: tenseFilter } }
+          : tense ? { tense } : undefined,
         orderBy: [{ tense: 'asc' }, { id: 'asc' }],
       },
     },
