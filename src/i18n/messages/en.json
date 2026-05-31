@@ -39,7 +39,7 @@
   },
   "stats": {
     "items": [
-      { "label": "Currently learning", "description": "" },
+      { "label": "Verbs available",    "description": "" },
       { "label": "Forms in the App",   "description": "Conjugated in 14 tenses. Yes, all of them." },
       { "label": "Average streak",     "description": "" }
     ]

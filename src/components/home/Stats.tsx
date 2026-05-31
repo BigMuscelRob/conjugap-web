@@ -10,7 +10,6 @@ const STAT_STYLES = [
 ];
 
 type StatsData = {
-  userCount:        number;
   conjugationCount: number;
   avgStreakDays:     number;
 };
@@ -29,7 +28,7 @@ export default function Stats() {
   const fmt = (n: number) => n.toLocaleString('de-DE');
 
   const STAT_VALUES = data
-    ? [fmt(data.userCount), fmt(data.conjugationCount), `${data.avgStreakDays} Tage`]
+    ? ['150+', fmt(data.conjugationCount), `${data.avgStreakDays} Tage`]
     : ['—', '—', '—'];
 
   return (

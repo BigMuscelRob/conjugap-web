@@ -39,7 +39,7 @@
   },
   "stats": {
     "items": [
-      { "label": "Lernen gerade",          "description": "" },
+      { "label": "Verben verfügbar",        "description": "" },
       { "label": "Formen in der App",      "description": "In 14 Tempi konjugiert. Ja, alle." },
       { "label": "Streak im Durchschnitt", "description": "" }
     ]

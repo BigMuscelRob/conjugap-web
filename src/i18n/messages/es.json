@@ -39,7 +39,7 @@
   },
   "stats": {
     "items": [
-      { "label": "Aprendiendo ahora", "description": "" },
+      { "label": "Verbos disponibles", "description": "" },
       { "label": "Formas en la App",  "description": "Conjugado en 14 tiempos. Sí, todos." },
       { "label": "Racha media",       "description": "" }
     ]
