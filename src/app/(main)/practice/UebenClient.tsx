@@ -12,7 +12,8 @@ export default function UebenClient() {
   const initialTenses = tenses.length > 0 ? tenses : undefined;
   const initialVerbs  = verbs.length  > 0 ? verbs  : undefined;
 
-  const [config, setConfig] = useState<SessionConfig | null>(null);
+  const [config, setConfig]             = useState<SessionConfig | null>(null);
+  const [sessionStatus, setSessionStatus] = useState<string>('loading');
   const cardRef = useRef<PracticeCardHandle>(null);
 
   if (!config) {
@@ -23,27 +24,29 @@ export default function UebenClient() {
     <main className="min-h-screen bg-cream py-16 px-4">
       <div className="flex flex-col lg:flex-row lg:items-start w-fit mx-auto gap-4">
 
-        <PracticeCard ref={cardRef} config={config} onReset={() => setConfig(null)} />
+        <PracticeCard ref={cardRef} config={config} onReset={() => setConfig(null)} onStatusChange={setSessionStatus} />
 
-        {/* Special chars sidebar */}
-        <div className="flex lg:flex-col flex-wrap gap-2 bg-paper border-2 border-ink-900
-          rounded-[18px] p-3 shadow-[0_4px_0_#2A1F1A]
-          lg:self-start lg:mt-0 mx-auto lg:mx-0">
-          {SPECIAL_CHARS.map(ch => (
-            <button
-              key={ch}
-              type="button"
-              onMouseDown={e => { e.preventDefault(); cardRef.current?.insertChar(ch); }}
-              className="w-10 h-10 flex items-center justify-center rounded-lg
-                font-mono text-[17px] font-bold text-ink-700
-                bg-cream border border-ink-200
-                hover:border-terracotta-400 hover:text-terracotta-500
-                active:scale-95 transition-all duration-75 select-none"
-            >
-              {ch}
-            </button>
-          ))}
-        </div>
+        {/* Special chars sidebar — only visible while a question is active */}
+        {sessionStatus === 'running' && (
+          <div className="flex lg:flex-col flex-wrap gap-2 bg-paper border-2 border-ink-900
+            rounded-[18px] p-3 shadow-[0_4px_0_#2A1F1A]
+            lg:self-start lg:mt-0 mx-auto lg:mx-0">
+            {SPECIAL_CHARS.map(ch => (
+              <button
+                key={ch}
+                type="button"
+                onMouseDown={e => { e.preventDefault(); cardRef.current?.insertChar(ch); }}
+                className="w-10 h-10 flex items-center justify-center rounded-lg
+                  font-mono text-[17px] font-bold text-ink-700
+                  bg-cream border border-ink-200
+                  hover:border-terracotta-400 hover:text-terracotta-500
+                  active:scale-95 transition-all duration-75 select-none"
+              >
+                {ch}
+              </button>
+            ))}
+          </div>
+        )}
 
       </div>
     </main>

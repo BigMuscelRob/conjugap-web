@@ -28,11 +28,12 @@ export type PracticeCardHandle = {
 };
 
 interface Props {
-  config:  SessionConfig;
-  onReset: () => void;
+  config:           SessionConfig;
+  onReset:          () => void;
+  onStatusChange?:  (status: string) => void;
 }
 
-const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard({ config, onReset }, ref) {
+const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard({ config, onReset, onStatusChange }, ref) {
   const t          = useTranslations('practice.card');
   const structured = config.mode === 'structured';
   const session    = usePracticeSession(config);
@@ -68,6 +69,10 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
       });
     },
   }));
+
+  useEffect(() => {
+    onStatusChange?.(session.sessionStatus);
+  }, [session.sessionStatus]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Back-button guard ────────────────────────────────────────────────────
   useEffect(() => {
