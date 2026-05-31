@@ -103,13 +103,23 @@ export async function POST(req: NextRequest) {
   // (prevents clients from writing progress for arbitrary IDs)
   const validConjugations = await prisma.conjugation.findMany({
     where: { id: { in: results.map(r => r.conjugationId) } },
-    select: { id: true },
+    select: { id: true, verbId: true },
   });
   const validIds = new Set(validConjugations.map(c => c.id));
   const allValid = results.every(r => validIds.has(r.conjugationId));
 
   if (!allValid) {
     return NextResponse.json({ error: 'Invalid conjugationId in results' }, { status: 400 });
+  }
+
+  const validVerbIds = new Set(validConjugations.map(c => c.verbId));
+  const verbIdsValid = verbIds.every(id => validVerbIds.has(id));
+
+  if (!verbIdsValid) {
+    return NextResponse.json(
+      { error: 'verbIds do not match conjugation data' },
+      { status: 400 }
+    );
   }
 
   const correctCount   = results.filter(r => r.correct).length;
