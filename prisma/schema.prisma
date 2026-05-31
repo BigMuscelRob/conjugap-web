@@ -27,6 +27,7 @@ model Conjugation {
   progress UserProgress[]
 
   @@unique([verbId, tense, pronoun])
+  @@index([verbId])
 }
 
 // ── Auth.js (NextAuth v5) ─────────────────────────────────────────────────────
