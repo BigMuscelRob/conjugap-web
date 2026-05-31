@@ -122,20 +122,24 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const correctCount   = results.filter(r => r.correct).length;
-  const incorrectCount = results.length - correctCount;
+  const deduplicatedResults = [
+    ...new Map(results.map(r => [r.conjugationId, r])).values()
+  ];
+
+  const correctCount   = deduplicatedResults.filter(r => r.correct).length;
+  const incorrectCount = deduplicatedResults.length - correctCount;
 
   const [sessionRecord, totals] = await prisma.$transaction(async (tx) => {
     const serverNow = new Date(); // authoritative timestamp — never trust client for streak
     // a) Bulk-upsert UserProgress — max. 4 DB-Ops statt bis zu N sequenzieller upserts
     const existing = await tx.userProgress.findMany({
-      where:  { userId, conjugationId: { in: results.map(r => r.conjugationId) } },
+      where:  { userId, conjugationId: { in: deduplicatedResults.map(r => r.conjugationId) } },
       select: { conjugationId: true },
     });
     const existingIds = new Set(existing.map(e => e.conjugationId));
 
-    const toCreate = results.filter(r => !existingIds.has(r.conjugationId));
-    const toUpdate = results.filter(r =>  existingIds.has(r.conjugationId));
+    const toCreate = deduplicatedResults.filter(r => !existingIds.has(r.conjugationId));
+    const toUpdate = deduplicatedResults.filter(r =>  existingIds.has(r.conjugationId));
 
     if (toCreate.length > 0) {
       await tx.userProgress.createMany({
@@ -174,7 +178,7 @@ export async function POST(req: NextRequest) {
         verbIds,
         startedAt:       startedAtDate,
         completedAt:     completedAtDate,
-        totalQuestions:  results.length,
+        totalQuestions:  deduplicatedResults.length,
         correctCount,
         incorrectCount,
         durationSeconds,
@@ -212,8 +216,8 @@ export async function POST(req: NextRequest) {
     return [newSession, { agg, currentStreak: updatedUser.currentStreak }] as const;
   });
 
-  const accuracy = results.length > 0
-    ? Math.round((correctCount / results.length) * 100)
+  const accuracy = deduplicatedResults.length > 0
+    ? Math.round((correctCount / deduplicatedResults.length) * 100)
     : 0;
 
   return NextResponse.json({
