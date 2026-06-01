@@ -212,13 +212,15 @@
     "title": "Cuenta",
     "variant_label": "Variante del español",
     "variant_sub": "vosotros vs. ustedes",
-    "variant_es": "España (vosotros)",
-    "variant_mx": "México (ustedes)",
-    "variant_ar": "Argentina (vos)",
+    "variant_coming_soon": "Próximamente",
     "email_label": "Email",
     "stats_label": "Estadísticas",
     "stats_sub": "{answers} respuestas · {days} días activos",
-    "signout": "Cerrar sesión"
+    "signout":        "Cerrar sesión",
+    "delete_account": "Eliminar cuenta",
+    "delete_confirm": "¿Estás seguro? Todos los datos se eliminarán permanentemente.",
+    "delete_cancel":  "Cancelar",
+    "delete_loading": "Eliminando..."
   },
   "levels": {
     "novato":      "Novato",

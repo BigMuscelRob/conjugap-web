@@ -212,13 +212,15 @@
     "title": "Konto",
     "variant_label": "Spanisch-Variante",
     "variant_sub": "vosotros vs. ustedes",
-    "variant_es": "Spanien (vosotros)",
-    "variant_mx": "Mexiko (ustedes)",
-    "variant_ar": "Argentinien (vos)",
+    "variant_coming_soon": "Bald verfügbar",
     "email_label": "E-Mail",
     "stats_label": "Statistiken",
     "stats_sub": "{answers} Antworten · {days} aktive Tage",
-    "signout": "Abmelden"
+    "signout":        "Abmelden",
+    "delete_account": "Account löschen",
+    "delete_confirm": "Bist du sicher? Alle Daten werden unwiderruflich gelöscht.",
+    "delete_cancel":  "Abbrechen",
+    "delete_loading": "Wird gelöscht..."
   },
   "levels": {
     "novato":      "Anfänger",

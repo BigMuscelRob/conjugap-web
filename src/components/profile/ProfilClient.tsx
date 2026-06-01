@@ -14,8 +14,10 @@ interface UserData {
 export default function ProfilClient() {
   const router = useRouter();
   const t = useTranslations('profil');
-  const [user,    setUser]    = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user,          setUser]          = useState<UserData | null>(null);
+  const [loading,       setLoading]       = useState(true);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting,      setDeleting]      = useState(false);
 
   useEffect(() => {
     fetch('/api/profile')
@@ -76,14 +78,11 @@ export default function ProfilClient() {
               <p className="font-bold text-[14px] text-ink-900">{t('variant_label')}</p>
               <p className="text-[12px] font-semibold text-ink-500 mt-0.5">{t('variant_sub')}</p>
             </div>
-            <select
-              defaultValue="es-es"
-              className="px-3 py-2 rounded-[10px] border-2 border-ink-900/12 bg-cream font-bold text-[13px] text-ink-900 cursor-pointer focus:outline-none focus:border-terracotta-400 transition-colors"
-            >
-              <option value="es-es">{t('variant_es')}</option>
-              <option value="es-mx">{t('variant_mx')}</option>
-              <option value="es-ar">{t('variant_ar')}</option>
-            </select>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full
+              bg-terracotta-50 border border-terracotta-200
+              text-terracotta-600 text-[12px] font-bold tracking-wide">
+              🔜 {t('variant_coming_soon')}
+            </span>
           </div>
 
           {/* Email */}
@@ -97,7 +96,7 @@ export default function ProfilClient() {
           </div>
 
           {/* Sign out */}
-          <div className="px-6 py-4">
+          <div className="px-6 py-4 border-b border-ink-900/10">
             <button
               type="button"
               onClick={() => signOut({ callbackUrl: '/' })}
@@ -106,6 +105,54 @@ export default function ProfilClient() {
             >
               {t('signout')}
             </button>
+          </div>
+
+          {/* Delete account */}
+          <div className="px-6 py-4">
+            {!confirmDelete ? (
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(true)}
+                className="font-bold text-[14px] text-berry-500 hover:text-berry-600
+                  transition-colors duration-micro"
+              >
+                {t('delete_account')}
+              </button>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <p className="text-[13px] font-semibold text-ink-700">
+                  {t('delete_confirm')}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDelete(false)}
+                    disabled={deleting}
+                    className="px-4 py-2 rounded-xl border-2 border-ink-900/12
+                      font-bold text-[13px] text-ink-700 bg-cream
+                      hover:border-ink-900/25 transition-colors duration-micro
+                      disabled:opacity-50"
+                  >
+                    {t('delete_cancel')}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={deleting}
+                    onClick={async () => {
+                      setDeleting(true);
+                      await fetch('/api/account/delete', { method: 'DELETE' });
+                      await signOut({ callbackUrl: '/' });
+                    }}
+                    className="px-4 py-2 rounded-xl border-2 border-berry-500
+                      font-bold text-[13px] text-white bg-berry-500
+                      hover:bg-berry-600 hover:border-berry-600
+                      transition-colors duration-micro disabled:opacity-50"
+                  >
+                    {deleting ? t('delete_loading') : t('delete_account')}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
         </div>

@@ -212,13 +212,15 @@
     "title": "Account",
     "variant_label": "Spanish variant",
     "variant_sub": "vosotros vs. ustedes",
-    "variant_es": "Spain (vosotros)",
-    "variant_mx": "Mexico (ustedes)",
-    "variant_ar": "Argentina (vos)",
+    "variant_coming_soon": "Coming soon",
     "email_label": "Email",
     "stats_label": "Stats",
     "stats_sub": "{answers} answers · {days} active days",
-    "signout": "Sign out"
+    "signout":        "Sign out",
+    "delete_account": "Delete account",
+    "delete_confirm": "Are you sure? All data will be permanently deleted.",
+    "delete_cancel":  "Cancel",
+    "delete_loading": "Deleting..."
   },
   "levels": {
     "novato":      "Beginner",
