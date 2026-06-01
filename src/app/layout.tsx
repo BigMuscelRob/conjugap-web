@@ -10,8 +10,9 @@ export const metadata: Metadata = {
     'Trainiere spanische Verbkonjugation mit gezieltem Feedback und kurzen, motivierenden Übungseinheiten.',
   keywords: ['Spanisch', 'Konjugation', 'Lernen', 'Verben', 'Trainer'],
   icons: {
-    icon: '/icon.svg',
-    shortcut: '/favicon.ico',
+    icon:     '/icon.svg',
+    shortcut: '/icon.svg',
+    apple:    '/icon.svg',
   },
 };
 
