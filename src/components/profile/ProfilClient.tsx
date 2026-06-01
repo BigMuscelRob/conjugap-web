@@ -18,6 +18,7 @@ export default function ProfilClient() {
   const [loading,       setLoading]       = useState(true);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting,      setDeleting]      = useState(false);
+  const [deleted,       setDeleted]       = useState(false);
 
   useEffect(() => {
     fetch('/api/profile')
@@ -32,6 +33,25 @@ export default function ProfilClient() {
   }, [router]);
 
   const initial = user ? (user.name ?? user.email ?? '?')[0].toUpperCase() : '?';
+
+  if (deleted) {
+    return (
+      <div className="bg-cream min-h-screen flex items-center justify-center px-6">
+        <div className="text-center flex flex-col items-center gap-4">
+          <div className="w-16 h-16 rounded-full bg-sage-100 border-2 border-sage-300
+            flex items-center justify-center">
+            <i className="ph-fill ph-check text-[32px] text-sage-600" />
+          </div>
+          <h2 className="font-display font-bold text-[24px] text-ink-900">
+            {t('deleted_title')}
+          </h2>
+          <p className="text-[14px] font-semibold text-ink-500">
+            {t('deleted_subtitle')}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-cream min-h-screen px-6 py-12">
@@ -140,8 +160,13 @@ export default function ProfilClient() {
                     disabled={deleting}
                     onClick={async () => {
                       setDeleting(true);
-                      await fetch('/api/account/delete', { method: 'DELETE' });
-                      await signOut({ callbackUrl: '/' });
+                      const res = await fetch('/api/account/delete', { method: 'DELETE' });
+                      if (res.ok) {
+                        setDeleted(true);
+                        setTimeout(() => { signOut({ callbackUrl: '/' }); }, 3000);
+                      } else {
+                        setDeleting(false);
+                      }
                     }}
                     className="px-4 py-2 rounded-xl border-2 border-berry-500
                       font-bold text-[13px] text-white bg-berry-500
