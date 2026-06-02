@@ -3,21 +3,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button';
+import TenseHintPanel from './TenseHintPanel';
+import { TENSE_LABELS } from '@/lib/labels';
 import type { SessionConfig } from './SetupScreen';
 import { usePracticeSession } from '@/hooks/usePracticeSession';
-
-// ── Constants ─────────────────────────────────────────────────────────────────
-
-const TENSE_LABELS: Record<string, string> = {
-  pres:  'Presente',
-  pi:    'Pretérito Indefinido',
-  imp:   'Imperfecto',
-  pp:    'Pretérito Perfecto',
-  fut:   'Futuro Simple',
-  cond:  'Condicional',
-  sub:   'Subjuntivo Presente',
-  imper: 'Imperativo',
-};
 
 const PRONOUN_LABELS: Record<string, string> = {
   'yo':          'YO',
@@ -49,6 +38,7 @@ export default function PracticeCard({ config, onReset }: Props) {
   // Pure UI state
   const [value,       setValue]       = useState('');
   const [confirmExit, setConfirmExit] = useState(false);
+  const [showHint,    setShowHint]    = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -94,6 +84,7 @@ export default function PracticeCard({ config, onReset }: Props) {
   function handleNext() {
     session.nextQuestion();
     setValue('');
+    setShowHint(false);
   }
 
   function handleEnterKey() {
@@ -351,7 +342,7 @@ export default function PracticeCard({ config, onReset }: Props) {
           </span>
         </div>
         <div className="flex gap-2">
-          <Button variant="ghost" size="md" icon="lightbulb">{t('btn_hint')}</Button>
+          <Button variant="ghost" size="md" icon="lightbulb" onClick={() => setShowHint(prev => !prev)}>{t('btn_hint')}</Button>
           {session.answerState === 'idle'
             ? <Button variant="success" size="md" onClick={handleCheck} iconAfter="arrow-right">{t('btn_check')}</Button>
             : <Button variant="primary" size="md" onClick={handleNext}  iconAfter="arrow-right">{t('btn_next')}</Button>
@@ -359,6 +350,10 @@ export default function PracticeCard({ config, onReset }: Props) {
         </div>
       </div>
     </CardShell>
+    <TenseHintPanel
+      tense={session.current?.tense ?? ''}
+      show={showHint}
+    />
     </>
   );
 }

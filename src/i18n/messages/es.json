@@ -156,6 +156,19 @@
       "imper": { "desc": "Imperativo — órdenes y peticiones." }
     }
   },
+  "tenseHints": {
+    "label": "Tiempo verbal",
+    "signalWords": "Palabras clave",
+    "example": "Ejemplo",
+    "pres":  { "usage": "Acciones que ocurren ahora mismo o de forma habitual.", "signals": "ahora, siempre, todos los días, normalmente" },
+    "pi":    { "usage": "Acciones completadas en un momento específico del pasado.", "signals": "ayer, el año pasado, hace dos días, en 2020" },
+    "imp":   { "usage": "Acciones repetidas o continuas en el pasado.", "signals": "siempre, antes, cuando era niño, todos los veranos" },
+    "pp":    { "usage": "Acciones recientes o que siguen siendo relevantes.", "signals": "hoy, esta semana, ya, todavía no, alguna vez" },
+    "fut":   { "usage": "Acciones futuras, predicciones o suposiciones.", "signals": "mañana, el próximo año, en el futuro, seguramente" },
+    "cond":  { "usage": "Situaciones hipotéticas, peticiones corteses o consejos.", "signals": "si tuviera..., me gustaría, ¿podría?, debería" },
+    "sub":   { "usage": "Tras expresiones de deseo, duda, emoción o necesidad.", "signals": "quiero que, es importante que, espero que, ojalá" },
+    "imper": { "usage": "Órdenes, peticiones e instrucciones.", "signals": "¡Habla!, ¡No hables!, Por favor," }
+  },
   "language_switcher": {
     "label": "Idioma"
   },
