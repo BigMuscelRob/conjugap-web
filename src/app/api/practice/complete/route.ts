@@ -1,22 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { auth } from '@/../auth';
 import { prisma } from '@/lib/prisma';
 
 // ── Request body ──────────────────────────────────────────────────────────────
 
-interface ResultEntry {
-  conjugationId: number;
-  correct:       boolean;
-}
+const ResultEntrySchema = z.object({
+  conjugationId: z.number().int().positive(),
+  correct:       z.boolean(),
+});
 
-interface CompleteBody {
-  mode:        string;
-  tenses:      string[];
-  verbIds:     number[];
-  results:     ResultEntry[];
-  startedAt:   string;
-  completedAt: string;
-}
+const CompleteBodySchema = z.object({
+  mode:        z.enum(['structured', 'random']),
+  tenses:      z.array(z.enum(['pres', 'pi', 'imp', 'pp', 'fut', 'cond', 'sub', 'imper']))
+                 .min(1).max(8),
+  verbIds:     z.array(z.number().int().positive()).min(1).max(100),
+  results:     z.array(ResultEntrySchema).min(1).max(500),
+  startedAt:   z.string().datetime(),
+  completedAt: z.string().datetime(),
+});
 
 // ── Streak helpers ────────────────────────────────────────────────────────────
 
@@ -43,58 +45,26 @@ export async function POST(req: NextRequest) {
   }
   const userId = session.user.id;
 
-  let body: CompleteBody;
+  let rawBody: unknown;
   try {
-    body = await req.json() as CompleteBody;
+    rawBody = await req.json();
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  const { mode, tenses, verbIds, results, startedAt, completedAt } = body;
-
-  if (!Array.isArray(results) || results.length === 0) {
-    return NextResponse.json({ error: 'results must be a non-empty array' }, { status: 400 });
+  const parsed = CompleteBodySchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Invalid request', details: parsed.error.flatten() },
+      { status: 400 }
+    );
   }
-
-  const ALLOWED_MODES  = ['structured', 'random'] as const;
-  const ALLOWED_TENSES = ['pres', 'pi', 'imp', 'pp', 'fut', 'cond', 'sub', 'imper'] as const;
-
-  if (!ALLOWED_MODES.includes(mode as typeof ALLOWED_MODES[number])) {
-    return NextResponse.json({ error: 'Invalid mode' }, { status: 400 });
-  }
-
-  if (
-    !Array.isArray(tenses) ||
-    tenses.length === 0 ||
-    tenses.length > 8 ||
-    !tenses.every(t => ALLOWED_TENSES.includes(t as typeof ALLOWED_TENSES[number]))
-  ) {
-    return NextResponse.json({ error: 'Invalid tenses' }, { status: 400 });
-  }
-
-  if (
-    !Array.isArray(verbIds) ||
-    verbIds.length === 0 ||
-    verbIds.length > 100 ||
-    !verbIds.every(id => Number.isInteger(id) && id > 0)
-  ) {
-    return NextResponse.json({ error: 'Invalid verbIds' }, { status: 400 });
-  }
-
-  if (results.length > 500) {
-    return NextResponse.json({ error: 'Too many results' }, { status: 400 });
-  }
-  if (!results.every(r => Number.isInteger(r.conjugationId) && r.conjugationId > 0 && typeof r.correct === 'boolean')) {
-    return NextResponse.json({ error: 'Malformed result entry' }, { status: 400 });
-  }
+  const { mode, tenses, verbIds, results, startedAt, completedAt } = parsed.data;
 
   const startedAtDate   = new Date(startedAt);
   const completedAtDate = new Date(completedAt);
   const durationSeconds = Math.round((completedAtDate.getTime() - startedAtDate.getTime()) / 1000);
 
-  if (isNaN(startedAtDate.getTime()) || isNaN(completedAtDate.getTime())) {
-    return NextResponse.json({ error: 'Invalid date format' }, { status: 400 });
-  }
   if (durationSeconds < 0 || durationSeconds > 86400) {
     return NextResponse.json({ error: 'Invalid duration' }, { status: 400 });
   }
