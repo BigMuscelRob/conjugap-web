@@ -3,11 +3,14 @@ import { prisma } from '@/lib/prisma';
 
 export const revalidate = 86400; // 24 Stunden
 
+const ALLOWED_CLASSES = ['-ar', '-er', '-ir', 'irregulares'];
+
 export async function GET(req: NextRequest) {
   const cls = req.nextUrl.searchParams.get('cls');
+  const clsFilter = cls && ALLOWED_CLASSES.includes(cls) ? cls : null;
 
   const verbs = await prisma.verb.findMany({
-    where: cls ? { cls } : undefined,
+    where: clsFilter ? { cls: clsFilter } : undefined,
     orderBy: { infinitive: 'asc' },
     select: {
       id:         true,

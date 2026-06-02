@@ -14,7 +14,9 @@ export async function GET(
     return NextResponse.json({ error: 'Invalid verb id' }, { status: 400 });
   }
 
-  const tense = req.nextUrl.searchParams.get('tense');
+  const ALLOWED_TENSES = ['pres', 'pi', 'imp', 'pp', 'fut', 'cond', 'sub', 'imper'];
+  const tenseRaw = req.nextUrl.searchParams.get('tense');
+  const tense = tenseRaw && ALLOWED_TENSES.includes(tenseRaw) ? tenseRaw : null;
 
   const verb = await prisma.verb.findUnique({
     where: { id: verbId },
