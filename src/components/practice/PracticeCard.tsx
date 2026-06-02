@@ -373,6 +373,7 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
   return (
     <>
     {exitOverlay}
+    <div className="flex flex-col gap-4 w-full">
     <CardShell>
 
       {/* Top: chips + progress */}
@@ -501,10 +502,11 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
         </div>
       </div>
     </CardShell>
-    <TenseHintPanel
-      tense={session.current?.tense ?? ''}
-      show={showHint}
-    />
+      <TenseHintPanel
+        tense={session.current?.tense ?? ''}
+        show={showHint}
+      />
+    </div>
     </>
   );
 });
