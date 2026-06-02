@@ -162,7 +162,10 @@ export default function ProfilClient() {
                       const res = await fetch('/api/account/delete', { method: 'DELETE' });
                       if (res.ok) {
                         setDeleted(true);
-                        setTimeout(() => { window.location.href = '/'; }, 3000);
+                        setTimeout(async () => {
+                          await fetch('/api/auth/signout', { method: 'POST' });
+                          window.location.href = '/';
+                        }, 3000);
                       } else {
                         setDeleting(false);
                       }
