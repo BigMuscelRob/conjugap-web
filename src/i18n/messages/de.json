@@ -150,6 +150,19 @@
       "imper": { "desc": "Imperativ, Aufforderungen und Befehle." }
     }
   },
+  "tenseHints": {
+    "label": "Zeitform",
+    "signalWords": "Signalwörter",
+    "example": "Beispiel",
+    "pres":  { "usage": "Aktionen die gerade passieren oder regelmäßig stattfinden.", "signals": "ahora, siempre, todos los días, normalmente" },
+    "pi":    { "usage": "Abgeschlossene Aktionen zu einem bestimmten Zeitpunkt in der Vergangenheit.", "signals": "ayer, el año pasado, hace dos días, en 2020" },
+    "imp":   { "usage": "Wiederholte oder andauernde Aktionen in der Vergangenheit.", "signals": "siempre, antes, cuando era niño, todos los veranos" },
+    "pp":    { "usage": "Aktionen die kürzlich stattgefunden haben oder noch relevant sind.", "signals": "hoy, esta semana, ya, todavía no, alguna vez" },
+    "fut":   { "usage": "Zukünftige Aktionen, Vorhersagen oder Vermutungen.", "signals": "mañana, el próximo año, en el futuro, seguramente" },
+    "cond":  { "usage": "Hypothetische Situationen, höfliche Bitten oder Ratschläge.", "signals": "si tuviera..., me gustaría, ¿podría?, debería" },
+    "sub":   { "usage": "Nach Ausdrücken von Wunsch, Zweifel, Emotion oder Notwendigkeit.", "signals": "quiero que, es importante que, espero que, ojalá" },
+    "imper": { "usage": "Befehle, Aufforderungen und Anweisungen.", "signals": "¡Habla!, ¡No hables!, Por favor," }
+  },
   "language_switcher": {
     "label": "Sprache"
   },

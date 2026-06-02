@@ -5,13 +5,13 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button';
+import TenseHintPanel from './TenseHintPanel';
 import type { SessionConfig } from './SetupScreen';
 import { usePracticeSession } from '@/hooks/usePracticeSession';
 import { playCorrect } from '@/lib/sounds';
 import { useHardModeTimer } from '@/hooks/useHardModeTimer';
 import { usePracticeSettings } from '@/hooks/usePracticeSettings';
 import { TENSE_LABELS, PRONOUN_LABELS } from '@/lib/labels';
-
 
 function formatTime(ms: number) {
   const s = Math.floor(ms / 1000);
@@ -53,6 +53,7 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
   // Pure UI state
   const [value,       setValue]       = useState('');
   const [confirmExit, setConfirmExit] = useState(false);
+  const [showHint,    setShowHint]    = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -121,6 +122,7 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
   function handleNext() {
     session.nextQuestion();
     setValue('');
+    setShowHint(false);
   }
 
   function handleEnterKey() {
@@ -490,7 +492,7 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
         </div>
         <div className="flex gap-2">
           {!hardMode && (
-            <Button variant="ghost" size="md" icon="lightbulb">{t('btn_hint')}</Button>
+            <Button variant="ghost" size="md" icon="lightbulb" onClick={() => setShowHint(prev => !prev)}>{t('btn_hint')}</Button>
           )}
           {session.answerState === 'idle'
             ? <Button variant="success" size="md" onClick={handleCheck} iconAfter="arrow-right">{t('btn_check')}</Button>
@@ -499,6 +501,10 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
         </div>
       </div>
     </CardShell>
+    <TenseHintPanel
+      tense={session.current?.tense ?? ''}
+      show={showHint}
+    />
     </>
   );
 });

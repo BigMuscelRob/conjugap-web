@@ -150,6 +150,19 @@
       "imper": { "desc": "Imperative, commands and requests." }
     }
   },
+  "tenseHints": {
+    "label": "Tense",
+    "signalWords": "Signal words",
+    "example": "Example",
+    "pres":  { "usage": "Actions happening right now or on a regular basis.", "signals": "ahora, siempre, todos los días, normalmente" },
+    "pi":    { "usage": "Completed actions at a specific point in the past.", "signals": "ayer, el año pasado, hace dos días, en 2020" },
+    "imp":   { "usage": "Repeated or ongoing actions in the past.", "signals": "siempre, antes, cuando era niño, todos los veranos" },
+    "pp":    { "usage": "Actions that recently happened or are still relevant.", "signals": "hoy, esta semana, ya, todavía no, alguna vez" },
+    "fut":   { "usage": "Future actions, predictions or assumptions.", "signals": "mañana, el próximo año, en el futuro, seguramente" },
+    "cond":  { "usage": "Hypothetical situations, polite requests or advice.", "signals": "si tuviera..., me gustaría, ¿podría?, debería" },
+    "sub":   { "usage": "After expressions of wish, doubt, emotion or necessity.", "signals": "quiero que, es importante que, espero que, ojalá" },
+    "imper": { "usage": "Commands, requests and instructions.", "signals": "¡Habla!, ¡No hables!, Por favor," }
+  },
   "language_switcher": {
     "label": "Language"
   },
