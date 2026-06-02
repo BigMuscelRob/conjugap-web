@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
@@ -163,7 +162,7 @@ export default function ProfilClient() {
                       const res = await fetch('/api/account/delete', { method: 'DELETE' });
                       if (res.ok) {
                         setDeleted(true);
-                        setTimeout(() => { signOut({ callbackUrl: '/' }); }, 3000);
+                        setTimeout(() => { window.location.href = '/'; }, 3000);
                       } else {
                         setDeleting(false);
                       }
