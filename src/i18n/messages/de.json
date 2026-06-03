@@ -177,7 +177,7 @@
     "card_title":    "Anmelden",
     "card_subtitle": "Speichere deinen Fortschritt und Streak.",
     "google_btn":    "Mit Google anmelden",
-    "legal":         "Mit der Anmeldung stimmst du unseren Nutzungsbedingungen zu."
+    "legal":         "Mit der Anmeldung stimmst du unseren <terms>Nutzungsbedingungen</terms> und der <privacy>Datenschutzerklärung</privacy> zu."
   },
   "coming_soon": {
     "badge": "Coming Soon",

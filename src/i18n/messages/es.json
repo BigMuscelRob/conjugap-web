@@ -177,7 +177,7 @@
     "card_title":    "Iniciar sesión",
     "card_subtitle": "Guarda tu progreso y racha.",
     "google_btn":    "Continuar con Google",
-    "legal":         "Al iniciar sesión, aceptas nuestros Términos de servicio."
+    "legal":         "Al iniciar sesión aceptas nuestros <terms>Términos de uso</terms> y la <política>Política de privacidad</política>."
   },
   "coming_soon": {
     "badge": "Próximamente",

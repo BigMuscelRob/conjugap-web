@@ -88,7 +88,11 @@ export default function LoginPage() {
           </form>
 
           <p className="text-[11px] font-semibold text-brand-muted leading-snug">
-            {t('legal')}
+            {t.rich('legal', {
+              terms:    (chunks) => <a href="/terms"   className="underline hover:text-ink-700">{chunks}</a>,
+              privacy:  (chunks) => <a href="/privacy" className="underline hover:text-ink-700">{chunks}</a>,
+              política: (chunks) => <a href="/privacy" className="underline hover:text-ink-700">{chunks}</a>,
+            })}
           </p>
         </div>
 

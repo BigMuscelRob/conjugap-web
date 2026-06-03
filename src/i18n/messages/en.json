@@ -177,7 +177,7 @@
     "card_title":    "Sign in",
     "card_subtitle": "Save your progress and streak.",
     "google_btn":    "Sign in with Google",
-    "legal":         "By signing in, you agree to our Terms of Service."
+    "legal":         "By signing in you agree to our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>."
   },
   "coming_soon": {
     "badge": "Coming Soon",
