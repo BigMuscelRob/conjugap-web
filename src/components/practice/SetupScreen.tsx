@@ -49,7 +49,7 @@ export default function SetupScreen({ onStart, onBack, initialTenses, initialVer
   }
 
   return (
-    <div className="relative min-h-[90vh] px-4 sm:px-6 pt-10 pb-[120px] bg-brand-bg overflow-hidden">
+    <div translate="no" className="relative min-h-[90vh] px-4 sm:px-6 pt-10 pb-[120px] bg-brand-bg overflow-hidden">
 
       {/* Radial glow — can't be expressed as a Tailwind class */}
       <div

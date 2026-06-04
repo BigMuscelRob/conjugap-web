@@ -518,7 +518,7 @@ export default PracticeCard;
 
 function CardShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-paper border-2 border-ink-900 rounded-[28px] p-5 sm:p-9 shadow-[0_6px_0_#2A1F1A] max-w-[560px] mx-auto flex flex-col gap-5">
+    <div translate="no" className="bg-paper border-2 border-ink-900 rounded-[28px] p-5 sm:p-9 shadow-[0_6px_0_#2A1F1A] max-w-[560px] mx-auto flex flex-col gap-5">
       {children}
     </div>
   );

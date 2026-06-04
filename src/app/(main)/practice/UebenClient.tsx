@@ -21,7 +21,7 @@ export default function UebenClient() {
   }
 
   return (
-    <main className="min-h-screen bg-cream py-16 px-4">
+    <main translate="no" className="min-h-screen bg-cream py-16 px-4">
       <div className="flex flex-col lg:flex-row lg:items-start w-fit mx-auto gap-4">
 
         <PracticeCard ref={cardRef} config={config} onReset={() => setConfig(null)} onStatusChange={setSessionStatus} />
