@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth, signOut } from '@/../auth';
+import { auth } from '@/../auth';
 import { prisma } from '@/lib/prisma';
 
 export async function DELETE() {
@@ -8,7 +8,14 @@ export async function DELETE() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  await prisma.user.delete({ where: { id: session.user.id } });
-
-  return NextResponse.json({ success: true });
+  try {
+    await prisma.session.deleteMany({ where: { userId: session.user.id } });
+    await prisma.user.delete({ where: { id: session.user.id } });
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json(
+      { error: 'Account could not be deleted' },
+      { status: 500 }
+    );
+  }
 }

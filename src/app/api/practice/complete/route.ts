@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
   const parsed = CompleteBodySchema.safeParse(rawBody);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: 'Invalid request', details: parsed.error.flatten() },
+      { error: 'Invalid request' },
       { status: 400 }
     );
   }
@@ -99,7 +99,11 @@ export async function POST(req: NextRequest) {
   const correctCount   = deduplicatedResults.filter(r => r.correct).length;
   const incorrectCount = deduplicatedResults.length - correctCount;
 
-  const [sessionRecord, totals] = await prisma.$transaction(async (tx) => {
+  let sessionRecord: Awaited<ReturnType<typeof prisma.practiceSession.create>>;
+  let totals: { agg: { _sum: { correct: number | null; incorrect: number | null } }; currentStreak: number };
+
+  try {
+    [sessionRecord, totals] = await prisma.$transaction(async (tx) => {
     const serverNow = new Date(); // authoritative timestamp — never trust client for streak
     // a) Bulk-upsert UserProgress — max. 4 DB-Ops statt bis zu N sequenzieller upserts
     const existing = await tx.userProgress.findMany({
@@ -184,7 +188,13 @@ export async function POST(req: NextRequest) {
     });
 
     return [newSession, { agg, currentStreak: updatedUser.currentStreak }] as const;
-  });
+    });
+  } catch {
+    return NextResponse.json(
+      { error: 'Failed to save session' },
+      { status: 500 }
+    );
+  }
 
   const accuracy = deduplicatedResults.length > 0
     ? Math.round((correctCount / deduplicatedResults.length) * 100)

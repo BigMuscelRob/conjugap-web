@@ -14,7 +14,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'verbIds must be 1–100 comma-separated integers' }, { status: 400 });
   }
 
-  const tense       = req.nextUrl.searchParams.get('tense');
+  const ALLOWED_TENSES = ['pres','pi','imp','pp','fut','cond','sub','imper'];
+  const tenseRaw = req.nextUrl.searchParams.get('tense');
+  const tense = tenseRaw && ALLOWED_TENSES.includes(tenseRaw)
+    ? tenseRaw
+    : null;
   const tensesParam = req.nextUrl.searchParams.get('tenses');
   const tenseFilter = tensesParam
     ? tensesParam.split(',').filter(t =>
