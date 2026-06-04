@@ -412,7 +412,7 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
           {PRONOUN_LABELS[current.pronoun] ?? current.pronoun}
         </div>
         <div className="font-display text-[36px] sm:text-[56px] font-bold tracking-tightest text-ink-900 leading-none">
-          {current.infinitive}
+          <span translate="no">{current.infinitive}</span>
         </div>
         <div className="text-ink-500 italic text-[14px] mt-1">
           {current.meaningDe}
@@ -427,6 +427,7 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
         onKeyDown={e => { if (e.key === 'Enter') handleEnterKey(); }}
         readOnly={session.answerState !== 'idle'}
         placeholder={t('placeholder')}
+        translate="no"
         className={[
           'w-full font-mono text-[24px] sm:text-[32px] font-bold text-center',
           'px-5 py-3 sm:py-[18px] rounded-[18px] border-2 outline-none',
@@ -463,7 +464,7 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
       {session.answerState === 'wrong' && (
         <div className="flex items-center gap-2.5 px-4 py-3 rounded-md text-[14px] font-bold bg-warn-soft text-berry-700 border border-berry-500/25">
           <i className="ph-fill ph-arrow-right text-[18px]" aria-hidden="true" />
-          <span>
+          <span translate="no">
             {t.rich('hint_wrong', {
               typed:   value || '—',
               correct: current.form.split('|')[0].trim(),

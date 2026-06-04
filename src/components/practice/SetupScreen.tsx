@@ -194,7 +194,7 @@ export default function SetupScreen({ onStart, onBack, initialTenses, initialVer
                                 : 'bg-white-warm border-ink-900/[0.08] hover:border-ink-900/20'
                               }`}
                           >
-                            <span className={`font-mono text-sm font-bold truncate
+                            <span translate="no" className={`font-mono text-sm font-bold truncate
                               ${active ? 'text-white-warm' : 'text-ink-900'}`}>
                               {v.word}
                             </span>

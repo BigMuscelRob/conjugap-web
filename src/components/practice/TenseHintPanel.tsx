@@ -47,7 +47,7 @@ export default function TenseHintPanel({ tense, show }: Props) {
         <p className="text-[11px] font-bold text-ink-400 uppercase tracking-[0.08em] mb-2">
           {t('example')} — <span className="text-terracotta-500">{hint.example.verb}</span>
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5" translate="no">
           {PRONOUNS.map(p => (
             <div key={p} className="flex items-center justify-between
               bg-cream rounded-lg px-3 py-1.5">
