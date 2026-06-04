@@ -47,17 +47,6 @@ export default function Hero() {
               <i className="ph-bold ph-lightning" aria-hidden="true" />
               {t('cta_primary')}
             </Link>
-            <button
-              type="button"
-              className="inline-flex items-center justify-center gap-2 font-body font-bold text-[17px] text-ink-900
-                px-7 py-4 bg-transparent border-2 border-transparent rounded-md
-                transition-colors duration-micro ease-smooth
-                hover:bg-ink-50
-                active:bg-ink-100"
-            >
-              <i className="ph-bold ph-play-circle" aria-hidden="true" />
-              {t('cta_secondary')}
-            </button>
           </div>
 
 
