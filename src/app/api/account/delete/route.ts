@@ -9,8 +9,10 @@ export async function DELETE() {
   }
 
   try {
-    await prisma.session.deleteMany({ where: { userId: session.user.id } });
-    await prisma.user.delete({ where: { id: session.user.id } });
+    await prisma.$transaction([
+      prisma.session.deleteMany({ where: { userId: session.user.id } }),
+      prisma.user.delete({ where: { id: session.user.id } }),
+    ]);
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json(
