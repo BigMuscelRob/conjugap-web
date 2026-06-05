@@ -178,12 +178,6 @@
     "google_btn":    "Mit Google anmelden",
     "legal":         "Mit der Anmeldung stimmst du unseren <terms>Nutzungsbedingungen</terms> und der <privacy>Datenschutzerklärung</privacy> zu."
   },
-  "coming_soon": {
-    "badge": "Coming Soon",
-    "title": "Spanische Verben –\nendlich kein Stress mehr.",
-    "subtitle": "ConjuGap ist ein smarter Konjugationstrainer, der dich genau dort abholt, wo du stehst. Fünf Minuten täglich reichen.",
-    "eta": "Sommer 2026"
-  },
   "dashboard": {
     "page_title": "Dashboard — ConjuGap",
     "identity_level": "Nivel {level} · {count} Antworten",

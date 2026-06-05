@@ -178,12 +178,6 @@
     "google_btn":    "Sign in with Google",
     "legal":         "By signing in you agree to our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>."
   },
-  "coming_soon": {
-    "badge": "Coming Soon",
-    "title": "Spanish verbs –\nfinally stress-free.",
-    "subtitle": "ConjuGap is a smart conjugation trainer that meets you where you are. Five minutes a day is all it takes.",
-    "eta": "Summer 2026"
-  },
   "dashboard": {
     "page_title": "Dashboard — ConjuGap",
     "identity_level": "Level {level} · {count} answers",
