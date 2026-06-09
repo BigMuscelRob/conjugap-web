@@ -13,7 +13,7 @@ export default function TenseHintPanel({ tense, show }: Props) {
   if (!hint || !show) return null;
 
   return (
-    <div className="w-full bg-paper border-2 border-ink-900 rounded-[18px]
+    <div className="w-[min(560px,calc(100vw-2rem))] mx-auto bg-paper border-2 border-ink-900 rounded-[18px]
       shadow-[0_4px_0_#2A1F1A] p-5 flex flex-col gap-4
       animate-in slide-in-from-top-2 duration-200">
 

@@ -373,7 +373,7 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
   return (
     <>
     {exitOverlay}
-    <div className="flex flex-col gap-4 w-full">
+    <div className="flex flex-col gap-4 w-[min(560px,calc(100vw-2rem))] mx-auto">
     <CardShell>
 
       {/* Top: chips + progress */}
