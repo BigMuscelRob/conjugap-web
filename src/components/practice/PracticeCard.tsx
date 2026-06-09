@@ -522,7 +522,7 @@ function CardShell({ children, centered }: { children: React.ReactNode; centered
       translate="no"
       className={[
         'bg-paper border-2 border-ink-900 rounded-[28px] p-5 sm:p-9',
-        'shadow-[0_6px_0_#2A1F1A] w-[calc(100vw-2rem)] max-w-[560px] mx-auto',
+        'shadow-[0_6px_0_#2A1F1A] w-[min(560px,calc(100vw-2rem))] mx-auto',
         'flex flex-col gap-5 min-h-[520px]',
         centered ? 'justify-center items-center' : '',
       ].join(' ')}
