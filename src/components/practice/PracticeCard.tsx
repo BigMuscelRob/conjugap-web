@@ -173,8 +173,8 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
     return (
       <>
         {exitOverlay}
-        <CardShell>
-          <div className="flex flex-col items-center gap-4 py-10">
+        <CardShell centered>
+          <div className="flex flex-col items-center gap-4">
             <div className="w-10 h-10 border-4 border-terracotta-200 border-t-terracotta-500 rounded-full animate-spin" />
             <p className="text-sm font-semibold text-brand-muted">Lade Verben…</p>
           </div>
@@ -188,8 +188,8 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
     return (
       <>
         {exitOverlay}
-        <CardShell>
-          <p className="text-base font-semibold text-berry-700 text-center py-10">
+        <CardShell centered>
+          <p className="text-base font-semibold text-berry-700 text-center">
             {session.error ?? 'Keine Fragen für diese Auswahl.'}
           </p>
         </CardShell>
@@ -204,8 +204,8 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
     return (
       <>
         {exitOverlay}
-        <CardShell>
-          <div className="flex flex-col items-center gap-6 py-8 text-center">
+        <CardShell centered>
+          <div className="flex flex-col items-center gap-6 text-center">
             <div className="w-14 h-14 rounded-full bg-saffron-50 border-2 border-saffron-200 flex items-center justify-center">
               <i className="ph-fill ph-arrow-right text-[26px] text-saffron-500" aria-hidden="true" />
             </div>
@@ -359,8 +359,8 @@ const PracticeCard = forwardRef<PracticeCardHandle, Props>(function PracticeCard
     return (
       <>
         {exitOverlay}
-        <CardShell>
-          <div className="flex flex-col items-center gap-4 py-10">
+        <CardShell centered>
+          <div className="flex flex-col items-center gap-4">
             <div className="w-10 h-10 border-4 border-terracotta-200 border-t-terracotta-500 rounded-full animate-spin" />
             <p className="text-sm font-semibold text-brand-muted">Laden…</p>
           </div>
@@ -516,9 +516,17 @@ export default PracticeCard;
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function CardShell({ children }: { children: React.ReactNode }) {
+function CardShell({ children, centered }: { children: React.ReactNode; centered?: boolean }) {
   return (
-    <div translate="no" className="bg-paper border-2 border-ink-900 rounded-[28px] p-5 sm:p-9 shadow-[0_6px_0_#2A1F1A] max-w-[560px] mx-auto flex flex-col gap-5">
+    <div
+      translate="no"
+      className={[
+        'bg-paper border-2 border-ink-900 rounded-[28px] p-5 sm:p-9',
+        'shadow-[0_6px_0_#2A1F1A] w-full max-w-[560px] mx-auto',
+        'flex flex-col gap-5 min-h-[520px]',
+        centered ? 'justify-center items-center' : '',
+      ].join(' ')}
+    >
       {children}
     </div>
   );
