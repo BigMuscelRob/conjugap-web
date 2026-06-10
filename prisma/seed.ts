@@ -295,6 +295,40 @@ const VERBS: VerbSeed[] = [
       imper: ['—',        'haz',       'haga',     'hagamos',    'haced',     'hagan'],
     },
   },
+  {
+    infinitive: 'mandar',
+    cls: '-ar',
+    irregular: false,
+    meaningDe: 'schicken / senden',
+    meaningEn: 'to send / to order',
+    tenses: {
+      pres:  ['mando',      'mandas',      'manda',      'mandamos',     'mandáis',       'mandan'],
+      pi:    ['mandé',      'mandaste',    'mandó',      'mandamos',     'mandasteis',    'mandaron'],
+      imp:   ['mandaba',    'mandabas',    'mandaba',    'mandábamos',   'mandabais',     'mandaban'],
+      pp:    ['he mandado', 'has mandado', 'ha mandado', 'hemos mandado','habéis mandado','han mandado'],
+      fut:   ['mandaré',    'mandarás',    'mandará',    'mandaremos',   'mandaréis',     'mandarán'],
+      cond:  ['mandaría',   'mandarías',   'mandaría',   'mandaríamos',  'mandaríais',    'mandarían'],
+      sub:   ['mande',      'mandes',      'mande',      'mandemos',     'mandéis',       'manden'],
+      imper: ['—',          'manda',       'mande',      'mandemos',     'mandad',        'manden'],
+    },
+  },
+  {
+    infinitive: 'meter',
+    cls: '-er',
+    irregular: false,
+    meaningDe: 'hineinstecken / einlegen',
+    meaningEn: 'to put in / to insert',
+    tenses: {
+      pres:  ['meto',      'metes',      'mete',      'metemos',     'metéis',       'meten'],
+      pi:    ['metí',      'metiste',    'metió',     'metimos',     'metisteis',    'metieron'],
+      imp:   ['metía',     'metías',     'metía',     'metíamos',    'metíais',      'metían'],
+      pp:    ['he metido', 'has metido', 'ha metido', 'hemos metido','habéis metido','han metido'],
+      fut:   ['meteré',    'meterás',    'meterá',    'meteremos',   'meteréis',     'meterán'],
+      cond:  ['metería',   'meterías',   'metería',   'meteríamos',  'meteríais',    'meterían'],
+      sub:   ['meta',      'metas',      'meta',      'metamos',     'metáis',       'metan'],
+      imper: ['—',         'mete',       'meta',      'metamos',     'meted',        'metan'],
+    },
+  },
 ];
 
 async function main() {
