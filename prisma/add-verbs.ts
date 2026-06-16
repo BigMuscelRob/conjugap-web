@@ -55,6 +55,23 @@ const NEW_VERBS: VerbSeed[] = [
       imper: ['—',         'mete',       'meta',      'metamos',     'meted',        'metan'],
     },
   },
+  {
+    infinitive: 'poner',
+    cls: 'irregulares',
+    irregular: true,
+    meaningDe: 'legen / stellen / setzen',
+    meaningEn: 'to put / to place',
+    tenses: {
+      pres:  ['pongo',      'pones',      'pone',      'ponemos',     'ponéis',      'ponen'],
+      pi:    ['puse',       'pusiste',    'puso',      'pusimos',     'pusisteis',   'pusieron'],
+      imp:   ['ponía',      'ponías',     'ponía',     'poníamos',    'poníais',     'ponían'],
+      pp:    ['he puesto',  'has puesto', 'ha puesto', 'hemos puesto','habéis puesto','han puesto'],
+      fut:   ['pondré',     'pondrás',    'pondrá',    'pondremos',   'pondréis',    'pondrán'],
+      cond:  ['pondría',    'pondrías',   'pondría',   'pondríamos',  'pondríais',   'pondrían'],
+      sub:   ['ponga',      'pongas',     'ponga',     'pongamos',    'pongáis',     'pongan'],
+      imper: ['—',          'pon',        'ponga',     'pongamos',    'poned',       'pongan'],
+    },
+  },
 ];
 
 async function main() {
