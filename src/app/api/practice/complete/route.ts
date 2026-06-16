@@ -92,9 +92,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const deduplicatedResults = [
-    ...new Map(results.map(r => [r.conjugationId, r])).values()
-  ];
+  const firstResultMap = new Map<number, typeof results[number]>();
+  for (const r of results) {
+    if (!firstResultMap.has(r.conjugationId)) {
+      firstResultMap.set(r.conjugationId, r);
+    }
+  }
+  const deduplicatedResults = [...firstResultMap.values()];
 
   const correctCount   = deduplicatedResults.filter(r => r.correct).length;
   const incorrectCount = deduplicatedResults.length - correctCount;
